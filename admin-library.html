@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library Management | Fictional World Library</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f8;color:#25243a;margin:0}
+header{background:#211c35;color:white;padding:22px}
+header a{color:#d2c4ff}
+main{max-width:800px;margin:25px auto;padding:16px}
+section{background:white;padding:20px;border-radius:12px;margin-bottom:20px}
+label{display:block;margin-top:16px}
+input,select{width:100%;padding:12px;margin-top:7px;box-sizing:border-box;border:1px solid #ddd;border-radius:7px}
+button{background:#7547e8;color:white;border:0;padding:12px;margin-top:18px;border-radius:7px}
+.note{color:#777;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<a href="admin.html">Back to Dashboard</a>
+<h1>Reader Library Management</h1>
+<p>Review books saved by readers.</p>
+</header>
+<main>
+<section>
+<h2>Find Reader Library Records</h2>
+<label for="reader">Reader ID</label>
+<input id="reader" placeholder="Enter reader ID">
+<label for="book">Book ID</label>
+<input id="book" placeholder="Enter book ID">
+<button type="button" onclick="alert('Library records will load after database connection.')">Search Records</button>
+</section>
+<section>
+<h2>Saved Books</h2>
+<p>No records loaded.</p>
+<p class="note">This page is not connected to the database yet.</p>
+</section>
+</main>
+</body>
+</html>
