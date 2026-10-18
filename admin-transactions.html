@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transactions | Fictional World Library</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f8;color:#25243a;margin:0}
+header{background:#211c35;color:white;padding:22px}
+header a{color:#d2c4ff}
+main{max-width:950px;margin:25px auto;padding:16px}
+section{background:white;padding:20px;border-radius:12px;margin-bottom:20px}
+input,select{width:100%;padding:12px;margin:10px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:7px}
+button{background:#7547e8;color:white;border:0;padding:12px;border-radius:7px;cursor:pointer}
+.notice{background:#fff8e8;padding:14px;border-radius:8px;font-size:13px;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin-top:16px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #eee;font-size:13px}
+.table-wrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<header>
+<a href="admin.html">Back to Dashboard</a>
+<h1>Transactions</h1>
+<p>Review coin purchases and payment records.</p>
+</header>
+
+<main>
+<section>
+<h2>Find Transactions</h2>
+<input id="search" type="text" placeholder="Search by payment reference">
+<select id="status">
+<option value="">All statuses</option>
+<option value="pending">Pending</option>
+<option value="success">Successful</option>
+<option value="failed">Failed</option>
+</select>
+<button type="button" onclick="filterTransactions()">Search</button>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Reference</th>
+<th>Amount</th>
+<th>Status</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="transactions">
+<tr><td colspan="4">Transactions will appear after the database connection.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<div class="notice">
+Payment records are not connected yet. Transaction information must be retrieved securely from Supabase. Never mark a payment successful or credit coins based only on a browser-side action.
+</div>
+</main>
+
+<script>
+function filterTransactions(){
+ document.getElementById("transactions").innerHTML =
+ '<tr><td colspan="4">Connect the verified transaction table before searching.</td></tr>';
+}
+</script>
+</body>
+</html>
