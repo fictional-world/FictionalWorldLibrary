@@ -3,262 +3,199 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Management | Fictional World Library</title>
-
+  <title>Manage Books | Fictional World Library</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #f5f5f8;
-      color: #25243a;
-      font-family: Arial, sans-serif;
-    }
-
-    header {
-      background: #211c35;
-      color: white;
-      padding: 22px;
-    }
-
-    header a {
-      color: #d2c4ff;
-      text-decoration: none;
-      font-size: 13px;
-    }
-
-    header h1 {
-      font-size: 23px;
-      margin-bottom: 8px;
-    }
-
-    header p {
-      font-size: 13px;
-      color: #d2cce0;
-    }
-
-    main {
-      max-width: 950px;
-      margin: 25px auto;
-      padding: 0 16px;
-    }
-
-    .panel {
-      background: white;
-      border: 1px solid #e9e7f0;
-      border-radius: 12px;
-      padding: 22px;
-      margin-bottom: 22px;
-    }
-
-    h2 {
-      font-size: 18px;
-      margin-top: 0;
-    }
-
-    .description {
-      color: #85849a;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: bold;
-      margin: 17px 0 7px;
-    }
-
-    input, select, textarea {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #dedbe8;
-      border-radius: 7px;
-      background: white;
-      color: #25243a;
-      font: inherit;
-      font-size: 14px;
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    button {
-      background: #7547e8;
-      color: white;
-      border: 0;
-      border-radius: 7px;
-      padding: 12px 17px;
-      margin-top: 18px;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .secondary {
-      background: white;
-      color: #25243a;
-      border: 1px solid #dedbe8;
-    }
-
-    .notice {
-      background: #fff8e8;
-      color: #755b22;
-      border: 1px solid #f1dfb5;
-      border-radius: 8px;
-      padding: 13px;
-      font-size: 12px;
-      line-height: 1.6;
-      margin-top: 15px;
-    }
-
-    #message {
-      font-size: 13px;
-      margin-top: 15px;
-      overflow-wrap: anywhere;
-    }
-
-    .book-item {
-      padding: 15px 0;
-      border-bottom: 1px solid #e9e7f0;
-    }
-
-    .book-item:last-child {
-      border-bottom: 0;
-    }
-
-    .book-item h3 {
-      font-size: 15px;
-      margin: 0 0 7px;
-    }
-
-    .book-item p {
-      color: #85849a;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 600px) {
-      .panel {
-        padding: 16px;
-      }
-    }
+    *{box-sizing:border-box}
+    body{margin:0;background:#f5f5f8;color:#25243a;font-family:Arial,sans-serif}
+    header{background:#211b38;color:white;padding:22px}
+    header a{color:#ddd;text-decoration:none}
+    main{max-width:1000px;margin:auto;padding:20px}
+    .card{background:white;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:0 2px 10px #00000008}
+    h1{font-size:24px;margin:12px 0}
+    h2{font-size:19px;margin-top:0}
+    label{display:block;font-weight:bold;margin:14px 0 6px}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:7px;font-size:16px;background:white}
+    textarea{min-height:100px;resize:vertical}
+    button{border:0;background:#6b42c1;color:white;padding:12px 18px;border-radius:7px;font-size:15px;margin-top:16px;cursor:pointer}
+    .secondary{background:#eee;color:#25243a}
+    .note{background:#f1ecff;padding:12px;border-radius:8px;line-height:1.5}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .book-item{padding:14px 0;border-bottom:1px solid #eee}
+    .book-item:last-child{border-bottom:0}
+    .muted{color:#777;font-size:14px}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}main{padding:12px}}
   </style>
 </head>
-
 <body>
-  <header>
-    <a href="admin.html">← Back to Admin Dashboard</a>
-    <h1>Books & Chapters</h1>
-    <p>Manage stories for Fictional World Library.</p>
-  </header>
+<header>
+  <a href="admin.html">← Back to Dashboard</a>
+  <h1>Book Management</h1>
+  <div>Fictional World Library</div>
+</header>
 
-  <main>
-    <section class="panel">
-      <h2>Add a Book</h2>
-      <p class="description">
-        Enter the book details. You can add chapters after creating the book.
-      </p>
+<main>
+  <div class="card">
+    <h2>Add a Book</h2>
+    <p class="note">Complete the book details below. This form is currently a user interface only; saving books to Supabase will be connected later.</p>
 
-      <form id="bookForm">
-        <label for="title">Book Title</label>
-        <input id="title" name="title" required>
+    <form id="bookForm">
+      <label for="title">Book Title *</label>
+      <input id="title" required placeholder="Enter book title">
 
-        <label for="author">Author Name</label>
-        <input id="author" name="author" required>
-
-        <label for="genre">Genre</label>
-        <select id="genre" name="genre" required>
-          <option value="">Select a genre</option>
-          <option>Werewolf</option>
-          <option>Mafia</option>
-          <option>Erotica</option>
-          <option>LGBTQ</option>
-          <option>Billionaire Drama</option>
-          <option>Vampire</option>
-          <option>Paranormal</option>
-          <option>Christian Romance</option>
-        </select>
-
-        <label for="cover">Cover Image URL</label>
-        <input
-          id="cover"
-          name="cover"
-          type="url"
-          placeholder="https://..."
-        >
-
-        <label for="description">Book Description</label>
-        <textarea id="description" name="description" required></textarea>
-
-        <label for="length">Story Length</label>
-        <select id="length" name="length" required>
-          <option value="">Select story length</option>
-          <option value="short">Short</option>
-          <option value="long">Long</option>
-        </select>
-
-        <label for="status">Publication Status</label>
-        <select id="status" name="status" required>
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-          <option value="completed">Completed</option>
-          <option value="ongoing">Ongoing</option>
-        </select>
-
-        <button type="submit">Save Book</button>
-      </form>
-
-      <div id="message" role="status" aria-live="polite"></div>
-
-      <div class="notice">
-        This form is the book-entry interface. It is not connected to the
-        database yet. Do not enter real book records until the database
-        connection and field names have been verified.
+      <div class="grid">
+        <div>
+          <label for="author">Author *</label>
+          <input id="author" required placeholder="Author name">
+        </div>
+        <div>
+          <label for="publisher">Publisher</label>
+          <input id="publisher" placeholder="Publisher name">
+        </div>
       </div>
-    </section>
 
-    <section class="panel">
-      <h2>Manage Chapters</h2>
-      <p class="description">
-        After saving a book, chapters will be associated with its database
-        record. Each chapter needs a chapter number, title, and content.
-      </p>
-
-      <label for="chapterBook">Book</label>
-      <select id="chapterBook">
-        <option value="">Books will appear here after the database is connected.</option>
-      </select>
-
-      <label for="chapterNumber">Chapter Number</label>
-      <input id="chapterNumber" type="number" min="1" placeholder="1">
-
-      <label for="chapterTitle">Chapter Title</label>
-      <input id="chapterTitle" placeholder="Chapter title">
-
-      <label for="chapterContent">Chapter Content</label>
-      <textarea id="chapterContent" placeholder="Enter chapter text"></textarea>
-
-      <button type="button" disabled>
-        Save Chapter — Awaiting Database Connection
-      </button>
-    </section>
-
-    <section class="panel">
-      <h2>Existing Books</h2>
-      <p class="description">
-        Published and draft books will appear here once the database connection
-        is complete.
-      </p>
-
-      <div id="bookList">
-        <p class="description">Database connection pending.</p>
+      <div class="grid">
+        <div>
+          <label for="genre">Genre *</label>
+          <select id="genre" required>
+            <option value="">Select genre</option>
+            <option>Werewolf</option>
+            <option>Mafia</option>
+            <option>Erotica</option>
+            <option>LGBTQ</option>
+            <option>Billionaire Drama</option>
+            <option>Vampire</option>
+            <option>Paranormal</option>
+            <option>Christian Romance</option>
+          </select>
+        </div>
+        <div>
+          <label for="length">Story Length *</label>
+          <select id="length" required>
+            <option value="">Select length</option>
+            <option>Short</option>
+            <option>Long</option>
+          </select>
+        </div>
       </div>
-    </section>
-  </main>
+
+      <div class="grid">
+        <div>
+          <label for="status">Publication Status *</label>
+          <select id="status" required>
+            <option value="">Select status</option>
+            <option>Draft</option>
+            <option>Ongoing</option>
+            <option>Completed</option>
+          </select>
+        </div>
+        <div>
+          <label for="featured">Featured Book?</label>
+          <select id="featured">
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="cover">Book Cover Image URL</label>
+      <input id="cover" type="url" placeholder="https://example.com/cover.jpg">
+
+      <label for="description">Book Description *</label>
+      <textarea id="description" required placeholder="Write the book synopsis..."></textarea>
+
+      <button type="submit">Preview Book Details</button>
+      <button type="reset" class="secondary">Clear Form</button>
+    </form>
+
+    <div id="preview" hidden class="note" style="margin-top:20px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Chapter Management</h2>
+    <p>Chapters will belong to a selected book. We will connect this section to the database after the admin pages are ready.</p>
+
+    <label for="chapterBook">Book Title</label>
+    <input id="chapterBook" placeholder="Enter the book title">
+
+    <div class="grid">
+      <div>
+        <label for="chapterNumber">Chapter Number</label>
+        <input id="chapterNumber" type="number" min="1" placeholder="e.g. 1">
+      </div>
+      <div>
+        <label for="chapterTitle">Chapter Title</label>
+        <input id="chapterTitle" placeholder="e.g. The Beginning">
+      </div>
+    </div>
+
+    <label for="chapterContent">Chapter Content</label>
+    <textarea id="chapterContent" placeholder="Enter the chapter text..."></textarea>
+
+    <button type="button" id="chapterPreviewButton">Preview Chapter Details</button>
+    <div id="chapterPreview" hidden class="note" style="margin-top:16px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Existing Books</h2>
+    <p class="muted">Books saved in Supabase will appear here after database integration.</p>
+    <div id="existingBooks">Database connection pending.</div>
+  </div>
+</main>
+
+<script>
+  document.getElementById("bookForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const details = {
+      title: document.getElementById("title").value.trim(),
+      author: document.getElementById("author").value.trim(),
+      publisher: document.getElementById("publisher").value.trim(),
+      genre: document.getElementById("genre").value,
+      length: document.getElementById("length").value,
+      status: document.getElementById("status").value,
+      featured: document.getElementById("featured").value,
+      cover: document.getElementById("cover").value.trim(),
+      description: document.getElementById("description").value.trim()
+    };
+
+    document.getElementById("preview").hidden = false;
+    document.getElementById("preview").innerHTML =
+      "<strong>Preview only — not saved</strong><br>" +
+      "Title: " + escapeText(details.title) + "<br>" +
+      "Author: " + escapeText(details.author) + "<br>" +
+      "Publisher: " + escapeText(details.publisher || "Not specified") + "<br>" +
+      "Genre: " + escapeText(details.genre) + "<br>" +
+      "Story length: " + escapeText(details.length) + "<br>" +
+      "Status: " + escapeText(details.status) + "<br>" +
+      "Featured: " + escapeText(details.featured) + "<br>" +
+      "Description: " + escapeText(details.description);
+  });
+
+  document.getElementById("chapterPreviewButton").addEventListener("click", function() {
+    const book = document.getElementById("chapterBook").value.trim();
+    const number = document.getElementById("chapterNumber").value;
+    const title = document.getElementById("chapterTitle").value.trim();
+    const content = document.getElementById("chapterContent").value.trim();
+    const box = document.getElementById("chapterPreview");
+
+    if (!book || !number || Number(number) < 1 || !title || !content) {
+      box.hidden = false;
+      box.textContent = "Please enter the book title, a valid chapter number, chapter title, and chapter content.";
+      return;
+    }
+
+    box.hidden = false;
+    box.innerHTML = "<strong>Chapter preview only — not saved</strong><br>" +
+      "Book: " + escapeText(book) + "<br>" +
+      "Chapter " + escapeText(number) + ": " + escapeText(title) +
+      "<br>Content length: " + content.length + " characters.";
+  });
+
+  function escapeText(value) {
+    const div = document.createElement("div");
+    div.textContent = String(value);
+    return div.innerHTML;
+  }
+</script>
 </body>
   </html>
