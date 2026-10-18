@@ -1,551 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fictional World Library | Admin Dashboard</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #f5f5f8;
-      --panel: #ffffff;
-      --text: #25243a;
-      --muted: #85849a;
-      --accent: #7547e8;
-      --border: #e9e7f0;
-      --sidebar: #211c35;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    button, input, select, textarea {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .layout {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      width: 245px;
-      background: var(--sidebar);
-      color: white;
-      padding: 26px 16px;
-      flex-shrink: 0;
-    }
-
-    .brand {
-      font-size: 19px;
-      font-weight: 700;
-      line-height: 1.5;
-      padding: 0 10px 28px;
-    }
-
-    .brand span {
-      display: block;
-      color: #b9a4ff;
-      font-size: 12px;
-      font-weight: 400;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .nav-label {
-      padding: 15px 10px 8px;
-      color: #a7a1bb;
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .nav-item {
-      display: block;
-      width: 100%;
-      padding: 13px 12px;
-      margin-bottom: 4px;
-      color: #e4e0f0;
-      text-decoration: none;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      text-align: left;
-      font-size: 13px;
-    }
-
-    .nav-item.active,
-    .nav-item:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .main {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .topbar {
-      min-height: 76px;
-      padding: 18px 28px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .topbar h1 {
-      font-size: 21px;
-    }
-
-    .topbar p {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 5px;
-    }
-
-    .admin-badge {
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      padding: 9px 13px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .content {
-      padding: 28px;
-      max-width: 1500px;
-      margin: auto;
-    }
-
-    .welcome {
-      margin-bottom: 25px;
-    }
-
-    .welcome h2 {
-      font-size: 25px;
-      margin-bottom: 8px;
-    }
-
-    .welcome p {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      min-width: 0;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 16px;
-    }
-
-    .stat-value {
-      font-size: 27px;
-      font-weight: 700;
-    }
-
-    .stat-note {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 9px;
-    }
-
-    .section-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .section-heading h3 {
-      font-size: 17px;
-    }
-
-    .section-heading p {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 5px;
-    }
-
-    .button {
-      display: inline-block;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 7px;
-      padding: 11px 15px;
-      font-size: 12px;
-      text-decoration: none;
-    }
-
-    .button.secondary {
-      color: var(--text);
-      background: white;
-      border: 1px solid var(--border);
-    }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .action-card h4 {
-      font-size: 14px;
-      margin-bottom: 9px;
-    }
-
-    .action-card p {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-      margin-bottom: 17px;
-    }
-
-    .management {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-
-    .management-card h3 {
-      margin-bottom: 9px;
-      font-size: 16px;
-    }
-
-    .management-card p {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.7;
-      margin-bottom: 16px;
-    }
-
-    .status {
-      display: inline-block;
-      background: #f0ebff;
-      color: #6740c5;
-      padding: 6px 9px;
-      border-radius: 20px;
-      font-size: 10px;
-    }
-
-    .notice {
-      background: #fff8e8;
-      border: 1px solid #f1dfb5;
-      border-radius: 10px;
-      padding: 16px;
-      color: #755b22;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .footer {
-      color: var(--muted);
-      font-size: 11px;
-      text-align: center;
-      padding: 24px 0 5px;
-    }
-
-    @media (max-width: 1050px) {
-      .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 700px) {
-      .layout {
-        display: block;
-      }
-
-      .sidebar {
-        width: 100%;
-        padding: 16px;
-      }
-
-      .brand {
-        padding-bottom: 12px;
-      }
-
-      .nav-label {
-        display: none;
-      }
-
-      .nav-list {
-        display: flex;
-        overflow-x: auto;
-        gap: 6px;
-        padding-bottom: 3px;
-      }
-
-      .nav-item {
-        width: auto;
-        flex-shrink: 0;
-        white-space: nowrap;
-        margin: 0;
-        padding: 11px;
-      }
-
-      .topbar {
-        padding: 16px;
-      }
-
-      .content {
-        padding: 18px 14px;
-      }
-
-      .stats {
-        gap: 10px;
-      }
-
-      .card {
-        padding: 15px;
-      }
-
-      .stat-value {
-        font-size: 22px;
-      }
-
-      .quick-actions,
-      .management {
-        grid-template-columns: 1fr;
-      }
-
-      .welcome h2 {
-        font-size: 22px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fictional World Library | Admin Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f5f8;--panel:#fff;--text:#25243a;--muted:#85849a;--accent:#7547e8;--border:#e9e7f0;--sidebar:#211c35}
+body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:var(--sidebar);color:white;padding:26px 16px;flex-shrink:0}
+.brand{font-size:19px;font-weight:700;line-height:1.5;padding:0 10px 28px}
+.brand span{display:block;color:#b9a4ff;font-size:12px;font-weight:400;letter-spacing:2px;text-transform:uppercase}
+.nav-label{padding:15px 10px 8px;color:#a7a1bb;font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
+.nav-item{display:block;width:100%;padding:12px;margin-bottom:4px;color:#e4e0f0;text-decoration:none;border-radius:8px;font-size:13px}
+.nav-item.active,.nav-item:hover{background:var(--accent);color:white}
+.main{flex:1;min-width:0}
+.topbar{min-height:76px;padding:18px 28px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:16px}
+.topbar h1{font-size:21px}
+.topbar p{color:var(--muted);font-size:12px;margin-top:5px}
+.admin-badge{border:1px solid var(--border);border-radius:30px;padding:9px 13px;font-size:12px}
+.content{padding:28px;max-width:1500px;margin:auto}
+.welcome{margin-bottom:25px}
+.welcome h2{font-size:25px;margin-bottom:8px}
+.welcome p,.section-heading p{color:var(--muted);font-size:13px;line-height:1.6}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:28px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;min-width:0}
+.stat-label{color:var(--muted);font-size:12px;margin-bottom:16px}
+.stat-value{font-size:27px;font-weight:700}
+.stat-note{font-size:11px;color:var(--muted);margin-top:9px}
+.section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.section-heading h3{font-size:17px}
+.quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:28px}
+.action-card h4{font-size:14px;margin-bottom:9px}
+.action-card p,.management-card p{color:var(--muted);font-size:12px;line-height:1.7;margin-bottom:17px}
+.button{display:inline-block;background:var(--accent);color:white;border:0;border-radius:7px;padding:11px 15px;font-size:12px;text-decoration:none}
+.management{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+.management-card h3{margin-bottom:9px;font-size:16px}
+.status{display:inline-block;background:#f0ebff;color:#6740c5;padding:6px 9px;border-radius:20px;font-size:10px}
+.notice{background:#fff8e8;border:1px solid #f1dfb5;border-radius:10px;padding:16px;color:#755b22;font-size:12px;line-height:1.7}
+.footer{color:var(--muted);font-size:11px;text-align:center;padding:24px 0 5px}
+@media(max-width:1050px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){
+.layout{display:block}.sidebar{width:100%;padding:16px}
+.brand{padding-bottom:12px}.nav-label{display:none}
+.nav-list{display:flex;overflow-x:auto;gap:6px;padding-bottom:3px}
+.nav-item{width:auto;flex-shrink:0;white-space:nowrap;margin:0;padding:11px}
+.topbar{padding:16px}.content{padding:18px 14px}
+.stats{gap:10px}.card{padding:15px}.stat-value{font-size:22px}
+.quick-actions,.management{grid-template-columns:1fr}
+.welcome h2{font-size:22px}
+}
+</style>
 </head>
-
 <body>
-  <div class="layout">
+<div class="layout">
+<aside class="sidebar">
+<div class="brand">Fictional World<span>Library Administration</span></div>
+<div class="nav-label">Main Menu</div>
+<nav class="nav-list">
+<a class="nav-item active" href="admin.html">Overview</a>
+<a class="nav-item" href="admin-books.html">Books & Chapters</a>
+<a class="nav-item" href="admin-authors.html">Authors</a>
+<a class="nav-item" href="admin-publishers.html">Publishers</a>
+<a class="nav-item" href="admin-readers.html">Readers</a>
+<a class="nav-item" href="admin-library.html">Book Performance</a>
+<a class="nav-item" href="admin-reviews.html">Book Reviews</a>
+<a class="nav-item" href="admin-genres.html">Genres</a>
+<a class="nav-item" href="admin-reading-activity.html">Reading Activity</a>
+<a class="nav-item" href="admin-unlocks.html">Chapter Unlocks</a>
+<a class="nav-item" href="admin-reports.html">Reports</a>
+<a class="nav-item" href="admin-transactions.html">Transactions</a>
+<a class="nav-item" href="admin-subscriptions.html">Subscriptions</a>
+<a class="nav-item" href="admin-notifications.html">Notifications</a>
+<a class="nav-item" href="admin-visitors.html">Visitors & Analytics</a>
+<a class="nav-item" href="admin-settings.html">Settings</a>
+</nav>
+</aside>
 
-    <aside class="sidebar">
-      <div class="brand">
-        Fictional World
-        <span>Library Administration</span>
-      </div>
+<main class="main">
+<header class="topbar">
+<div><h1>Admin Dashboard</h1><p>Fictional World Library management</p></div>
+<div class="admin-badge">Administrator</div>
+</header>
 
-      <div class="nav-label">Main menu</div>
+<div class="content">
+<section class="welcome">
+<h2>Welcome to your dashboard</h2>
+<p>Manage books, authors, readers and activity across your library.</p>
+</section>
 
-      <nav class="nav-list">
-        <a class="nav-item active" href="#overview">Overview</a>
-        <a class="nav-item" href="#books">Books & Chapters</a>
-        <a class="nav-item" href="#authors">Authors</a>
-        <a class="nav-item" href="#publishers">Publishers</a>
-        <a class="nav-item" href="#readers">Readers</a>
-        <a class="nav-item" href="#transactions">Transactions</a>
-        <a class="nav-item" href="#subscriptions">Subscriptions</a>
-        <a class="nav-item" href="#notifications">Notifications</a>
-        <a class="nav-item" href="#visitors">Visitors & Analytics</a>
-        <a class="nav-item" href="#settings">Settings</a>
-      </nav>
-    </aside>
+<section class="stats">
+<div class="card"><div class="stat-label">Total Books</div><div class="stat-value">—</div><div class="stat-note">Published and unpublished books</div></div>
+<div class="card"><div class="stat-label">Registered Readers</div><div class="stat-value">—</div><div class="stat-note">Reader accounts</div></div>
+<div class="card"><div class="stat-label">Total Authors</div><div class="stat-value">—</div><div class="stat-note">Registered authors</div></div>
+<div class="card"><div class="stat-label">Total Visitors</div><div class="stat-value">—</div><div class="stat-note">Website visits</div></div>
+</section>
 
-    <main class="main">
+<section>
+<div class="section-heading"><div><h3>Quick Actions</h3><p>Frequently used management tools</p></div></div>
+<div class="quick-actions">
+<div class="card action-card"><h4>Books & Chapters</h4><p>Add books, covers, descriptions and chapters.</p><a class="button" href="admin-books.html">Manage Books</a></div>
+<div class="card action-card"><h4>Authors</h4><p>Manage author details and their stories.</p><a class="button" href="admin-authors.html">Manage Authors</a></div>
+<div class="card action-card"><h4>Book Performance</h4><p>Review book activity, unlocks, library additions and reviews.</p><a class="button" href="admin-library.html">View Performance</a></div>
+</div>
+</section>
 
-      <header class="topbar">
-        <div>
-          <h1>Admin Dashboard</h1>
-          <p>Fictional World Library management</p>
-        </div>
+<section class="management">
+<div class="card management-card"><h3>Books & Chapters</h3><p>Add books, manage chapters and control publication status.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Authors & Publishers</h3><p>Manage author profiles and publisher information.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Reader Accounts</h3><p>Review registered readers and account information.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Book Reviews</h3><p>Review ratings and feedback associated with individual books.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Transactions & Subscriptions</h3><p>Review payment records and subscription statuses.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Reading Activity</h3><p>Review reading activity and chapter unlock records.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Visitors & Reports</h3><p>Review available traffic and performance statistics.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Notifications & Settings</h3><p>Manage reader announcements and administrative preferences.</p><span class="status">Connection pending</span></div>
+<div class="card management-card"><h3>Genres</h3><p>Manage the genres used to organise books.</p><span class="status">Connection pending</span></div>
+</section>
 
-        <div class="admin-badge">Administrator</div>
-      </header>
-
-      <div class="content" id="overview">
-
-        <section class="welcome">
-          <h2>Welcome to your dashboard</h2>
-          <p>Manage your books, chapters, authors, readers and platform activity.</p>
-        </section>
-
-        <section class="stats">
-          <div class="card">
-            <div class="stat-label">Total Books</div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">Published and unpublished books</div>
-          </div>
-
-          <div class="card">
-            <div class="stat-label">Registered Readers</div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">Reader accounts</div>
-          </div>
-
-          <div class="card">
-            <div class="stat-label">Total Authors</div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">Registered authors</div>
-          </div>
-
-          <div class="card">
-            <div class="stat-label">Total Visitors</div>
-            <div class="stat-value">—</div>
-            <div class="stat-note">Website visits</div>
-          </div>
-        </section>
-
-        <section>
-          <div class="section-heading">
-            <div>
-              <h3>Quick Actions</h3>
-              <p>Frequently used management tools</p>
-            </div>
-          </div>
-
-          <div class="quick-actions">
-            <div class="card action-card">
-              <h4>Books & Chapters</h4>
-              <p>Add new books, upload covers, manage chapters and publish stories.</p>
-              <a class="button" href="#books">Manage Books</a>
-            </div>
-
-            <div class="card action-card">
-              <h4>Authors & Publishers</h4>
-              <p>Manage author information, publishing details and book ownership.</p>
-              <a class="button" href="#authors">Manage Authors</a>
-            </div>
-
-            <div class="card action-card">
-              <h4>Payments</h4>
-              <p>Review transactions, coin purchases and reader subscriptions.</p>
-              <a class="button" href="#transactions">View Transactions</a>
-            </div>
-          </div>
-        </section>
-
-        <section class="management">
-
-          <div class="card management-card" id="books">
-            <h3>Books & Chapters</h3>
-            <p>
-              Create books, upload cover images, enter descriptions,
-              manage chapter content and control publication status.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="authors">
-            <h3>Authors</h3>
-            <p>
-              View author records, manage author details and associate
-              stories with their respective authors.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="publishers">
-            <h3>Publishers</h3>
-            <p>
-              Manage publisher information and associate books
-              with the appropriate publisher.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="readers">
-            <h3>Reader Accounts</h3>
-            <p>
-              Review registered readers and their account information.
-              Sensitive information must remain protected.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="transactions">
-            <h3>Transactions</h3>
-            <p>
-              Review payment references, payment status, coin purchases
-              and transaction history.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="subscriptions">
-            <h3>Subscriptions</h3>
-            <p>
-              Review reader memberships, subscription tiers,
-              billing periods and subscription status.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="notifications">
-            <h3>Notifications</h3>
-            <p>
-              Prepare announcements and reader notifications
-              for new releases and platform updates.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="visitors">
-            <h3>Visitors & Analytics</h3>
-            <p>
-              Review available visitor records and monitor
-              activity across the reading platform.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-          <div class="card management-card" id="settings">
-            <h3>Settings</h3>
-            <p>
-              Manage administrative access and review
-              platform configuration.
-            </p>
-            <span class="status">Connection pending</span>
-          </div>
-
-        </section>
-
-        <div class="notice">
-          <strong>Setup status</strong><br>
-          This dashboard is the interface only. Its figures and management
-          sections will display actual information after the backend
-          connection is completed.
-        </div>
-
-        <div class="footer">
-          Fictional World Library · Administration
-        </div>
-
-      </div>
-    </main>
-  </div>
+<div class="notice"><strong>Setup status</strong><br>This dashboard is an interface. Live figures and management actions will become available after the database connection and permissions are implemented.</div>
+<div class="footer">Fictional World Library · Administration</div>
+</div>
+</main>
+</div>
 </body>
-</html>
+                                                                                               </html>
