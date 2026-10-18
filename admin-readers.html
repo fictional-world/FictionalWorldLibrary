@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Readers | Fictional World Library</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f8;color:#25243a;margin:0}
+header{background:#211c35;color:white;padding:22px}
+header a{color:#d2c4ff}
+main{max-width:900px;margin:25px auto;padding:16px}
+section{background:white;padding:20px;border-radius:12px;margin-bottom:20px}
+input,select{width:100%;padding:12px;margin:10px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:7px}
+button{background:#7547e8;color:white;border:0;padding:12px;border-radius:7px}
+.note{background:#fff8e8;padding:14px;border-radius:8px;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+<a href="admin.html">Back to Dashboard</a>
+<h1>Reader Management</h1>
+<p>Manage reader accounts and review account activity.</p>
+</header>
+<main>
+<section>
+<h2>Find a Reader</h2>
+<input type="text" id="readerSearch" placeholder="Search by reader ID or email">
+<button type="button" onclick="searchReader()">Search</button>
+<div id="results" aria-live="polite"></div>
+</section>
+<section>
+<h2>Reader Records</h2>
+<p>Reader information will appear here after the secure database connection is completed.</p>
+</section>
+<div class="note">
+Reader account information must be accessed through authorized, secure database policies. Do not display passwords or authentication secrets.
+</div>
+</main>
+<script>
+function searchReader(){
+ document.getElementById("results").textContent =
+ "Reader search will be available after the database connection is completed.";
+}
+</script>
+</body>
+</html>
