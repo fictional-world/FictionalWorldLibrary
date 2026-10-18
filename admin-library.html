@@ -3,39 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Library Management | Fictional World Library</title>
+<title>Book Performance | Fictional World Library</title>
 <style>
 body{font-family:Arial,sans-serif;background:#f5f5f8;color:#25243a;margin:0}
 header{background:#211c35;color:white;padding:22px}
 header a{color:#d2c4ff}
-main{max-width:800px;margin:25px auto;padding:16px}
+main{max-width:900px;margin:25px auto;padding:16px}
 section{background:white;padding:20px;border-radius:12px;margin-bottom:20px}
-label{display:block;margin-top:16px}
-input,select{width:100%;padding:12px;margin-top:7px;box-sizing:border-box;border:1px solid #ddd;border-radius:7px}
-button{background:#7547e8;color:white;border:0;padding:12px;margin-top:18px;border-radius:7px}
+input{width:100%;padding:12px;margin:12px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:7px}
+button{background:#7547e8;color:white;border:0;padding:12px;border-radius:7px;cursor:pointer}
+.metric{background:#f0ebff;padding:15px;border-radius:8px;margin:10px 0}
 .note{color:#777;font-size:14px}
 </style>
 </head>
 <body>
 <header>
 <a href="admin.html">Back to Dashboard</a>
-<h1>Reader Library Management</h1>
-<p>Review books saved by readers.</p>
+<h1>Book Performance</h1>
+<p>Monitor reader activity and performance for each book.</p>
 </header>
 <main>
 <section>
-<h2>Find Reader Library Records</h2>
-<label for="reader">Reader ID</label>
-<input id="reader" placeholder="Enter reader ID">
-<label for="book">Book ID</label>
-<input id="book" placeholder="Enter book ID">
-<button type="button" onclick="alert('Library records will load after database connection.')">Search Records</button>
+<h2>Find a Book</h2>
+<input id="search" type="search" placeholder="Search by book title or ID">
+<p class="note">Your published books will appear here after database connection.</p>
+<div id="bookList">
+<p>No books loaded yet.</p>
+</div>
 </section>
-<section>
-<h2>Saved Books</h2>
-<p>No records loaded.</p>
-<p class="note">This page is not connected to the database yet.</p>
+
+<section id="report">
+<h2>Book Performance Report</h2>
+<p id="selectedBook">Select a book to view its report.</p>
+<div class="metric">Library Additions: —</div>
+<div class="metric">Readers: —</div>
+<div class="metric">Chapters Unlocked: —</div>
+<div class="metric">Chapter Reading Activity: —</div>
+<div class="metric">Reviews and Ratings: —</div>
+<div class="metric">Book Revenue: —</div>
+<p class="note">Statistics will load from verified database records after connection.</p>
 </section>
 </main>
+<script>
+document.getElementById("search").addEventListener("input",function(){
+document.getElementById("selectedBook").textContent =
+this.value.trim()
+? "Search results will appear after database connection."
+: "Select a book to view its report.";
+});
+</script>
 </body>
 </html>
