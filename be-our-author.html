@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#100b1d">
+<title>Be Our Author | Fictional World Library</title>
+
+<style>
+:root {
+  --bg:#100b1d;
+  --panel:#1b132b;
+  --panel2:#241a38;
+  --border:#38284d;
+  --text:#f7f2ff;
+  --muted:#c0b4d0;
+  --accent:#b18aff;
+  --gold:#f2ce83;
+}
+body.light {
+  --bg:#f7f4fc;
+  --panel:#fff;
+  --panel2:#eee7f8;
+  --border:#ddd0ed;
+  --text:#241633;
+  --muted:#70627f;
+  --accent:#7040c9;
+  --gold:#926416;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  line-height:1.7;
+}
+a { color:var(--accent); }
+header {
+  padding:16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+}
+.logo {
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  color:white;
+  background:linear-gradient(135deg,#b18aff,#7040c9);
+  font-size:22px;
+}
+header button {
+  background:var(--panel);
+  color:var(--text);
+  border:1px solid var(--border);
+  padding:10px;
+  border-radius:9px;
+  cursor:pointer;
+}
+main {
+  width:min(900px,100%);
+  margin:auto;
+  padding:24px 17px 60px;
+}
+.hero {
+  padding:28px 22px;
+  border-radius:18px;
+  border:1px solid #50366f;
+  background:linear-gradient(135deg,#2b1945,#171023);
+  margin-bottom:25px;
+}
+.eyebrow {
+  color:#d4baff;
+  font-size:11px;
+  letter-spacing:2px;
+  font-weight:bold;
+}
+h1 { font-size:clamp(30px,6vw,44px); line-height:1.15; }
+h2 { font-size:23px; margin-top:34px; }
+h3 { font-size:17px; }
+p,li { color:var(--muted); }
+.card {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:20px;
+  margin:15px 0;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+.amount {
+  color:var(--gold);
+  font-size:24px;
+  font-weight:800;
+}
+.tag {
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:7px;
+  background:var(--panel2);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:bold;
+}
+.notice {
+  border-left:3px solid var(--gold);
+  padding:12px 15px;
+  background:var(--panel2);
+  border-radius:0 10px 10px 0;
+}
+.button {
+  display:inline-block;
+  background:#7844d6;
+  color:white;
+  border-radius:10px;
+  padding:12px 17px;
+  text-decoration:none;
+  font-weight:bold;
+}
+footer {
+  text-align:center;
+  border-top:1px solid var(--border);
+  padding:25px 15px;
+  color:var(--muted);
+}
+footer a { margin:0 7px; }
+</style>
+</head>
+
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">F</div>
+    <span>Fictional World Library</span>
+  </div>
+  <button onclick="document.body.classList.toggle('light')">
+    Change theme
+  </button>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">WRITE · CREATE · PUBLISH</div>
+    <h1>Your Stories Deserve a World of Their Own.</h1>
+    <p>
+      Fictional World Library welcomes storytellers with original ideas,
+      memorable characters and stories readers cannot put down.
+      Explore our submission requirements and contract options below.
+    </p>
+    <a class="button"
+       href="mailto:fictionalworldlibary@gmail.com?subject=Author%20Application">
+       Contact Our Author Team
+    </a>
+  </section>
+
+  <h2>01. Choose Your Story Length</h2>
+
+  <div class="grid">
+    <section class="card">
+      <span class="tag">SHORT STORY</span>
+      <h3>Short Fiction</h3>
+      <p>Suitable for focused stories with a satisfying beginning and ending.</p>
+      <ul>
+        <li>12–25 chapters.</li>
+        <li>600–1,000 words per chapter.</li>
+        <li>At least 5 completed chapters for an application.</li>
+        <li>Remaining chapters are due within 2 weeks after signing,
+        unless another deadline is agreed in writing.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <span class="tag">LONG STORY</span>
+      <h3>Long Fiction</h3>
+      <p>Suitable for extended plots, character development and continuing conflict.</p>
+      <ul>
+        <li>30–60 chapters.</li>
+        <li>600–1,000 words per chapter.</li>
+        <li>At least 10 completed chapters for an application.</li>
+        <li>Remaining chapters are due within 4–5 weeks after signing,
+        unless another deadline is agreed in writing.</li>
+      </ul>
+    </section>
+  </div>
+
+  <h2>02. Submission and Review</h2>
+
+  <section class="card">
+    <ol>
+      <li>Prepare an original story that you have the right to submit.</li>
+      <li>Complete the required number of chapters for your chosen category.</li>
+      <li>Contact the author team to confirm the current submission procedure
+      and required materials.</li>
+      <li>Our team will review a complete application, normally within
+      3–7 working days.</li>
+      <li>If your story is accepted, review the proposed contract, rights,
+      payment terms and deadlines before signing.</li>
+    </ol>
+    <p class="notice">
+      Review times are estimates, not a guarantee of acceptance.
+      Please do not submit work that infringes another person's rights.
+    </p>
+  </section>
+
+  <h2>03. Contract Options</h2>
+
+  <div class="grid">
+    <section class="card">
+      <span class="tag">EXCLUSIVE</span>
+      <h3>Exclusive Contract</h3>
+      <p>
+        Under an exclusive agreement, the story's publication and licensing
+        rights are governed by the signed contract. Review the scope,
+        territory, duration and permitted uses carefully before signing.
+      </p>
+      <p><strong>Proposed contract duration:</strong> 10 years.</p>
+      <hr>
+      <h3>Short Story Bonuses</h3>
+      <div class="amount">$30</div>
+      <p>Signing bonus, subject to the contract.</p>
+      <div class="amount">$20</div>
+      <p>Completion bonus, subject to completion requirements.</p>
+      <hr>
+      <h3>Long Story Bonuses</h3>
+      <div class="amount">$50</div>
+      <p>Signing bonus, subject to the contract.</p>
+      <div class="amount">$30</div>
+      <p>Completion bonus, subject to completion requirements.</p>
+    </section>
+
+    <section class="card">
+      <span class="tag">NON-EXCLUSIVE</span>
+      <h3>Non-Exclusive Contract</h3>
+      <p>
+        A non-exclusive agreement may allow you to publish or license
+        the story elsewhere, subject to the exact terms of your signed
+        agreement.
+      </p>
+      <div class="amount">60%</div>
+      <p>Proposed author revenue share.</p>
+      <hr>
+      <h3>Short Story Milestone</h3>
+      <div class="amount">Up to $100</div>
+      <p>
+        Eligibility requires at least 25 published chapters and $50 in
+        qualifying revenue within 3 months after signing.
+      </p>
+      <hr>
+      <h3>Long Story Milestone</h3>
+      <div class="amount">Up to $200</div>
+      <p>
+        Eligibility requires at least 60 published chapters and $50 in
+        qualifying revenue within 3 months after signing.
+      </p>
+    </section>
+  </div>
+
+  <p class="notice">
+    Bonuses and revenue shares are subject to the final signed agreement,
+    applicable eligibility rules, and confirmation by the author team.
+    A stated maximum bonus is not a guaranteed payment.
+  </p>
+
+  <h2>04. Deadlines and Completion</h2>
+
+  <section class="card">
+    <p>
+      Before signing, confirm the final chapter count, delivery schedule,
+      editing requirements, revision process and completion criteria.
+    </p>
+    <p>
+      Short-story and long-story deadlines are described above. Any change
+      to an agreed deadline should be approved in writing by the relevant
+      representative.
+    </p>
+    <p>
+      A completion bonus, where offered, is payable only after the
+      applicable completion requirements have been met and verified.
+    </p>
+  </section>
+
+  <h2>05. Payments and Withdrawals</h2>
+
+  <section class="card">
+    <ul>
+      <li>Scheduled monthly payment date: the 25th of each month for
+      the previous month's eligible earnings.</li>
+      <li>Minimum withdrawal threshold: $50 equivalent, subject to
+      the applicable payment method and contract.</li>
+      <li>For naira payments, an eligible Nigerian bank account may be used.</li>
+      <li>For dollar payments, an eligible Grey or Raenest account or tag
+      may be used, subject to provider availability and verification.</li>
+    </ul>
+    <p>
+      Processing times, currency conversion, transfer fees, eligibility
+      and required verification may affect the amount received and when
+      it arrives. Confirm the current payment procedure with the author team.
+    </p>
+  </section>
+
+  <h2>06. What We Expect From Our Authors</h2>
+
+  <section class="card">
+    <ul>
+      <li>Submit original work that you have the right to publish.</li>
+      <li>Follow the agreed chapter length, story structure and deadlines.</li>
+      <li>Respond professionally to editorial feedback and revision requests.</li>
+      <li>Do not plagiarise, submit stolen work or misrepresent authorship.</li>
+      <li>Read the entire contract before signing.</li>
+      <li>Keep your contact and payment information accurate and secure.</li>
+    </ul>
+  </section>
+
+  <h2>07. Ready to Apply?</h2>
+
+  <section class="card">
+    <p>
+      Have your story and required chapters ready? Contact our author team
+      to confirm submission instructions and the current terms.
+    </p>
+    <a class="button"
+       href="mailto:fictionalworldlibary@gmail.com?subject=Author%20Application">
+       Email the Author Team
+    </a>
+    <p class="small">
+      Email: fictionalworldlibary@gmail.com
+    </p>
+  </section>
+
+  <p class="small">
+    The information on this page is a general guide and does not replace
+    an executed publishing contract. Final rights, bonuses, revenue shares,
+    deadlines and payment obligations are determined by the signed agreement.
+  </p>
+</main>
+
+<footer>
+  <p>Fictional World Library</p>
+  <p>Your Stories. Your Worlds. Your Next Obsession.</p>
+  <p>
+    <a href="index.html">Home</a>
+    <a href="about.html">About Us</a>
+    <a href="terms.html">Terms</a>
+    <a href="privacy.html">Privacy</a>
+  </p>
+  <p>© 2026 Fictional World Library</p>
+</footer>
+</body>
+    </html>
