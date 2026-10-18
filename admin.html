@@ -1,192 +1,551 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10101b">
-<title>Fictional World Library</title>
-<link rel="icon" href="/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{--bg:#10101b;--surface:#191927;--card:#202033;--text:#f7f4ff;--muted:#aaa7bd;--accent:#c7a3ff;--line:#34334a;--gold:#f4cf86}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}
-body.light{--bg:#faf8ff;--surface:#fff;--card:#f0ebf8;--text:#20172c;--muted:#71687d;--line:#ded5e9}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-button:disabled{opacity:.5;cursor:not-allowed}
-header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
-.nav{max-width:1200px;margin:auto;padding:13px 20px;display:flex;align-items:center;gap:20px}
-.brand{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:800;letter-spacing:1px;min-width:max-content}
-.brand img{width:44px;height:44px;object-fit:contain}
-.brand small{display:block;color:var(--accent);font-size:10px;letter-spacing:4px}
-.navlinks{display:flex;align-items:center;gap:5px;flex:1;flex-wrap:wrap}
-.navlinks button,.quiet{border:0;background:transparent;color:var(--muted);padding:10px;border-radius:9px}
-.navlinks button:hover,.navlinks button.active,.quiet:hover{background:var(--card);color:var(--text)}
-.actions{display:flex;align-items:center;gap:8px}
-.primary,.secondary{border:1px solid transparent;border-radius:10px;padding:11px 16px;font-weight:700}
-.primary{background:var(--accent);color:#20142e}
-.secondary{background:var(--card);border-color:var(--line);color:var(--text)}
-main{max-width:1200px;min-height:75vh;margin:auto;padding:24px 20px 100px}
-.page{display:none}.page.active{display:block}
-h1,h2,h3{font-family:"Playfair Display",serif}
-h1{font-size:clamp(2.3rem,6vw,4.6rem);line-height:1.08;margin:12px 0}
-h2{font-size:clamp(1.6rem,4vw,2.3rem)}
-p{line-height:1.7}.muted{color:var(--muted)}
-.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:25px;align-items:center;padding:45px 0}
-.eyebrow{color:var(--gold);font-size:.8rem;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.gradient-text{color:var(--accent)}
-.hero-art{min-height:300px;border:1px solid var(--line);border-radius:22px;background:radial-gradient(circle at 50% 30%,#44315f,var(--surface) 65%);display:grid;place-items:center;text-align:center;padding:25px}
-.hero-art img{max-width:100%;max-height:250px;object-fit:contain}
-.section-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:25px 0 16px}
-.book-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
-.book-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer}
-.cover{height:220px;background:linear-gradient(145deg,#48315e,#191927);display:grid;place-items:center;overflow:hidden}
-.cover img{width:100%;height:100%;object-fit:cover}
-.cover span{font-family:"Playfair Display",serif;font-size:1.2rem;text-align:center;padding:15px}
-.book-info{padding:12px}.book-info h3{font-size:1rem;margin:0 0 6px}.book-info p{font-size:.82rem;margin:4px 0}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:9px 13px;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:20px}
-.chip.active{background:var(--accent);color:#20142e}
-.panel,.feature-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin:16px 0}
-.form-grid,.two-col,.tier-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.tier-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-.field{margin:14px 0}.field label{display:block;margin-bottom:7px;font-weight:600}
-.field input,.field select,.field textarea,input,select,textarea{width:100%;max-width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--text)}
-.field textarea{min-height:120px}
-.notice{padding:14px;border:1px solid var(--line);border-radius:10px;color:var(--muted)}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
-.toast{display:none;position:fixed;bottom:85px;left:50%;transform:translateX(-50%);z-index:50;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:10px;max-width:90%;box-shadow:0 5px 30px #0005}
-.toast.show{display:block}
-.bottom-nav{display:none}
-footer{border-top:1px solid var(--line);padding:25px;text-align:center;color:var(--muted)}
-@media(max-width:850px){.nav{flex-wrap:wrap;gap:10px}.navlinks{order:3;flex-basis:100%;overflow-x:auto;flex-wrap:nowrap}.navlinks button{white-space:nowrap}.actions{margin-left:auto}.book-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{grid-template-columns:1fr}.tier-grid{grid-template-columns:1fr}}
-@media(max-width:550px){.nav{padding:10px}.brand img{width:36px;height:36px}.navlinks button{padding:8px;font-size:.82rem}main{padding:15px 12px 100px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.cover{height:180px}.form-grid,.two-col{grid-template-columns:1fr}.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;justify-content:space-around;padding:8px 3px calc(8px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line)}.bottom-nav button{border:0;background:transparent;color:var(--muted);font-size:.72rem;padding:8px 5px}.bottom-nav button.active{color:var(--accent)}}
-</style>
-</head>
-<body>
-<header>
-<div class="nav">
-<a class="brand" href="#" data-go="home"><img src="/logo.png" alt="Fictional World logo" onerror="this.style.display='none'"><span>FICTIONAL WORLD<small>LIBRARY</small></span></a>
-<nav class="navlinks">
-<button data-go="home">Home</button><button data-go="browse">Discover</button><button data-go="library">Library</button><button data-go="notifications">Notifications</button><button data-go="writer">Be Our Author</button>
-</nav>
-<div class="actions"><span>🪙 <b id="coinBalance">0</b></span><button class="secondary" id="themeToggle">☾</button><button class="primary" id="accountButton">Log in</button></div>
-</div>
-</header>
-<main>
-<section id="home" class="page active">
-<div class="hero"><div><div class="eyebrow">Your next obsession starts here</div><h1>YOUR NEXT OBSESSION STARTS HERE</h1><p>Every world has a story.</p><p>Discover unforgettable characters, impossible love, dangerous secrets, and endless adventures.</p><button class="primary" data-go="browse">Explore Stories →</button></div><div class="hero-art"><img src="/logo.png" alt="Fictional World Library" onerror="this.outerHTML='<span class=\\'gradient-text\\'>FICTIONAL WORLD</span>'"></div></div>
-<div class="section-head"><h2>Explore genres</h2></div><div id="genreList" class="chips"></div>
-<div class="section-head"><h2>Ongoing stories</h2><button class="quiet" data-go="browse">View all →</button></div><div id="ongoingBooks" class="book-grid"></div>
-<div class="section-head"><h2>Completed stories</h2></div><div id="completedBooks" class="book-grid"></div>
-</section>
-<section id="browse" class="page">
-<div class="section-head"><div><div class="eyebrow">Find your next read</div><h2>Discover stories</h2></div></div>
-<div class="field"><input id="bookSearch" type="search" placeholder="Search by title, author or genre"></div><div id="browseGenres" class="chips"></div><div id="browseBooks" class="book-grid"></div>
-</section>
-<section id="library" class="page">
-<div class="eyebrow">Your personal bookshelf</div><h2>My Library</h2>
-<div class="chips"><button class="chip active" data-library-status="all">All</button><button class="chip" data-library-status="ongoing">Ongoing read</button><button class="chip" data-library-status="completed">Completed read</button><button class="chip" data-library-status="viewed">Viewed</button></div>
-<div id="libraryList" class="book-grid"></div>
-</section>
-<section id="notifications" class="page"><div class="eyebrow">Stay up to date</div><h2>Notifications</h2><div id="notificationsList" class="panel">Log in to view your notifications.</div></section>
-<section id="profile" class="page"><div class="eyebrow">Your account</div><h2>Profile</h2><div id="profileInfo" class="panel">Please log in or create an account.</div>
-<form id="profileForm" class="panel"><h3>Profile details</h3><div class="field"><label for="profileName">Name</label><input id="profileName" autocomplete="name"></div><div class="field"><label for="profileGender">Gender</label><select id="profileGender"><option value="">Prefer not to say</option><option>Female</option><option>Male</option><option>Other</option></select></div><button class="primary">Save profile</button><button type="button" class="secondary" id="logoutButton">Log out</button></form>
-</section>
-<section id="account" class="page">
-<div class="eyebrow">Welcome to Fictional World</div><h2>Reader account</h2>
-<div class="two-col">
-<form id="loginForm" class="panel"><h3>Log in</h3><div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" required autocomplete="email"></div><div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" required autocomplete="current-password"></div><button class="primary">Log in</button><p><button type="button" class="quiet" data-go="reset">Forgot password?</button></p></form>
-<form id="registerForm" class="panel"><h3>Create an account</h3><div class="field"><label for="registerName">Name</label><input id="registerName" required autocomplete="name"></div><div class="field"><label for="registerEmail">Email</label><input id="registerEmail" type="email" required autocomplete="email"></div><div class="field"><label for="registerPassword">Password</label><input id="registerPassword" type="password" minlength="8" required autocomplete="new-password"></div><button class="primary">Create account</button></form>
-</div></section>
-<section id="reset" class="page"><h2>Reset password</h2><form id="passwordResetForm" class="panel"><div class="field"><label for="resetEmail">Account email</label><input id="resetEmail" type="email" required></div><button class="primary">Send reset link</button></form></section>
-<section id="bookDetail" class="page"><button class="secondary" data-go="browse">← Back to stories</button><div id="bookDetailContent" class="panel"></div><button id="addToLibraryButton" class="primary">Add to Library</button><div id="chapterList" class="panel"></div></section>
-<section id="reader" class="page"><button class="secondary" data-go="bookDetail">← Back to book</button><div id="chapterContent" class="panel"></div><div class="row"><button class="secondary" id="previousChapter">Previous</button><button class="primary" id="nextChapter">Next chapter</button></div></section>
-<section id="wallet" class="page"><div class="eyebrow">Reader account</div><h2>Wallet</h2><div class="panel"><h3>Your coins</h3><p><strong id="walletBalance">0</strong> coins</p><button class="secondary" id="refreshWalletButton">Refresh wallet</button></div><div class="section-head"><h2>Top up</h2></div><div id="coinPackages" class="tier-grid"></div><div class="section-head"><h2>Transaction history</h2></div><div id="transactionHistory" class="panel"></div></section>
-<section id="subscriptions" class="page"><div class="eyebrow">More ways to read</div><h2>Membership</h2><div id="subscriptionStatus" class="panel"></div><div id="subscriptionPlans" class="tier-grid"></div></section>
-<section id="more" class="page"><h2>More</h2><div class="panel"><div class="row"><span>Wallet</span><button class="secondary" data-go="wallet">Open</button></div><div class="row"><span>Customer Service</span><button class="secondary" data-go="support">Contact us</button></div><div class="row"><span>Settings</span><button class="secondary" data-go="settings">Open</button></div></div></section>
-<section id="support" class="page"><h2>Customer Service</h2><p>For assistance, contact our support team.</p><div class="panel"><p>Email: fictionalworldlibary@gmail.com</p><a href="mailto:fictionalworldlibary@gmail.com" class="primary">Email customer service</a></div><button class="secondary" data-go="writer">Be Our Author</button></section>
-<section id="settings" class="page"><h2>Settings</h2><div class="panel"><div class="row"><span>Appearance</span><button class="secondary" id="settingsTheme">Toggle light/dark mode</button></div><div class="row"><span>About Us</span><span>Fictional World Library</span></div><div class="row"><span>Terms & Conditions</span><button class="secondary" data-go="terms">Read terms</button></div><button class="secondary" data-go="account">Log in / Sign up</button></div></section>
-<section id="terms" class="page"><h2>Terms & Conditions</h2><div class="panel"><p>Respect authors' rights and follow the rules of the platform. Prices, payment terms, privacy practices and refund policies must be finalised before public launch.</p></div></section>
-<section id="writer" class="page">
-<div class="hero"><div><div class="eyebrow">For storytellers</div><h1>Be Our Author</h1><p>Have a story readers won't want to put down? Share your story with Fictional World Library.</p><a class="primary" href="mailto:fictionalworldlibary@gmail.com?subject=Fictional%20World%20Author%20Application">Apply by email →</a></div><div class="hero-art"><img src="/logo.png" alt="Fictional World logo"></div></div>
-<div class="panel"><h2>Before you apply</h2><h3>Short stories</h3><p>12–25 chapters, with 600–1,000 words per chapter. Submit at least 5 completed chapters. Review takes 3–7 working days.</p><h3>Long stories</h3><p>30–60 chapters, with 600–1,000 words per chapter. Submit at least 10 completed chapters. Review takes 3–7 working days.</p><h3>Exclusive contract</h3><p>Short story: $30 signing bonus and $20 completion bonus. Long story: $50 signing bonus and $30 completion bonus. Exclusive rights apply for 10 years.</p><h3>Non-exclusive contract</h3><p>60% revenue share. Milestone rewards may reach $100 for short stories or $200 for long stories, subject to the agreed chapter and revenue requirements.</p><h3>Payments</h3><p>Payments are made on the 25th of each month for the previous month's earnings. Minimum withdrawal is $50. Naira payments use Nigerian bank accounts; USD payments use a Grey or Raenest Tag.</p><p>Confirm the current contract and guidelines before submitting.</p></div>
-</section>
-</main>
-<nav class="bottom-nav">
-<button data-go="home" class="active">⌂<br>Home</button><button data-go="library">▤<br>Library</button><button data-go="notifications">♧<br>Notifications</button><button data-go="profile">◉<br>Profile</button><button data-go="more">•••<br>More</button>
-</nav>
-<footer>All Readers · All Genres · Endless Stories</footer>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fictional World Library | Admin Dashboard</title>
 
-const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
-const SUPABASE_KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-const $ = id => document.getElementById(id);
-const GENRES = ["All","Werewolf","Mafia","Erotica","LGBTQ","Billionaire Drama","Vampire","Paranormal","Christian Romance"];
-const COIN_PACKAGES = [
-{id:"coins_100",coins:100,priceUSD:2.99},
-{id:"coins_300",coins:300,priceUSD:7.99},
-{id:"coins_600",coins:600,priceUSD:14.99},
-{id:"coins_1200",coins:1200,priceUSD:27.99}
-];
-const SUBSCRIPTION_PLANS = [
-{id:"readers_pass",name:"Readers Pass",monthlyUSD:5.99,yearlyUSD:49.99,monthlyCoins:50,coinDiscount:5,freeChapters:0},
-{id:"vip_reader",name:"VIP Reader",monthlyUSD:9.99,yearlyUSD:89.99,monthlyCoins:150,coinDiscount:9,freeChapters:0},
-{id:"exclusive_reader",name:"Exclusive Reader",monthlyUSD:19.99,yearlyUSD:179.99,monthlyCoins:300,coinDiscount:15,freeChapters:2}
-];
-let currentReader = null, currentBook = null, currentChapter = null, books = [], selectedGenre = "All", libraryStatus = "all", paymentInProgress = false;
-const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const formatMoney = value => "$" + Number(value || 0).toFixed(2);
-let toastTimer;
-function showMessage(message,error=false){const t=$("toast");t.textContent=message;t.style.background=error?"#9f3434":"var(--text)";t.style.color=error?"#fff":"var(--bg)";t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),3500);}
-function go(page){const target=$(page);if(!target){showMessage("This page is not available.",true);return;}document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p===target));document.querySelectorAll("[data-go]").forEach(b=>b.classList.toggle("active",b.dataset.go===page));window.scrollTo({top:0,behavior:"smooth"});if(page==="library")loadReaderLibrary();if(page==="profile")loadReaderProfile();if(page==="notifications")loadNotifications();if(page==="wallet")loadWallet();if(page==="subscriptions"){loadMySubscription();renderSubscriptionPlans();}}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b){e.preventDefault();go(b.dataset.go);}});
-$("themeToggle").addEventListener("click",toggleTheme);
-$("settingsTheme").addEventListener("click",toggleTheme);
-function toggleTheme(){document.body.classList.toggle("light");}
-function renderGenres(){const markup=GENRES.map(g=>`<button class="chip ${g===selectedGenre?"active":""}" data-genre="${escapeHTML(g)}">${escapeHTML(g)}</button>`).join("");$("genreList").innerHTML=markup;$("browseGenres").innerHTML=markup;}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-genre]");if(!b)return;selectedGenre=b.dataset.genre;renderGenres();renderBooks();go("browse");});
-function bookCard(book){return `<article class="book-card" tabindex="0" role="button" data-book-id="${escapeHTML(book.id)}"><div class="cover">${book.cover_url?`<img src="${escapeHTML(book.cover_url)}" alt="${escapeHTML(book.title)}" loading="lazy">`:`<span>${escapeHTML(book.title)}</span>`}</div><div class="book-info"><h3>${escapeHTML(book.title)}</h3><p class="muted">${escapeHTML(book.author_name||"Fictional World")}</p><p class="muted">${escapeHTML(book.genre||"Fiction")}</p></div></article>`;}
-function renderBooks(){const q=($("bookSearch")?.value||"").trim().toLowerCase();const filtered=books.filter(b=>(selectedGenre==="All"||b.genre===selectedGenre)&&(!q||[b.title,b.author_name,b.genre,b.synopsis].some(v=>String(v||"").toLowerCase().includes(q))));$("browseBooks").innerHTML=filtered.length?filtered.map(bookCard).join():"<p class='muted'>No stories found. Please try another search.</p>";const ongoing=books.filter(b=>String(b.status||"").toLowerCase()==="ongoing");const completed=books.filter(b=>String(b.status||"").toLowerCase()==="completed");$("ongoingBooks").innerHTML=ongoing.length?ongoing.slice(0,5).map(bookCard).join():"<p class='muted'>New stories are coming soon.</p>";$("completedBooks").innerHTML=completed.length?completed.slice(0,5).map(bookCard).join():"<p class='muted'>Completed stories are coming soon.</p>";}
-$("bookSearch").addEventListener("input",renderBooks);
-async function loadBooks(){const {data,error}=await db.from("books").select("id,title,cover_url,genre,length,status,synopsis,author_name,tags").order("created_at",{ascending:false});if(error){console.error(error);showMessage("Books could not be loaded. Check the books table and its access policies.",true);return;}books=data||[];renderBooks();}
-  async function registerReader(name,email,password){const {data,error}=await db.auth.signUp({email,password,options:{data:{name}}});if(error)throw error;if(data.user){const {error:profileError}=await db.from("users").upsert({id:data.user.id,name,email,coin_balance:0},{onConflict:"id"});if(profileError)console.error("Profile creation:",profileError);}showMessage(data.session?"Account created.":"Check your email to confirm your account.");if(data.session){currentReader=data.user;await afterLogin();}else go("account");}
-async function loginReader(email,password){const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;currentReader=data.user;await afterLogin();showMessage("Welcome back.");}
-async function logoutReader(){const {error}=await db.auth.signOut();if(error)throw error;currentReader=null;showLoggedOutState();showMessage("You have logged out.");go("home");}
-async function resetReaderPassword(email){const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin});if(error)throw error;showMessage("If the account exists, a password reset email has been sent.");}
-async function afterLogin(){if(!currentReader)return;$("accountButton").textContent="Profile";$("coinBalance").textContent="…";await loadReaderProfile();await loadReaderLibrary();await loadWallet();await loadNotifications();await loadMySubscription();go("home");}
-async function loadReaderProfile(){if(!currentReader){$("profileInfo").textContent="Please log in or create an account.";return;}const {data,error}=await db.from("users").select("id,name,gender,email,coin_balance").eq("id",currentReader.id).maybeSingle();if(error){console.error(error);$("profileInfo").textContent="Profile information is unavailable. Check the users table policies.";return;}const p=data||{id:currentReader.id,email:currentReader.email};$("profileName").value=p.name||"";$("profileGender").value=p.gender||"";$("coinBalance").textContent=Number(p.coin_balance||0);$("walletBalance").textContent=Number(p.coin_balance||0);$("profileInfo").innerHTML=`<p><strong>${escapeHTML(p.name||"Reader")}</strong></p><p>${escapeHTML(p.email||currentReader.email)}</p><p>Reader ID: ${escapeHTML(p.id)}</p>`;}
-async function saveReaderProfile(event){event.preventDefault();if(!currentReader){showMessage("Please log in first.",true);go("account");return;}const {error}=await db.from("users").upsert({id:currentReader.id,email:currentReader.email,name:$("profileName").value.trim(),gender:$("profileGender").value},{onConflict:"id"});if(error)throw error;showMessage("Profile saved.");await loadReaderProfile();}
-async function addBookToLibrary(bookId,status="ongoing"){if(!currentReader)throw new Error("Please log in first.");const {error}=await db.from("library").upsert({user_id:currentReader.id,book_id:String(bookId),status},{onConflict:"user_id,book_id"});if(error)throw error;showMessage("Added to your Library.");await loadReaderLibrary();}
-async function loadReaderLibrary(){if(!currentReader){$("libraryList").innerHTML="<p class='muted'>Log in to see your saved stories.</p>";return;}let query=db.from("library").select("book_id,status,created_at").eq("user_id",currentReader.id).order("created_at",{ascending:false});if(libraryStatus!=="all")query=query.eq("status",libraryStatus);const {data,error}=await query;if(error){console.error(error);$("libraryList").innerHTML="<p class='muted'>Library could not be loaded. Check your library table policies.</p>";return;}const ids=(data||[]).map(x=>String(x.book_id));const rows=books.filter(b=>ids.includes(String(b.id)));$("libraryList").innerHTML=rows.length?rows.map(bookCard).join():"<p class='muted'>Your Library is empty. Explore stories and add one to your Library.</p>";}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-library-status]");if(!b)return;libraryStatus=b.dataset.libraryStatus;document.querySelectorAll("[data-library-status]").forEach(x=>x.classList.toggle("active",x===b));loadReaderLibrary();});
-async function openBook(id){const book=books.find(b=>String(b.id)===String(id));if(!book)throw new Error("Story not found.");currentBook=book;$("bookDetailContent").innerHTML=`<div class="book-detail"><div class="cover">${book.cover_url?`<img src="${escapeHTML(book.cover_url)}" alt="">`:`<span>${escapeHTML(book.title)}</span>`}</div><div><h2>${escapeHTML(book.title)}</h2><p>By ${escapeHTML(book.author_name||"Fictional World")}</p><p>${escapeHTML(book.genre||"Fiction")} · ${escapeHTML(book.status||"Ongoing")}</p><p>${escapeHTML(book.synopsis||"Discover this story on Fictional World Library.")}</p></div></div>`;const {data,error}=await db.from("chapters").select("id,chapter_number,title,locked,pub_status").eq("book_id",String(id)).eq("pub_status","published").order("chapter_number",{ascending:true});if(error){console.error(error);$("chapterList").textContent="Chapters are unavailable."; }else{$("chapterList").innerHTML="<h3>Chapters</h3>"+((data||[]).map(c=>`<div class="row"><span>${escapeHTML(c.chapter_number)}. ${escapeHTML(c.title||"Chapter")}</span><button class="primary" data-chapter-id="${escapeHTML(c.id)}">${c.locked?"Unlock":"Read"}</button></div>`).join("")||"<p>No published chapters yet.</p>");}go("bookDetail");}
-document.addEventListener("click",async e=>{const b=e.target.closest("[data-book-id]");if(b){try{await openBook(b.dataset.bookId);}catch(err){showMessage(err.message,true);}}});
-$("addToLibraryButton").addEventListener("click",async()=>{try{if(!currentBook)throw new Error("Choose a story first.");await addBookToLibrary(currentBook.id);}catch(e){showMessage(e.message,true);}});
-async function loadNotifications(){if(!currentReader){$("notificationsList").textContent="Please log in to view notifications.";return;}const {data,error}=await db.from("notification").select("*").order("created_at",{ascending:false}).limit(30);if(error){console.error(error);$("notificationsList").textContent="Notifications are unavailable.";return;}const items=data||[];$("notificationsList").innerHTML=items.length?items.map(n=>`<div class="row"><div><strong>${escapeHTML(n.title||"Notification")}</strong><p>${escapeHTML(n.message||n.content||"")}</p></div></div>`).join(""):"<p class='muted'>You have no notifications yet.</p>";}
-function renderCoinPackages(){$("coinPackages").innerHTML=COIN_PACKAGES.map(p=>`<div class="panel"><h3>${p.coins} Coins</h3><p>${formatMoney(p.priceUSD)}</p><button class="primary" data-purchase-type="coins" data-product-id="${p.id}">Buy coins</button></div>`).join("");}
-function renderSubscriptionPlans(){$("subscriptionPlans").innerHTML=SUBSCRIPTION_PLANS.map(p=>`<div class="panel"><h3>${escapeHTML(p.name)}</h3><p>${formatMoney(p.monthlyUSD)} per month</p><p>${formatMoney(p.yearlyUSD)} per year</p><ul><li>${p.monthlyCoins} monthly coins</li><li>${p.coinDiscount}% coin discount</li>${p.freeChapters?`<li>${p.freeChapters} free chapters</li>`:""}</ul><button class="primary" data-purchase-type="subscription" data-product-id="${p.id}" data-billing-cycle="monthly">Monthly</button><button class="secondary" data-purchase-type="subscription" data-product-id="${p.id}" data-billing-cycle="yearly">Yearly</button></div>`).join("");}
-async function loadMySubscription(){if(!currentReader){$("subscriptionStatus").textContent="Log in to view your membership.";return;}const {data,error}=await db.from("subscription").select("*").eq("user_id",currentReader.id).eq("status","active").order("updated_at",{ascending:false}).limit(1);if(error){console.error(error);$("subscriptionStatus").textContent="Membership information is unavailable.";return;}const s=data?.[0];$("subscriptionStatus").textContent=s?`Active plan: ${s.tier} · ${s.billing_cycle}`:"You do not have an active subscription.";}
-async function loadWallet(){if(!currentReader){$("transactionHistory").textContent="Log in to view your wallet.";return;}await loadReaderProfile();const {data,error}=await db.from("transactions").select("created_at,amount_ngn,coins_added,payment_status").eq("user_id",currentReader.id).order("created_at",{ascending:false}).limit(50);if(error){console.error(error);$("transactionHistory").textContent="Transaction history is unavailable.";return;}const rows=data||[];$("transactionHistory").innerHTML=rows.length?rows.map(t=>`<div class="row"><span>${escapeHTML(t.coins_added||0)} coins</span><span>${escapeHTML(t.payment_status||"pending")}</span><span>${escapeHTML(t.created_at?new Date(t.created_at).toLocaleDateString():"")}</span></div>`).join(""):"<p>No transactions yet.</p>";}
-  async function callPaymentFunction(name,payload){if(!currentReader)throw new Error("Please log in before making a purchase.");const {data,error}=await db.auth.getSession();if(error)throw error;const token=data.session?.access_token;if(!token)throw new Error("Your session has expired. Please log in again.");const response=await fetch(`${SUPABASE_URL}/functions/v1/${name}`,{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`,"apikey":SUPABASE_KEY},body:JSON.stringify(payload)});const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.message||result.error||"Payment request failed.");return result;}
-async function startPayment(type,id,cycle){if(paymentInProgress)return;if(!currentReader){go("account");showMessage("Log in before making a purchase.",true);return;}paymentInProgress=true;try{showMessage("Preparing secure checkout…");const result=await callPaymentFunction("initialize-payment",{product_type:type,product_id:id,billing_cycle:cycle||null});if(!result.authorization_url||!result.authorization_url.startsWith("https://"))throw new Error("Checkout URL was not returned. Check the payment function configuration.");location.assign(result.authorization_url);}catch(e){console.error(e);showMessage(e.message,true);}finally{paymentInProgress=false;}}
-async function verifyReturnedPayment(){const params=new URLSearchParams(location.search);const reference=params.get("reference")||params.get("trxref");if(!reference||!currentReader)return;try{showMessage("Verifying payment…");const result=await callPaymentFunction("verify-payment",{reference});if(result.status==="success"||result.status==="successfully_verified"){showMessage("Payment confirmed.");await loadReaderProfile();await loadWallet();await loadMySubscription();}else showMessage("Payment is still being verified. Check your transaction history.",true);}catch(e){console.error(e);showMessage("Payment verification is pending. Please check your transaction history.",true);}finally{params.delete("reference");params.delete("trxref");const q=params.toString();history.replaceState({}, "",location.pathname+(q?"?"+q:"")+location.hash);}}
-async function unlockChapter(id){if(!currentReader){go("account");throw new Error("Log in to unlock chapters.");}if(!confirm("Unlock this chapter for 10 coins?"))return;const {data,error}=await db.rpc("unlock_chapter",{p_chapter_id:String(id)});if(error)throw error;if(data?.success===false)throw new Error(data.message||"Chapter could not be unlocked.");await loadReaderProfile();await openChapter(id);showMessage("Chapter unlocked.");}
-async function openChapter(id){if(!currentReader){go("account");throw new Error("Please log in to read.");}const {data,error}=await db.rpc("get_chapter_content",{p_chapter_id:String(id)});if(error)throw error;const c=Array.isArray(data)?data[0]:data;if(!c)throw new Error("Chapter content is unavailable or has not been unlocked.");currentChapter=c;$("chapterContent").innerHTML=`<h2>${escapeHTML(c.title||"Chapter")}</h2><article class="reader-text">${escapeHTML(c.content||c.chapter_content||"").replace(/\n/g,"<br>")}</article>`;go("reader");}
-async function openChapterOrUnlock(id){const {data,error}=await db.from("chapters").select("id,locked,pub_status").eq("id",String(id)).single();if(error)throw error;if(data.pub_status!=="published")throw new Error("This chapter is not published.");if(data.locked)await unlockChapter(id);else await openChapter(id);}
-document.addEventListener("click",async e=>{const b=e.target.closest("button");if(!b)return;try{if(b.dataset.chapterId)await openChapterOrUnlock(b.dataset.chapterId);if(b.dataset.purchaseType)await startPayment(b.dataset.purchaseType,b.dataset.productId,b.dataset.billingCycle);if(b.id==="logoutButton")await logoutReader();if(b.id==="refreshWalletButton")await loadWallet();if(b.id==="accountButton")go(currentReader?"profile":"account");if(b.id==="writerEmailButton")location.href="mailto:fictionalworldlibary@gmail.com?subject=Fictional%20World%20Author%20Application";}catch(err){console.error(err);showMessage(err.message||"The action could not be completed.",true);}});
-document.addEventListener("submit",async e=>{const form=e.target;try{if(form.id==="loginForm"){e.preventDefault();await loginReader($("loginEmail").value.trim(),$("loginPassword").value);}else if(form.id==="registerForm"){e.preventDefault();await registerReader($("registerName").value.trim(),$("registerEmail").value.trim(),$("registerPassword").value);}else if(form.id==="profileForm"){await saveReaderProfile(e);}else if(form.id==="passwordResetForm"){e.preventDefault();await resetReaderPassword($("resetEmail").value.trim());}}catch(err){console.error(err);showMessage(err.message||"Something went wrong.",true);}});
-function showLoggedOutState(){$("accountButton").textContent="Log in";$("coinBalance").textContent="0";$("walletBalance").textContent="0";$("profileInfo").textContent="Please log in or create an account.";}
-async function initialise(){renderGenres();renderCoinPackages();renderSubscriptionPlans();await loadBooks();const {data,error}=await db.auth.getSession();if(error)console.error(error);currentReader=data.session?.user||null;db.auth.onAuthStateChange((_event,session)=>{currentReader=session?.user||null;if(currentReader)afterLogin();else showLoggedOutState();});if(currentReader){await afterLogin();await verifyReturnedPayment();}else showLoggedOutState();}
-$("previousChapter").addEventListener("click",()=>showMessage("Use the chapter list to select a previous chapter."));
-$("nextChapter").addEventListener("click",()=>showMessage("Use the chapter list to select the next chapter."));
-initialise().catch(e=>{console.error(e);showMessage("The site could not finish loading. Check your internet connection and Supabase configuration.",true);});
-</script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f5f5f8;
+      --panel: #ffffff;
+      --text: #25243a;
+      --muted: #85849a;
+      --accent: #7547e8;
+      --border: #e9e7f0;
+      --sidebar: #211c35;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 245px;
+      background: var(--sidebar);
+      color: white;
+      padding: 26px 16px;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.5;
+      padding: 0 10px 28px;
+    }
+
+    .brand span {
+      display: block;
+      color: #b9a4ff;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .nav-label {
+      padding: 15px 10px 8px;
+      color: #a7a1bb;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      display: block;
+      width: 100%;
+      padding: 13px 12px;
+      margin-bottom: 4px;
+      color: #e4e0f0;
+      text-decoration: none;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .nav-item.active,
+    .nav-item:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .topbar {
+      min-height: 76px;
+      padding: 18px 28px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar h1 {
+      font-size: 21px;
+    }
+
+    .topbar p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .admin-badge {
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 9px 13px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .content {
+      padding: 28px;
+      max-width: 1500px;
+      margin: auto;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h2 {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .welcome p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      min-width: 0;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-value {
+      font-size: 27px;
+      font-weight: 700;
+    }
+
+    .stat-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 9px;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-heading h3 {
+      font-size: 17px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .button {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 7px;
+      padding: 11px 15px;
+      font-size: 12px;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      color: var(--text);
+      background: white;
+      border: 1px solid var(--border);
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .action-card h4 {
+      font-size: 14px;
+      margin-bottom: 9px;
+    }
+
+    .action-card p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 17px;
+    }
+
+    .management {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .management-card h3 {
+      margin-bottom: 9px;
+      font-size: 16px;
+    }
+
+    .management-card p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .status {
+      display: inline-block;
+      background: #f0ebff;
+      color: #6740c5;
+      padding: 6px 9px;
+      border-radius: 20px;
+      font-size: 10px;
+    }
+
+    .notice {
+      background: #fff8e8;
+      border: 1px solid #f1dfb5;
+      border-radius: 10px;
+      padding: 16px;
+      color: #755b22;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      padding: 24px 0 5px;
+    }
+
+    @media (max-width: 1050px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 16px;
+      }
+
+      .brand {
+        padding-bottom: 12px;
+      }
+
+      .nav-label {
+        display: none;
+      }
+
+      .nav-list {
+        display: flex;
+        overflow-x: auto;
+        gap: 6px;
+        padding-bottom: 3px;
+      }
+
+      .nav-item {
+        width: auto;
+        flex-shrink: 0;
+        white-space: nowrap;
+        margin: 0;
+        padding: 11px;
+      }
+
+      .topbar {
+        padding: 16px;
+      }
+
+      .content {
+        padding: 18px 14px;
+      }
+
+      .stats {
+        gap: 10px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .stat-value {
+        font-size: 22px;
+      }
+
+      .quick-actions,
+      .management {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome h2 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <aside class="sidebar">
+      <div class="brand">
+        Fictional World
+        <span>Library Administration</span>
+      </div>
+
+      <div class="nav-label">Main menu</div>
+
+      <nav class="nav-list">
+        <a class="nav-item active" href="#overview">Overview</a>
+        <a class="nav-item" href="#books">Books & Chapters</a>
+        <a class="nav-item" href="#authors">Authors</a>
+        <a class="nav-item" href="#publishers">Publishers</a>
+        <a class="nav-item" href="#readers">Readers</a>
+        <a class="nav-item" href="#transactions">Transactions</a>
+        <a class="nav-item" href="#subscriptions">Subscriptions</a>
+        <a class="nav-item" href="#notifications">Notifications</a>
+        <a class="nav-item" href="#visitors">Visitors & Analytics</a>
+        <a class="nav-item" href="#settings">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+
+      <header class="topbar">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p>Fictional World Library management</p>
+        </div>
+
+        <div class="admin-badge">Administrator</div>
+      </header>
+
+      <div class="content" id="overview">
+
+        <section class="welcome">
+          <h2>Welcome to your dashboard</h2>
+          <p>Manage your books, chapters, authors, readers and platform activity.</p>
+        </section>
+
+        <section class="stats">
+          <div class="card">
+            <div class="stat-label">Total Books</div>
+            <div class="stat-value">—</div>
+            <div class="stat-note">Published and unpublished books</div>
+          </div>
+
+          <div class="card">
+            <div class="stat-label">Registered Readers</div>
+            <div class="stat-value">—</div>
+            <div class="stat-note">Reader accounts</div>
+          </div>
+
+          <div class="card">
+            <div class="stat-label">Total Authors</div>
+            <div class="stat-value">—</div>
+            <div class="stat-note">Registered authors</div>
+          </div>
+
+          <div class="card">
+            <div class="stat-label">Total Visitors</div>
+            <div class="stat-value">—</div>
+            <div class="stat-note">Website visits</div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading">
+            <div>
+              <h3>Quick Actions</h3>
+              <p>Frequently used management tools</p>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <div class="card action-card">
+              <h4>Books & Chapters</h4>
+              <p>Add new books, upload covers, manage chapters and publish stories.</p>
+              <a class="button" href="#books">Manage Books</a>
+            </div>
+
+            <div class="card action-card">
+              <h4>Authors & Publishers</h4>
+              <p>Manage author information, publishing details and book ownership.</p>
+              <a class="button" href="#authors">Manage Authors</a>
+            </div>
+
+            <div class="card action-card">
+              <h4>Payments</h4>
+              <p>Review transactions, coin purchases and reader subscriptions.</p>
+              <a class="button" href="#transactions">View Transactions</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="management">
+
+          <div class="card management-card" id="books">
+            <h3>Books & Chapters</h3>
+            <p>
+              Create books, upload cover images, enter descriptions,
+              manage chapter content and control publication status.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="authors">
+            <h3>Authors</h3>
+            <p>
+              View author records, manage author details and associate
+              stories with their respective authors.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="publishers">
+            <h3>Publishers</h3>
+            <p>
+              Manage publisher information and associate books
+              with the appropriate publisher.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="readers">
+            <h3>Reader Accounts</h3>
+            <p>
+              Review registered readers and their account information.
+              Sensitive information must remain protected.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="transactions">
+            <h3>Transactions</h3>
+            <p>
+              Review payment references, payment status, coin purchases
+              and transaction history.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="subscriptions">
+            <h3>Subscriptions</h3>
+            <p>
+              Review reader memberships, subscription tiers,
+              billing periods and subscription status.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="notifications">
+            <h3>Notifications</h3>
+            <p>
+              Prepare announcements and reader notifications
+              for new releases and platform updates.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="visitors">
+            <h3>Visitors & Analytics</h3>
+            <p>
+              Review available visitor records and monitor
+              activity across the reading platform.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+          <div class="card management-card" id="settings">
+            <h3>Settings</h3>
+            <p>
+              Manage administrative access and review
+              platform configuration.
+            </p>
+            <span class="status">Connection pending</span>
+          </div>
+
+        </section>
+
+        <div class="notice">
+          <strong>Setup status</strong><br>
+          This dashboard is the interface only. Its figures and management
+          sections will display actual information after the backend
+          connection is completed.
+        </div>
+
+        <div class="footer">
+          Fictional World Library · Administration
+        </div>
+
+      </div>
+    </main>
+  </div>
 </body>
 </html>
