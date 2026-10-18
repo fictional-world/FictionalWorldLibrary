@@ -12,9 +12,6 @@
   --background: #f5f5f8;
   --border: #e5e2ed;
   --text: #29243b;
-  --muted: #77718a;
-  --success: #18794e;
-  --danger: #b42318;
 }
 
 * { box-sizing: border-box; }
@@ -38,13 +35,13 @@ header a {
 }
 
 header h1 {
-  font-size: 24px;
+  font-size: 25px;
   margin: 16px 0 6px;
 }
 
 main {
   width: 100%;
-  max-width: 1050px;
+  max-width: 1000px;
   margin: auto;
   padding: 20px;
 }
@@ -57,7 +54,7 @@ main {
   margin-bottom: 20px;
 }
 
-h2 { font-size: 19px; margin-top: 0; }
+h2 { font-size: 20px; margin-top: 0; }
 
 label {
   display: block;
@@ -66,7 +63,6 @@ label {
 }
 
 input, select, textarea {
-  display: block;
   width: 100%;
   padding: 12px;
   font-size: 16px;
@@ -77,14 +73,14 @@ input, select, textarea {
 }
 
 textarea {
-  min-height: 100px;
+  min-height: 110px;
   resize: vertical;
 }
 
 button {
   background: var(--primary);
   color: white;
-  border: none;
+  border: 0;
   border-radius: 7px;
   padding: 12px 16px;
   margin: 12px 8px 0 0;
@@ -92,16 +88,14 @@ button {
   cursor: pointer;
 }
 
-button:disabled { opacity: .6; cursor: wait; }
+button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
 
-.secondary { background: #eeeaf5; color: var(--text); }
-.danger { background: var(--danger); }
-.small { padding: 8px 10px; }
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+.secondary {
+  background: #eeeaf5;
+  color: var(--text);
 }
 
 .notice {
@@ -112,24 +106,46 @@ button:disabled { opacity: .6; cursor: wait; }
   line-height: 1.5;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
 #message {
   display: none;
-  padding: 12px;
+  padding: 13px;
   border-radius: 8px;
   margin-bottom: 16px;
   overflow-wrap: anywhere;
 }
 
-#message.success { display: block; background: #e8f7ee; color: var(--success); }
-#message.error { display: block; background: #fff0ef; color: var(--danger); }
+#message.success {
+  display: block;
+  background: #e8f7ee;
+  color: #18794e;
+}
 
-.muted { color: var(--muted); font-size: 14px; }
-.book-item { border-top: 1px solid var(--border); padding: 16px 0; }
-.book-item h3 { margin: 0 0 8px; }
-.book-meta { font-size: 14px; line-height: 1.7; color: var(--muted); }
-.chapter-item { border-top: 1px solid var(--border); padding: 12px 0; }
+#message.error {
+  display: block;
+  background: #fff0ef;
+  color: #b42318;
+}
 
-@media (max-width: 600px) {
+.book-item, .chapter-item {
+  border-top: 1px solid var(--border);
+  padding: 15px 0;
+}
+
+.book-item h3 { margin-bottom: 8px; }
+
+.muted {
+  color: #77718a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media(max-width:600px) {
   main { padding: 12px; }
   .grid { grid-template-columns: 1fr; }
   .card { padding: 16px; }
@@ -149,27 +165,26 @@ button:disabled { opacity: .6; cursor: wait; }
   <div id="message" role="status" aria-live="polite"></div>
 
   <section class="card">
-    <h2 id="bookFormHeading">Add a Book</h2>
+    <h2 id="formHeading">Add a Book</h2>
 
     <div class="notice">
-      Books and chapters are saved to Supabase when the connection and permissions are configured correctly.
-      Required fields are marked with *.
+      Add or update books here. Changes will be saved to Supabase when your account has the required database permissions.
     </div>
 
     <form id="bookForm">
       <input type="hidden" id="bookId">
 
       <label for="title">Book Title *</label>
-      <input id="title" required maxlength="250" placeholder="Enter the book title">
+      <input id="title" required maxlength="250" placeholder="Enter book title">
 
       <div class="grid">
         <div>
-          <label for="authorName">Author Name *</label>
-          <input id="authorName" required maxlength="200" placeholder="Enter author name">
+          <label for="author">Author Name *</label>
+          <input id="author" required placeholder="Author name">
         </div>
         <div>
           <label for="publisher">Publisher</label>
-          <input id="publisher" maxlength="200" placeholder="Publisher name">
+          <input id="publisher" placeholder="Publisher name">
         </div>
       </div>
 
@@ -188,13 +203,12 @@ button:disabled { opacity: .6; cursor: wait; }
             <option>Christian Romance</option>
           </select>
         </div>
-
         <div>
           <label for="length">Story Length *</label>
           <select id="length" required>
-            <option value="">Select story length</option>
-            <option value="Short">Short</option>
-            <option value="Long">Long</option>
+            <option value="">Select length</option>
+            <option>Short</option>
+            <option>Long</option>
           </select>
         </div>
       </div>
@@ -204,14 +218,13 @@ button:disabled { opacity: .6; cursor: wait; }
           <label for="status">Publication Status *</label>
           <select id="status" required>
             <option value="">Select status</option>
-            <option value="Draft">Draft</option>
-            <option value="Ongoing">Ongoing</option>
-            <option value="Completed">Completed</option>
+            <option>Draft</option>
+            <option>Ongoing</option>
+            <option>Completed</option>
           </select>
         </div>
-
         <div>
-          <label for="featured">Featured Book</label>
+          <label for="featured">Featured Book?</label>
           <select id="featured">
             <option value="false">No</option>
             <option value="true">Yes</option>
@@ -219,17 +232,17 @@ button:disabled { opacity: .6; cursor: wait; }
         </div>
       </div>
 
-      <label for="coverUrl">Book Cover Image URL</label>
-      <input id="coverUrl" type="url" placeholder="https://example.com/cover.jpg">
+      <label for="cover">Cover Image URL</label>
+      <input id="cover" type="url" placeholder="https://example.com/cover.jpg">
 
       <label for="tags">Tags</label>
       <input id="tags" placeholder="Romance, Alpha, Rejected Mate">
 
-      <label for="synopsis">Book Description / Synopsis *</label>
-      <textarea id="synopsis" required placeholder="Write the book synopsis"></textarea>
+      <label for="synopsis">Synopsis *</label>
+      <textarea id="synopsis" required placeholder="Write the book description"></textarea>
 
-      <button id="saveBookButton" type="submit">Save Book</button>
-      <button id="cancelEditButton" type="button" class="secondary" hidden>Cancel Edit</button>
+      <button id="saveBook" type="submit">Save Book</button>
+      <button id="cancelEdit" type="button" class="secondary" hidden>Cancel Edit</button>
       <button type="reset" class="secondary">Clear Form</button>
     </form>
   </section>
@@ -237,14 +250,10 @@ button:disabled { opacity: .6; cursor: wait; }
   <section class="card">
     <h2>Chapter Management</h2>
 
-    <p class="muted">
-      Select a saved book, then add its chapters. Chapter content is stored in the chapters table.
-    </p>
-
     <form id="chapterForm">
       <label for="chapterBook">Select Book *</label>
       <select id="chapterBook" required>
-        <option value="">Loading books...</option>
+        <option value="">Load books first</option>
       </select>
 
       <div class="grid">
@@ -254,48 +263,45 @@ button:disabled { opacity: .6; cursor: wait; }
         </div>
         <div>
           <label for="chapterTitle">Chapter Title *</label>
-          <input id="chapterTitle" required maxlength="250" placeholder="Chapter title">
+          <input id="chapterTitle" required placeholder="Chapter title">
         </div>
       </div>
 
       <div class="grid">
         <div>
-          <label for="chapterStatus">Chapter Publication Status</label>
+          <label for="chapterStatus">Chapter Status</label>
           <select id="chapterStatus">
             <option value="Draft">Draft</option>
             <option value="Published">Published</option>
           </select>
         </div>
         <div>
-          <label for="chapterLocked">Locked Chapter?</label>
-          <select id="chapterLocked">
-            <option value="true">Yes — requires unlocking</option>
+          <label for="locked">Locked Chapter?</label>
+          <select id="locked">
+            <option value="true">Yes — paid chapter</option>
             <option value="false">No — free chapter</option>
           </select>
         </div>
       </div>
 
       <label for="chapterContent">Chapter Content *</label>
-      <textarea id="chapterContent" required placeholder="Write or paste the chapter content here"></textarea>
+      <textarea id="chapterContent" required placeholder="Write or paste chapter content"></textarea>
 
-      <button id="saveChapterButton" type="submit">Save Chapter</button>
+      <button id="saveChapter" type="submit">Save Chapter</button>
     </form>
 
-    <div id="chapterList" style="margin-top:22px"></div>
+    <div id="chapterList"></div>
   </section>
 
   <section class="card">
     <h2>Existing Books</h2>
-    <button type="button" id="refreshBooksButton" class="secondary">Refresh Book List</button>
-    <div id="existingBooks" style="margin-top:16px">Loading books...</div>
+    <button id="refreshBooks" type="button" class="secondary">Refresh Book List</button>
+    <div id="bookList" style="margin-top:16px">Loading books...</div>
   </section>
 </main>
 
-<!-- Supabase JavaScript library -->
+<!-- Load Supabase library before initializing the client. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Your existing Supabase configuration -->
-<script src="supabase.js"></script>
 
 <script>
 (function () {
@@ -303,10 +309,14 @@ button:disabled { opacity: .6; cursor: wait; }
 
   const $ = id => document.getElementById(id);
 
-  let supabaseClient = window.supabaseClient;
+  const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+
+  let client = null;
   let books = [];
 
-  function showMessage(text, type) {
+  function message(text, type) {
     const box = $("message");
     box.textContent = text;
     box.className = type;
@@ -321,66 +331,56 @@ button:disabled { opacity: .6; cursor: wait; }
   }
 
   function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
       '"': "&quot;",
       "'": "&#39;"
-    })[char]);
+    })[character]);
   }
 
-  function normalizeStatus(value) {
-    const allowed = ["Draft", "Ongoing", "Completed"];
-    return allowed.includes(value) ? value : "Draft";
-  }
-
-  function parseTags(value) {
-    return value.trim();
-  }
-
-  function requireClient() {
-    if (!supabaseClient) {
+  function setupClient() {
+    if (!window.supabase || !window.supabase.createClient) {
       throw new Error(
-        "Supabase client not found. Check that supabase.js loads correctly and defines window.supabaseClient."
+        "The Supabase library did not load. Check your internet connection and refresh the page."
       );
     }
+
+    client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
   }
 
   async function loadBooks() {
-    requireClient();
-
-    $("existingBooks").textContent = "Loading books...";
-    $("chapterBook").innerHTML = '<option value="">Select a book</option>';
-
-    const { data, error } = await supabaseClient
+    const { data, error } = await client
       .from("books")
-      .select("id,title,author_name,genre,length,status,synopsis,cover_url,tags,publisher,featured,created_at")
+      .select("id,title,author_name,publisher,genre,length,status,cover_url,tags,synopsis,featured,created_at")
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
     books = data || [];
 
+    const select = $("chapterBook");
+    select.replaceChildren(new Option("Select a book", ""));
+
     books.forEach(book => {
-      const option = document.createElement("option");
-      option.value = String(book.id);
-      option.textContent = book.title;
-      $("chapterBook").appendChild(option);
+      select.add(new Option(book.title, String(book.id)));
     });
 
     renderBooks();
   }
 
   function renderBooks() {
-    const container = $("existingBooks");
+    const list = $("bookList");
+    list.replaceChildren();
 
     if (!books.length) {
-      container.textContent = "No books found. Add your first book using the form above.";
+      list.textContent = "No books found yet.";
       return;
     }
-
-    container.replaceChildren();
 
     books.forEach(book => {
       const item = document.createElement("div");
@@ -390,102 +390,103 @@ button:disabled { opacity: .6; cursor: wait; }
       heading.textContent = book.title;
       item.appendChild(heading);
 
-      const details = document.createElement("div");
-      details.className = "book-meta";
+      const details = document.createElement("p");
+      details.className = "muted";
       details.textContent =
         "Author: " + (book.author_name || "Not specified") +
-        " · Genre: " + (book.genre || "Not specified") +
-        " · Length: " + (book.length || "Not specified") +
-        " · Status: " + (book.status || "Not specified") +
-        " · Featured: " + (book.featured ? "Yes" : "No");
+        " | Genre: " + (book.genre || "Not specified") +
+        " | Length: " + (book.length || "Not specified") +
+        " | Status: " + (book.status || "Not specified") +
+        " | Featured: " + (book.featured ? "Yes" : "No");
       item.appendChild(details);
 
       const edit = document.createElement("button");
       edit.type = "button";
-      edit.className = "small";
       edit.textContent = "Edit Book";
       edit.addEventListener("click", () => editBook(book));
       item.appendChild(edit);
 
-      const chapters = document.createElement("button");
-      chapters.type = "button";
-      chapters.className = "small secondary";
-      chapters.textContent = "View Chapters";
-      chapters.addEventListener("click", () => {
+      const view = document.createElement("button");
+      view.type = "button";
+      view.className = "secondary";
+      view.textContent = "View Chapters";
+      view.addEventListener("click", async () => {
         $("chapterBook").value = String(book.id);
-        loadChapters(book.id);
-        $("chapterForm").scrollIntoView({ behavior: "smooth" });
+        try {
+          await loadChapters(book.id);
+          $("chapterForm").scrollIntoView({ behavior: "smooth" });
+        } catch (error) {
+          message("Could not load chapters: " + error.message, "error");
+        }
       });
-      item.appendChild(chapters);
+      item.appendChild(view);
 
-      container.appendChild(item);
+      list.appendChild(item);
     });
   }
 
   function editBook(book) {
     $("bookId").value = book.id;
     $("title").value = book.title || "";
-    $("authorName").value = book.author_name || "";
+    $("author").value = book.author_name || "";
     $("publisher").value = book.publisher || "";
     $("genre").value = book.genre || "";
     $("length").value = book.length || "";
-    $("status").value = normalizeStatus(book.status);
+    $("status").value = book.status || "";
     $("featured").value = String(Boolean(book.featured));
-    $("coverUrl").value = book.cover_url || "";
+    $("cover").value = book.cover_url || "";
     $("tags").value = book.tags || "";
     $("synopsis").value = book.synopsis || "";
 
-    $("bookFormHeading").textContent = "Edit Book";
-    $("saveBookButton").textContent = "Update Book";
-    $("cancelEditButton").hidden = false;
+    $("formHeading").textContent = "Edit Book";
+    $("saveBook").textContent = "Update Book";
+    $("cancelEdit").hidden = false;
     $("bookForm").scrollIntoView({ behavior: "smooth" });
   }
 
   function resetBookForm() {
     $("bookForm").reset();
     $("bookId").value = "";
-    $("bookFormHeading").textContent = "Add a Book";
-    $("saveBookButton").textContent = "Save Book";
-    $("cancelEditButton").hidden = true;
+    $("formHeading").textContent = "Add a Book";
+    $("saveBook").textContent = "Save Book";
+    $("cancelEdit").hidden = true;
   }
+
+  $("cancelEdit").addEventListener("click", resetBookForm);
 
   $("bookForm").addEventListener("submit", async event => {
     event.preventDefault();
     clearMessage();
 
-    const button = $("saveBookButton");
+    const button = $("saveBook");
     button.disabled = true;
 
     try {
-      requireClient();
-
-      const bookId = $("bookId").value;
+      const id = $("bookId").value;
 
       const payload = {
         title: $("title").value.trim(),
-        author_name: $("authorName").value.trim(),
+        author_name: $("author").value.trim(),
         publisher: $("publisher").value.trim() || null,
         genre: $("genre").value,
         length: $("length").value,
         status: $("status").value,
         featured: $("featured").value === "true",
-        cover_url: $("coverUrl").value.trim() || null,
-        tags: parseTags($("tags").value) || null,
+        cover_url: $("cover").value.trim() || null,
+        tags: $("tags").value.trim() || null,
         synopsis: $("synopsis").value.trim()
       };
 
       let result;
 
-      if (bookId) {
-        result = await supabaseClient
-          .from("books")
+      if (id) {
+        result = await client.from("books")
           .update(payload)
-          .eq("id", bookId)
+          .eq("id", id)
           .select()
           .single();
       } else {
-        result = await supabaseClient
-          .from("books")
+        result = await client.from("books")
           .insert(payload)
           .select()
           .single();
@@ -493,36 +494,22 @@ button:disabled { opacity: .6; cursor: wait; }
 
       if (result.error) throw result.error;
 
-      showMessage(bookId ? "Book updated successfully." : "Book saved successfully.", "success");
-
       resetBookForm();
       await loadBooks();
+      message(id ? "Book updated successfully." : "Book saved successfully.", "success");
     } catch (error) {
       console.error(error);
-      showMessage("Could not save the book: " + error.message, "error");
+      message("Book save failed: " + error.message, "error");
     } finally {
       button.disabled = false;
     }
   });
 
-  $("cancelEditButton").addEventListener("click", resetBookForm);
-
-  $("bookForm").addEventListener("reset", () => {
-    setTimeout(() => {
-      $("bookId").value = "";
-      $("bookFormHeading").textContent = "Add a Book";
-      $("saveBookButton").textContent = "Save Book";
-      $("cancelEditButton").hidden = true;
-    }, 0);
-  });
-
   async function loadChapters(bookId) {
-    requireClient();
-
     const list = $("chapterList");
     list.textContent = "Loading chapters...";
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await client
       .from("chapters")
       .select("id,book_id,chapter_number,title,locked,pub_status")
       .eq("book_id", String(bookId))
@@ -530,26 +517,27 @@ button:disabled { opacity: .6; cursor: wait; }
 
     if (error) throw error;
 
-    if (!data || !data.length) {
-      list.textContent = "No chapters found for this book yet.";
+    list.replaceChildren();
+
+    if (!data || data.length === 0) {
+      list.textContent = "No chapters have been added to this book.";
       return;
     }
-
-    list.replaceChildren();
 
     data.forEach(chapter => {
       const item = document.createElement("div");
       item.className = "chapter-item";
 
       const title = document.createElement("strong");
-      title.textContent = "Chapter " + chapter.chapter_number + ": " + chapter.title;
+      title.textContent =
+        "Chapter " + chapter.chapter_number + ": " + chapter.title;
       item.appendChild(title);
 
       const info = document.createElement("p");
       info.className = "muted";
       info.textContent =
         "Status: " + (chapter.pub_status || "Not specified") +
-        " · " + (chapter.locked ? "Locked" : "Free");
+        " | " + (chapter.locked ? "Locked" : "Free");
       item.appendChild(info);
 
       list.appendChild(item);
@@ -560,15 +548,14 @@ button:disabled { opacity: .6; cursor: wait; }
     clearMessage();
 
     if (!$("chapterBook").value) {
-      $("chapterList").textContent = "";
+      $("chapterList").replaceChildren();
       return;
     }
 
     try {
       await loadChapters($("chapterBook").value);
     } catch (error) {
-      console.error(error);
-      showMessage("Could not load chapters: " + error.message, "error");
+      message("Could not load chapters: " + error.message, "error");
     }
   });
 
@@ -576,12 +563,10 @@ button:disabled { opacity: .6; cursor: wait; }
     event.preventDefault();
     clearMessage();
 
-    const button = $("saveChapterButton");
+    const button = $("saveChapter");
     button.disabled = true;
 
     try {
-      requireClient();
-
       const bookId = $("chapterBook").value;
       const number = Number($("chapterNumber").value);
       const title = $("chapterTitle").value.trim();
@@ -596,56 +581,47 @@ button:disabled { opacity: .6; cursor: wait; }
         chapter_number: number,
         title: title,
         content: content,
-        locked: $("chapterLocked").value === "true",
+        locked: $("locked").value === "true",
         pub_status: $("chapterStatus").value
       };
 
-      const { error } = await supabaseClient
-        .from("chapters")
-        .insert(payload);
-
+      const { error } = await client.from("chapters").insert(payload);
       if (error) throw error;
 
-      showMessage("Chapter saved successfully.", "success");
-
-      const selectedBook = bookId;
       $("chapterNumber").value = "";
       $("chapterTitle").value = "";
       $("chapterContent").value = "";
-      $("chapterLocked").value = "true";
-      $("chapterStatus").value = "Draft";
 
-      await loadChapters(selectedBook);
+      await loadChapters(bookId);
+      message("Chapter saved successfully.", "success");
     } catch (error) {
       console.error(error);
-      showMessage("Could not save the chapter: " + error.message, "error");
+      message("Chapter save failed: " + error.message, "error");
     } finally {
       button.disabled = false;
     }
   });
 
-  $("refreshBooksButton").addEventListener("click", async () => {
+  $("refreshBooks").addEventListener("click", async () => {
     clearMessage();
 
     try {
       await loadBooks();
-      showMessage("Book list refreshed.", "success");
+      message("Book list refreshed.", "success");
     } catch (error) {
-      console.error(error);
-      showMessage("Could not refresh books: " + error.message, "error");
+      message("Could not load books: " + error.message, "error");
     }
   });
 
   async function start() {
     try {
-      requireClient();
+      setupClient();
       await loadBooks();
     } catch (error) {
       console.error(error);
-      showMessage("Connection setup failed: " + error.message, "error");
-      $("existingBooks").textContent =
-        "Books could not be loaded. Check the Supabase configuration and table permissions.";
-      $("chapterBook").innerHTML = '<option value="">Books unavailable</option>';
+      $("bookList").textContent = "Books could not be loaded.";
+      $("chapterBook").replaceChildren(new Option("Books unavailable", ""));
+      message("Connection failed: " + error.message, "error");
     }
   }
 
@@ -654,4 +630,4 @@ button:disabled { opacity: .6; cursor: wait; }
 </script>
 
 </body>
-  </html>
+</html>
