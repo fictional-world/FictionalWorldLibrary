@@ -2,398 +2,1686 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FictionalWorld Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17131f">
+<meta name="description" content="Discover captivating stories at Fictional World Library.">
+<title>Fictional World Library</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, sans-serif; background: #fdf4ff; color: #222; padding-bottom: 20px; }
-  header { background: linear-gradient(90deg, #8B5CF6, #EC4899); padding: 14px; text-align: center; }
-  .logo-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .logo-text { font-size: 20px; font-weight: 800; color: #fff; font-family: Georgia, serif; }
-  .logo-text span { color: #FDE68A; }
-  .container { padding: 16px; max-width: 600px; margin: 0 auto; }
-  input, textarea, select { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; background: #fff; }
-  textarea { min-height: 100px; }
-  button { background: #8B5CF6; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; width: 100%; margin-top: 8px; font-size: 15px; cursor: pointer; }
-  button.secondary { background: #eee; color: #222; }
-  button.danger { background: #EC4899; }
-  h3 { color: #8B5CF6; margin: 20px 0 8px; }
-  .hidden { display: none; }
-  .book-item { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-  .book-item h4 { color: #8B5CF6; }
-  .chapter-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-  .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #f0f0f0; }
-  .tag.locked { background: #fde2ef; color: #EC4899; }
-  .tag.free { background: #eafaf1; color: #16a34a; }
-  .small-btn { width: auto; padding: 4px 10px; font-size: 12px; margin-left: 6px; }
-  .cover-preview { width: 90px; height: 120px; object-fit: cover; border-radius: 8px; margin-top: 6px; }
-  .cover-preview.small { width: 50px; height: 70px; float: left; margin-right: 10px; }
-  .top-tabs { display: flex; background: #fff; border-bottom: 2px solid #eee; position: sticky; top: 0; z-index: 10; }
-  .top-tab { flex: 1; text-align: center; padding: 12px 4px; font-size: 13px; color: #999; cursor: pointer; border-bottom: 3px solid transparent; }
-  .top-tab.active { color: #8B5CF6; font-weight: bold; border-bottom-color: #8B5CF6; }
-  .stat-card { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 10px; border: 1px solid #eee; }
-  .stat-num { font-size: 22px; font-weight: bold; color: #8B5CF6; }
-  .stat-label { font-size: 12px; color: #777; }
-  .stat-row { display: flex; gap: 10px; }
-  .stat-row .stat-card { flex: 1; }
-  .author-card { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+:root {
+  --bg: #111116;
+  --surface: #1b1b23;
+  --surface2: #24242e;
+  --text: #f7f5fa;
+  --muted: #aaa6b5;
+  --accent: #b18aff;
+  --accent2: #8d5ce6;
+  --border: #34323e;
+  --danger: #ff7777;
+  --success: #72d6a0;
+}
+
+body.light {
+  --bg: #f7f5fa;
+  --surface: #ffffff;
+  --surface2: #eeeaf5;
+  --text: #211b2b;
+  --muted: #706879;
+  --accent: #7540ca;
+  --accent2: #6031ae;
+  --border: #e1dbe9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.55;
+  transition: background .2s, color .2s;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+a { color: var(--accent); }
+
+.hidden { display: none !important; }
+
+.muted { color: var(--muted); }
+
+.small { font-size: 13px; }
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 5%;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  cursor: pointer;
+}
+
+.brand span { color: var(--accent); }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  padding: 11px 15px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.btn-primary {
+  background: var(--accent2);
+  border-color: var(--accent2);
+  color: white;
+}
+
+.btn-plain {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text);
+}
+
+.btn-block { width: 100%; }
+
+main {
+  width: 100%;
+  max-width: 1250px;
+  min-height: 65vh;
+  margin: auto;
+  padding: 24px 5% 105px;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 32px 25px;
+  margin-bottom: 30px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 90% 0%, #61428c 0%, transparent 45%),
+    linear-gradient(135deg, #30233e, #17141f);
+  color: white;
+}
+
+.hero-label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #d7c3ff;
+}
+
+.hero h1 {
+  max-width: 600px;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.12;
+  margin: 12px 0;
+}
+
+.hero p {
+  max-width: 570px;
+  color: #e0d9e9;
+}
+
+.section { margin: 30px 0; }
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.section-heading h2 {
+  font-size: 21px;
+  margin: 0;
+}
+
+.search-box {
+  display: flex;
+  gap: 8px;
+  margin: 22px 0;
+}
+
+.field {
+  width: 100%;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.genre-list {
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 5px 0 12px;
+}
+
+.genre-button {
+  flex: 0 0 auto;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.genre-button.active {
+  background: var(--accent2);
+  color: white;
+  border-color: var(--accent2);
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.book-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.book-cover {
+  display: block;
+  width: 100%;
+  height: 205px;
+  object-fit: cover;
+  background: var(--surface2);
+}
+
+.cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 205px;
+  padding: 15px;
+  text-align: center;
+  background: linear-gradient(145deg, #40304e, #211b2c);
+  color: #e8d9ff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.book-info { padding: 12px; }
+
+.book-title {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+
+.book-author {
+  margin: 0 0 7px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.book-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.book-info .btn {
+  width: 100%;
+  padding: 9px 6px;
+  font-size: 12px;
+}
+
+.panel {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.panel h2 { margin-top: 0; }
+
+.form-group { margin: 14px 0; }
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.form-message {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+
+.error { color: var(--danger); }
+.success { color: var(--success); }
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--surface2);
+  font-size: 27px;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stat-box {
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface2);
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.package {
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface2);
+}
+
+.package h3 { margin: 0 0 5px; }
+.package p { margin: 5px 0 12px; }
+
+.page-copy {
+  max-width: 850px;
+  margin: auto;
+  line-height: 1.8;
+}
+
+.page-copy h2 { margin-top: 28px; }
+
+.chapter-row,
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.chapter-row > div,
+.list-row > div { min-width: 0; }
+
+.chapter-row strong,
+.list-row strong { overflow-wrap: anywhere; }
+
+.reader-content {
+  line-height: 2;
+  font-size: 17px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: space-around;
+  gap: 2px;
+  padding: 8px 2px max(8px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.bottom-nav button {
+  flex: 1;
+  padding: 6px 2px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.bottom-nav button span {
+  display: block;
+  font-size: 19px;
+}
+
+.bottom-nav button.active { color: var(--accent); }
+
+.site-footer {
+  padding: 25px 5% 105px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.footer-links button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.loading {
+  padding: 25px 0;
+  color: var(--muted);
+}
+
+@media (min-width: 620px) {
+  .book-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .book-cover, .cover-placeholder { height: 260px; }
+
+  .hero { padding: 45px; }
+
+  .package-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 950px) {
+  .book-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  main { padding-top: 32px; }
+}
+
+@media (max-width: 380px) {
+  .brand { font-size: 16px; }
+  .header-actions .btn { padding: 9px; font-size: 12px; }
+  .book-cover, .cover-placeholder { height: 175px; }
+  .panel { padding: 16px; }
+}
 </style>
 </head>
-<body><div id="loginView">
-  <header><div class="logo-wrap">📖<span class="logo-text">Fictional<span>World</span> Admin</span></div></header>
-  <div class="container">
-    <h3>Log in</h3>
-    <input id="loginEmail" type="email" placeholder="Email">
-    <input id="loginPassword" type="password" placeholder="Password">
-    <button onclick="adminLogin()">Log In</button>
-    <p id="loginError" style="color:#EC4899;font-size:13px;margin-top:8px;"></p>
-  </div>
-</div>
+<body>
 
-<div id="adminView" class="hidden">
-  <header><div class="logo-wrap">📖<span class="logo-text">Fictional<span>World</span> Admin</span></div></header>
-  <div class="top-tabs">
-    <div class="top-tab active" id="tabBooks" onclick="switchSection('books')">Books</div>
-    <div class="top-tab" id="tabAuthors" onclick="switchSection('authors')">Authors</div>
-    <div class="top-tab" id="tabEarning" onclick="switchSection('earning')">Earning</div>
-    <div class="top-tab" id="tabNotif" onclick="switchSection('notif')">Notify</div>
+<header class="site-header">
+  <div class="brand" onclick="showPage('home')">
+    Fictional <span>World</span> Library
   </div>
+  <div class="header-actions">
+    <button class="btn" id="headerLogin" onclick="showPage('account')">Login</button>
+    <button class="btn btn-primary" onclick="showPage('wallet')">My Wallet</button>
+  </div>
+</header>
 
-  <div id="booksSection" class="container">
-    <h3>Add a New Book</h3>
-    <label style="font-size:13px;color:#777;">Book cover</label>
-    <input type="file" id="bookCoverFile" accept="image/*" onchange="previewCover(event)">
-    <img id="coverPreviewImg" class="cover-preview hidden">
-    <input id="bookTitle" placeholder="Book title">
-    <select id="bookGenre">
-      <option value="Werewolf">Werewolf</option><option value="Mafia">Mafia</option>
-      <option value="Erotica">Erotica</option><option value="LGBTQ">LGBTQ</option>
-      <option value="Billionaire Drama">Billionaire Drama</option><option value="Vampire">Vampire</option>
-      <option value="Paranormal">Paranormal</option><option value="Christian Romance">Christian Romance</option>
-    </select>
-    <select id="bookLength">
-      <option value="short">Short story</option><option value="long">Long story</option>
-    </select>
-    <select id="bookStatus">
-      <option value="ongoing">Ongoing</option><option value="completed">Completed</option>
-    </select>
-    <label style="font-size:13px;color:#777;">Author</label>
-    <select id="bookAuthor"></select>
-    <input id="bookTags" placeholder="Tags (comma separated)">
-    <textarea id="bookSynopsis" placeholder="Synopsis"></textarea>
-    <button onclick="addBook()">Save Book</button>
-    <h3>Your Books</h3>
-    <div id="bookList"></div>
+<main>
+
+<!-- HOME -->
+<section id="page-home" class="page">
+  <div class="hero">
+    <div class="hero-label">Your next favourite story awaits</div>
+    <h1>Discover Worlds Beyond Imagination</h1>
+    <p>Explore unforgettable characters, captivating romances, dangerous secrets, and stories worth staying up for.</p>
+    <button class="btn btn-primary" onclick="document.getElementById('bookSearch').focus()">Explore Stories</button>
   </div>
 
-  <div id="authorsSection" class="container hidden">
-    <h3>Add a New Author</h3>
-    <input id="newAuthorName" placeholder="Author pen name">
-    <button onclick="addAuthor()">Add Author</button>
-    <h3>Your Authors</h3>
-    <div id="authorList"></div>
+  <div class="search-box">
+    <input id="bookSearch" class="field" placeholder="Search books, authors, or keywords..." aria-label="Search books">
+    <button class="btn btn-primary" onclick="searchBooks()">Search</button>
   </div>
 
-  <div id="earningSection" class="container hidden">
-    <h3>Reading Stats</h3>
-    <div class="stat-row">
-      <div class="stat-card"><div class="stat-num" id="statVisitorsToday">0</div><div class="stat-label">Visitors Today</div></div>
-      <div class="stat-card"><div class="stat-num" id="statVisitorsWeek">0</div><div class="stat-label">This Week</div></div>
-      <div class="stat-card"><div class="stat-num" id="statVisitorsMonth">0</div><div class="stat-label">This Month</div></div>
+  <section class="section">
+    <div class="section-heading"><h2>Explore Genres</h2></div>
+    <div id="genreList" class="genre-list"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading"><h2>Featured Stories</h2></div>
+    <div id="featuredBooks" class="book-grid"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading"><h2 id="discoverHeading">Discover Stories</h2></div>
+    <div id="bookGrid" class="book-grid"></div>
+    <p id="bookLoading" class="loading">Loading books...</p>
+  </section>
+
+  <section class="section">
+    <div class="section-heading"><h2>Ongoing Stories</h2></div>
+    <div id="ongoingBooks" class="book-grid"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading"><h2>Completed Stories</h2></div>
+    <div id="completedBooks" class="book-grid"></div>
+  </section>
+</section>
+
+<!-- ACCOUNT / LOGIN -->
+<section id="page-account" class="page hidden">
+  <div class="panel">
+    <h2 id="authTitle">Reader Login</h2>
+    <p class="muted">Sign in to continue reading and manage your library.</p>
+
+    <div id="signupFields" class="hidden">
+      <div class="form-group">
+        <label for="signupName">Full name</label>
+        <input id="signupName" class="field" autocomplete="name" placeholder="Your name">
+      </div>
+
+      <div class="form-group">
+        <label for="signupGender">Gender (optional)</label>
+        <select id="signupGender" class="field">
+          <option value="">Prefer not to say</option>
+          <option value="Female">Female</option>
+          <option value="Male">Male</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
     </div>
-    <h3>Earnings</h3>
-    <div class="stat-card"><div class="stat-num" id="earnCoins">$0</div><div class="stat-label">Total From Coin Purchases</div></div>
-    <h3>Per-Book Breakdown</h3>
-    <div id="bookEarningsList"></div>
+
+    <div class="form-group">
+      <label for="authEmail">Email address</label>
+      <input id="authEmail" class="field" type="email" autocomplete="email" placeholder="you@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="authPassword">Password</label>
+      <input id="authPassword" class="field" type="password" autocomplete="current-password" placeholder="Enter password">
+    </div>
+
+    <button id="authSubmit" class="btn btn-primary btn-block" onclick="authenticate()">Login</button>
+
+    <p>
+      <button id="authSwitch" class="btn btn-plain" onclick="toggleAuthMode()">Create an account</button>
+    </p>
+
+    <button class="btn btn-plain" onclick="resetPassword()">Forgot password?</button>
+    <p id="authMessage" class="form-message" role="status"></p>
+  </div>
+</section>
+
+<!-- BOOK DETAILS -->
+<section id="page-book" class="page hidden">
+  <button class="btn" onclick="showPage('home')">← Back to books</button>
+  <div id="bookDetails" class="panel"></div>
+
+  <section class="section">
+    <div class="section-heading"><h2>Chapters</h2></div>
+    <div id="chapterList" class="panel">
+      <p class="muted">Select a book to view its published chapters.</p>
+    </div>
+  </section>
+</section>
+
+<!-- READER -->
+<section id="page-reader" class="page hidden">
+  <button class="btn" onclick="showPage('book')">← Back to chapters</button>
+  <div class="panel">
+    <p id="readerBookTitle" class="muted"></p>
+    <h2 id="readerChapterTitle">Chapter</h2>
+    <div id="readerContent" class="reader-content"></div>
+    <p id="readerMessage" class="form-message"></p>
+    <div class="chapter-row">
+      <button id="previousChapter" class="btn" onclick="navigateChapter(-1)">← Previous</button>
+      <button id="nextChapter" class="btn btn-primary" onclick="navigateChapter(1)">Next →</button>
+    </div>
+  </div>
+</section>
+
+<!-- LIBRARY -->
+<section id="page-library" class="page hidden">
+  <div class="section-heading"><h2>My Library</h2></div>
+  <p class="muted">Keep track of the stories you've started and finished.</p>
+
+  <div class="genre-list">
+    <button class="genre-button active" onclick="loadLibrary('all',this)">All</button>
+    <button class="genre-button" onclick="loadLibrary('ongoing',this)">Currently Reading</button>
+    <button class="genre-button" onclick="loadLibrary('completed',this)">Completed</button>
+    <button class="genre-button" onclick="loadLibrary('viewed',this)">Viewed</button>
   </div>
 
-  <div id="notifSection" class="container hidden">
-    <h3>Send a Notification</h3>
-    <textarea id="notifMessage" placeholder="Message to all readers"></textarea>
-    <button onclick="sendNotif()">Send to All Readers</button>
-    <p style="font-size:12px;color:#999;margin-top:8px;">This sends to every registered reader, use sparingly.</p>
+  <div id="libraryBooks" class="book-grid"></div>
+  <p id="libraryMessage" class="loading"></p>
+</section>
+
+<!-- WALLET -->
+<section id="page-wallet" class="page hidden">
+  <div class="panel">
+    <h2>My Wallet</h2>
+    <p class="muted">Use coins to unlock chapters and enjoy your favourite stories.</p>
+
+    <div class="stat-box">
+      <div class="muted">Available balance</div>
+      <div class="stat-number"><span id="walletBalance">—</span> coins</div>
+    </div>
+
+    <p class="muted">One locked chapter costs 10 coins.</p>
+
+    <div class="section-heading"><h2>Choose a Coin Package</h2></div>
+    <div id="coinPackages" class="package-grid"></div>
+
+    <p class="muted small">
+      Prices are displayed in USD. Checkout and currency conversion must be connected to the secure payment backend before real purchases can be made.
+    </p>
+
+    <div class="section-heading"><h2>Transaction History</h2></div>
+    <div id="transactionHistory"></div>
+
+    <div class="section-heading"><h2>Unlocked Chapters</h2></div>
+    <div id="unlockedHistory"></div>
   </div>
-      </div><script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
+</section>
+
+<!-- SUBSCRIPTIONS -->
+<section id="page-subscriptions" class="page hidden">
+  <div class="section-heading"><h2>Reader Memberships</h2></div>
+  <p class="muted">Choose the membership that suits your reading habits.</p>
+  <div id="subscriptionPlans" class="package-grid"></div>
+  <div class="panel">
+    <h2>My Subscription</h2>
+    <div id="mySubscription">Sign in to view your membership.</div>
+  </div>
+</section>
+
+<!-- NOTIFICATIONS -->
+<section id="page-notifications" class="page hidden">
+  <div class="section-heading"><h2>Notifications</h2></div>
+  <p class="muted">Important updates about your account, books, and purchases.</p>
+  <div id="notificationList" class="panel"></div>
+</section>
+
+<!-- PROFILE -->
+<section id="page-profile" class="page hidden">
+  <div class="panel">
+    <div class="profile-row">
+      <div id="profileAvatar" class="avatar">FW</div>
+      <div>
+        <h2 id="profileName">Reader Profile</h2>
+        <p id="profileEmail" class="muted">Sign in to view your account.</p>
+      </div>
+    </div>
+
+    <div id="profileDetails">
+      <p>Reader ID: <span id="readerId">—</span></p>
+    </div>
+
+    <div class="form-group">
+      <label for="profileNameInput">Display name</label>
+      <input id="profileNameInput" class="field" placeholder="Your name">
+    </div>
+
+    <div class="form-group">
+      <label for="profileGenderInput">Gender</label>
+      <select id="profileGenderInput" class="field">
+        <option value="">Prefer not to say</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="profilePictureInput">Profile picture</label>
+      <input id="profilePictureInput" class="field" type="file" accept="image/png,image/jpeg,image/webp">
+      <p class="muted small">Profile-picture saving requires a configured Supabase Storage bucket and appropriate access policies.</p>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+    <button class="btn" onclick="showPage('settings')">Account Settings</button>
+    <button class="btn" onclick="logout()">Log Out</button>
+    <p id="profileMessage" class="form-message"></p>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="page-settings" class="page hidden">
+  <div class="panel">
+    <h2>Settings</h2>
+
+    <div class="list-row">
+      <div>
+        <strong>Appearance</strong>
+        <div class="muted small">Switch between light and dark mode.</div>
+      </div>
+      <button class="btn" onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+
+    <div class="list-row">
+      <div>
+        <strong>Membership</strong>
+        <div class="muted small">View reader subscription plans.</div>
+      </div>
+      <button class="btn" onclick="showPage('subscriptions')">View Plans</button>
+    </div>
+
+    <div class="list-row">
+      <div>
+        <strong>Customer Service</strong>
+        <div class="muted small">Get help with your account or payments.</div>
+      </div>
+      <a class="btn" href="mailto:fictionalworldlibary@gmail.com">Contact Us</a>
+    </div>
+
+    <div class="list-row">
+      <div>
+        <strong>Be Our Author</strong>
+        <div class="muted small">Learn about publishing your stories.</div>
+      </div>
+      <button class="btn" onclick="showPage('authors')">Learn More</button>
+    </div>
+
+    <div class="list-row">
+      <div>
+        <strong>About Us</strong>
+      </div>
+      <button class="btn" onclick="showPage('about')">Read More</button>
+    </div>
+
+    <div class="list-row">
+      <div><strong>Privacy Policy</strong></div>
+      <button class="btn" onclick="showPage('privacy')">Read Policy</button>
+    </div>
+
+    <div class="list-row">
+      <div><strong>Terms &amp; Conditions</strong></div>
+      <button class="btn" onclick="showPage('terms')">Read Terms</button>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT US -->
+<section id="page-about" class="page hidden">
+  <article class="panel page-copy">
+    <h2>About Fictional World Library</h2>
+    <p>Fictional World Library is a digital reading platform created to bring readers and storytellers together through engaging fiction.</p>
+    <h2>Our Mission</h2>
+    <p>Our goal is to make discovering stories enjoyable, give readers a convenient place to follow their favourite books, and provide authors with opportunities to share their work.</p>
+    <h2>What We Offer</h2>
+    <p>Readers can explore genres, follow ongoing stories, discover completed books, and build a personal library. Eligible chapters may be available free or through coin-based unlocking.</p>
+    <h2>For Authors</h2>
+    <p>Writers can explore our author programme and review its current requirements before submitting their work.</p>
+    <p class="muted small">Contact: fictionalworldlibary@gmail.com</p>
+  </article>
+</section>
+
+<!-- PRIVACY -->
+<section id="page-privacy" class="page hidden">
+  <article class="panel page-copy">
+    <h2>Privacy Policy</h2>
+    <p>This policy explains how Fictional World Library handles information when readers use the platform.</p>
+
+    <h2>Information We Collect</h2>
+    <p>Depending on the features used, information may include your email address, display name, reader account identifier, profile picture, gender if supplied, reading progress, library activity, coin balance, transaction records, subscription status, and support correspondence.</p>
+
+    <h2>How We Use Information</h2>
+    <p>We use information to operate accounts, provide reading features, save library activity, process purchases, maintain subscriptions, investigate payment issues, respond to support requests, and protect the platform.</p>
+
+    <h2>Payments</h2>
+    <p>Payments may be processed through Paystack. Payment details are handled according to the payment provider's systems and applicable requirements. Fictional World Library should not collect or store card security codes in its own database.</p>
+
+    <h2>Service Providers</h2>
+    <p>We may rely on service providers for database hosting, authentication, image storage, website hosting, payment processing, and operational security. Information should only be shared as necessary for their functions and under applicable terms.</p>
+
+    <h2>Cookies and Technical Data</h2>
+    <p>Authentication sessions and necessary browser storage may be used to keep you signed in and operate the platform. Hosting and security systems may also process technical request information.</p>
+
+    <h2>Data Security and Retention</h2>
+    <p>We use appropriate technical and organisational measures to protect information. No internet service can guarantee absolute security. Records may be retained for as long as needed to operate the service, resolve disputes, meet legal obligations, and maintain financial records.</p>
+
+    <h2>Your Choices</h2>
+    <p>You can manage available profile information and contact support about access, correction, or deletion requests. Some records may need to be retained where required for security, financial, or legal purposes.</p>
+
+    <h2>Contact</h2>
+    <p>For privacy questions, contact fictionalworldlibary@gmail.com.</p>
+    <p class="muted small">This draft must be reviewed and adapted to the actual services, data practices, and applicable laws before launch.</p>
+  </article>
+</section>
+
+<!-- TERMS -->
+<section id="page-terms" class="page hidden">
+  <article class="panel page-copy">
+    <h2>Terms and Conditions</h2>
+    <p>By using Fictional World Library, you agree to use the platform lawfully and respect the rights of readers, authors, and other users.</p>
+
+    <h2>Accounts</h2>
+    <p>You are responsible for protecting your sign-in credentials and for activity carried out through your account. Provide accurate information and contact support if you suspect unauthorised access.</p>
+
+    <h2>Books and Content</h2>
+    <p>Books, chapters, covers, and other materials may be protected by intellectual property laws. You may read and use them through the features provided but must not copy, distribute, or commercially exploit them without permission.</p>
+
+    <h2>Coins and Chapter Unlocking</h2>
+    <p>Coins are platform credits used for eligible chapter unlocks. The displayed price and unlock conditions apply at the time of purchase. Coin balances are not a bank account or cash balance and cannot automatically be exchanged for money.</p>
+
+    <h2>Payments and Refunds</h2>
+    <p>Payments are subject to checkout information and applicable payment-provider terms. Failed or cancelled payments should not result in coin credits. Refund requests will be reviewed under the published refund rules and applicable law. Contact support if a payment succeeds but the purchased coins do not appear.</p>
+
+    <h2>Subscriptions</h2>
+    <p>Subscription benefits, prices, billing periods, renewal terms, cancellation procedures, and eligibility should be displayed before purchase. Benefits may depend on the active subscription status.</p>
+
+    <h2>Acceptable Use</h2>
+    <p>Do not attempt to bypass chapter restrictions, manipulate coin balances, interfere with other accounts, exploit security weaknesses, or upload unlawful or infringing material.</p>
+
+    <h2>Suspension and Changes</h2>
+    <p>Access may be restricted where necessary to investigate fraud, protect users, enforce these terms, or comply with legal requirements. Important changes to the service or terms should be communicated appropriately.</p>
+
+    <h2>Contact</h2>
+    <p>Questions or complaints: fictionalworldlibary@gmail.com.</p>
+    <p class="muted small">These draft terms require review before launch, including specific refund, subscription renewal, cancellation, and author-contract conditions.</p>
+  </article>
+</section>
+
+<!-- BE OUR AUTHOR -->
+<section id="page-authors" class="page hidden">
+  <article class="panel page-copy">
+    <h2>Be Our Author</h2>
+    <p>Fictional World Library welcomes writers interested in sharing original stories with readers. Our author programme is intended to help writers understand the submission and publishing process.</p>
+
+    <h2>Before Applying</h2>
+    <p>Prepare an original story, a clear synopsis, and the required opening chapters. Make sure you own or control the rights necessary to submit your work.</p>
+
+    <h2>Review Process</h2>
+    <p>Applications and manuscripts are subject to review. Acceptance, publishing arrangements, deadlines, and editorial requirements depend on the current programme guidelines and the contract offered.</p>
+
+    <h2>Contracts and Earnings</h2>
+    <p>Contract options, revenue shares, bonuses, chapter requirements, completion conditions, and payment arrangements must be explained in the current author guidelines and the writer's agreement.</p>
+
+    <h2>Apply</h2>
+    <p>Contact fictionalworldlibary@gmail.com to request the current submission instructions.</p>
+
+    <p class="muted small">This is a temporary overview. The final page will use your updated author-programme image and rules rather than inventing contract terms.</p>
+  </article>
+</section>
+
+<!-- MORE MENU -->
+<section id="page-more" class="page hidden">
+  <div class="panel">
+    <h2>More</h2>
+    <button class="btn btn-block" onclick="showPage('wallet')">Wallet &amp; Top Up</button>
+    <br><br>
+    <button class="btn btn-block" onclick="showPage('subscriptions')">Reader Subscriptions</button>
+    <br><br>
+    <button class="btn btn-block" onclick="showPage('notifications')">Notifications</button>
+    <br><br>
+    <button class="btn btn-block" onclick="showPage('settings')">Settings</button>
+    <br><br>
+    <a class="btn btn-block" href="mailto:fictionalworldlibary@gmail.com">Customer Service</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <strong>Fictional World Library</strong>
+  <div class="footer-links">
+    <button onclick="showPage('about')">About Us</button>
+    <button onclick="showPage('privacy')">Privacy Policy</button>
+    <button onclick="showPage('terms')">Terms &amp; Conditions</button>
+    <button onclick="showPage('authors')">Be Our Author</button>
+  </div>
+  <p>Customer Service: fictionalworldlibary@gmail.com</p>
+  <p class="small">Read stories. Discover new worlds.</p>
+</footer>
+
+<nav class="bottom-nav" aria-label="Main navigation">
+  <button class="active" onclick="showPage('home',this)"><span>⌂</span>Home</button>
+  <button onclick="showPage('library',this)"><span>▤</span>Library</button>
+  <button onclick="showPage('more',this)"><span>•••</span>More</button>
+  <button onclick="showPage('notifications',this)"><span>♧</span>Alerts</button>
+  <button onclick="showPage('profile',this)"><span>♙</span>Profile</button>
+ </nav>
+ <script>
+/* ==========================================
+   FICTIONAL WORLD LIBRARY
+   Reader frontend + Supabase connection
+========================================== */
+
 const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const GENRES = ["Werewolf","Mafia","Erotica","LGBTQ","Billionaire Drama","Vampire","Paranormal","Christian Romance"];
-let books = [];
-let authors = [];
-let pendingCoverData = null;
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function checkAdminSession() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    document.getElementById('loginView').classList.add('hidden');
-    document.getElementById('adminView').classList.remove('hidden');
-    await loadAuthors();
-    await loadBooks();
+const GENRES = [
+  "All",
+  "Werewolf",
+  "Mafia",
+  "Erotica",
+  "LGBTQ",
+  "Billionaire Drama",
+  "Vampire",
+  "Paranormal",
+  "Christian Romance"
+];
+
+const COIN_PACKAGES = [
+  { coins: 100, price: 2.99 },
+  { coins: 300, price: 7.99 },
+  { coins: 600, price: 14.99 },
+  { coins: 1200, price: 27.99 }
+];
+
+const SUBSCRIPTIONS = [
+  {
+    tier: "Tier 1",
+    name: "Readers Pass",
+    monthly: 5.99,
+    yearly: 49.99,
+    coins: 50,
+    discount: 5,
+    freeChapters: 0
+  },
+  {
+    tier: "Tier 2",
+    name: "VIP Reader",
+    monthly: 9.99,
+    yearly: 89.99,
+    coins: 150,
+    discount: 9,
+    freeChapters: 0
+  },
+  {
+    tier: "Tier 3",
+    name: "Exclusive Reader",
+    monthly: 19.99,
+    yearly: 179.99,
+    coins: 300,
+    discount: 15,
+    freeChapters: 2
+  }
+];
+
+let currentUser = null;
+let currentProfile = null;
+let allBooks = [];
+let selectedBook = null;
+let selectedChapters = [];
+let selectedChapterIndex = 0;
+let authMode = "login";
+let activeGenre = "All";
+let currentLibraryFilter = "all";
+let lastPage = "home";
+
+function byId(id) {
+  return document.getElementById(id);
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function money(value) {
+  return "$" + Number(value || 0).toFixed(2);
+}
+
+function showMessage(id, message, type = "") {
+  const el = byId(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = "form-message " + type;
+}
+
+function showPage(name, navButton) {
+  const target = byId("page-" + name);
+
+  if (!target) {
+    showPage("home");
+    return;
+  }
+
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.add("hidden");
+  });
+
+  target.classList.remove("hidden");
+
+  document.querySelectorAll(".bottom-nav button").forEach(button => {
+    button.classList.remove("active");
+  });
+
+  if (navButton) navButton.classList.add("active");
+
+  if (name !== "reader") lastPage = name;
+
+  if (name === "wallet") loadWallet();
+  if (name === "profile") loadProfile();
+  if (name === "library") loadLibrary(currentLibraryFilter);
+  if (name === "notifications") loadNotifications();
+  if (name === "subscriptions") loadSubscriptions();
+
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("light");
+
+  const theme = document.body.classList.contains("light")
+    ? "light"
+    : "dark";
+
+  try {
+    localStorage.setItem("fwl_theme", theme);
+  } catch (_) {}
+}
+
+function restoreTheme() {
+  try {
+    if (localStorage.getItem("fwl_theme") === "light") {
+      document.body.classList.add("light");
+    }
+  } catch (_) {}
+}
+
+/* ==========================================
+   AUTHENTICATION
+========================================== */
+
+function toggleAuthMode() {
+  authMode = authMode === "login" ? "signup" : "login";
+
+  byId("authTitle").textContent =
+    authMode === "login" ? "Reader Login" : "Create Reader Account";
+
+  byId("authSubmit").textContent =
+    authMode === "login" ? "Login" : "Create Account";
+
+  byId("authSwitch").textContent =
+    authMode === "login"
+      ? "Create an account"
+      : "Already have an account? Login";
+
+  byId("signupFields").classList.toggle("hidden", authMode !== "signup");
+
+  byId("authPassword").autocomplete =
+    authMode === "login" ? "current-password" : "new-password";
+
+  showMessage("authMessage", "");
+}
+
+async function authenticate() {
+  const email = byId("authEmail").value.trim();
+  const password = byId("authPassword").value;
+  const name = byId("signupName").value.trim();
+  const gender = byId("signupGender").value;
+
+  showMessage("authMessage", "");
+
+  if (!email || !password) {
+    showMessage("authMessage", "Enter your email and password.", "error");
+    return;
+  }
+
+  if (authMode === "signup" && !name) {
+    showMessage("authMessage", "Enter your name.", "error");
+    return;
+  }
+
+  if (password.length < 6) {
+    showMessage("authMessage", "Your password must contain at least 6 characters.", "error");
+    return;
+  }
+
+  byId("authSubmit").disabled = true;
+  byId("authSubmit").textContent = "Please wait...";
+
+  try {
+    if (authMode === "signup") {
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            gender
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (!data.session) {
+        showMessage(
+          "authMessage",
+          "Account created. Check your email to confirm your account, then log in.",
+          "success"
+        );
+        return;
+      }
+
+      currentUser = data.user;
+      await ensureProfile(name, gender);
+      await refreshAccount();
+      showMessage("authMessage", "Account created successfully.", "success");
+      showPage("home");
+    } else {
+      const { data, error } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      currentUser = data.user;
+      await ensureProfile();
+      await refreshAccount();
+      showMessage("authMessage", "Welcome back!", "success");
+      showPage("home");
+    }
+  } catch (error) {
+    showMessage(
+      "authMessage",
+      error.message || "Unable to authenticate. Please try again.",
+      "error"
+    );
+  } finally {
+    byId("authSubmit").disabled = false;
+    byId("authSubmit").textContent =
+      authMode === "login" ? "Login" : "Create Account";
   }
 }
 
-async function adminLogin() {
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) { document.getElementById('loginError').innerText = "Login failed: " + error.message; return; }
-  document.getElementById('loginView').classList.add('hidden');
-  document.getElementById('adminView').classList.remove('hidden');
-  await loadAuthors();
-  await loadBooks();
-}
+async function resetPassword() {
+  const email = byId("authEmail").value.trim();
 
-function switchSection(section) {
-  ['books','authors','earning','notif'].forEach(s => {
-    document.getElementById(s + 'Section').classList.add('hidden');
-    document.getElementById('tab' + s.charAt(0).toUpperCase() + s.slice(1)).classList.remove('active');
+  if (!email) {
+    showMessage("authMessage", "Enter your email address first.", "error");
+    return;
+  }
+
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
   });
-  document.getElementById(section + 'Section').classList.remove('hidden');
-  document.getElementById('tab' + section.charAt(0).toUpperCase() + section.slice(1)).classList.add('active');
-  if (section === 'earning') renderEarning();
+
+  if (error) {
+    showMessage("authMessage", error.message, "error");
+  } else {
+    showMessage("authMessage", "If the account exists, password reset instructions will be sent.", "success");
+  }
 }
 
-function previewCover(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    pendingCoverData = e.target.result;
-    const img = document.getElementById('coverPreviewImg');
-    img.src = pendingCoverData;
-    img.classList.remove('hidden');
+async function logout() {
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    alert("Unable to log out: " + error.message);
+    return;
+  }
+
+  currentUser = null;
+  currentProfile = null;
+  updateHeader();
+  showPage("home");
+}
+
+async function ensureProfile(name = "", gender = "") {
+  if (!currentUser) return;
+
+  const { data, error } = await db
+    .from("users")
+    .select("*")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Profile lookup:", error.message);
+    return;
+  }
+
+  if (data) {
+    currentProfile = data;
+    return;
+  }
+
+  const profile = {
+    id: currentUser.id,
+    name: name || currentUser.user_metadata?.name || "",
+    gender: gender || currentUser.user_metadata?.gender || "",
+    email: currentUser.email,
+    coin_balance: 0
   };
-  reader.readAsDataURL(file);
-}
-</script><script>
-async function loadAuthors() {
-  const { data } = await supabase.from('authors').select('*').order('name');
-  authors = data || [];
-  const select = document.getElementById('bookAuthor');
-  if (select) select.innerHTML = authors.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
-  renderAuthors();
+
+  const result = await db.from("users").insert(profile);
+
+  if (result.error) {
+    console.error("Profile creation:", result.error.message);
+    return;
+  }
+
+  currentProfile = profile;
 }
 
-async function addAuthor() {
-  const name = document.getElementById('newAuthorName').value.trim();
-  if (!name) { alert("Enter an author name."); return; }
-  await supabase.from('authors').insert([{ name }]);
-  document.getElementById('newAuthorName').value = "";
-  await loadAuthors();
+async function refreshAccount() {
+  if (!currentUser) return;
+
+  const { data, error } = await db
+    .from("users")
+    .select("*")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  if (!error && data) currentProfile = data;
+
+  updateHeader();
 }
 
-function renderAuthors() {
-  const el = document.getElementById('authorList');
-  if (!authors.length) { el.innerHTML = "<p style='font-size:13px;color:#999;'>No authors yet.</p>"; return; }
-  el.innerHTML = authors.map(a => {
-    const bookCount = books.filter(b => b.author_name === a.name).length;
-    return `<div class="author-card"><span>${a.name}</span><span style="font-size:12px;color:#777;">${bookCount} book(s)</span></div>`;
-  }).join('');
+function updateHeader() {
+  byId("headerLogin").textContent = currentUser ? "My Account" : "Login";
+
+  if (currentUser) {
+    byId("headerLogin").onclick = () => showPage("profile");
+  } else {
+    byId("headerLogin").onclick = () => showPage("account");
+  }
+
+  byId("walletBalance").textContent =
+    currentProfile ? Number(currentProfile.coin_balance || 0) : "—";
+}
+
+/* ==========================================
+   BOOKS AND GENRES
+========================================== */
+
+function renderGenres() {
+  byId("genreList").innerHTML = GENRES.map(genre => `
+    <button
+      class="genre-button ${activeGenre === genre ? "active" : ""}"
+      onclick="selectGenre('${escapeHTML(genre)}',this)"
+    >${escapeHTML(genre)}</button>
+  `).join("");
+}
+
+function selectGenre(genre, button) {
+  activeGenre = genre;
+
+  document.querySelectorAll("#genreList button").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  if (button) button.classList.add("active");
+
+  searchBooks();
+}
+
+function getCover(book) {
+  const cover = book.cover_url || "";
+
+  if (cover && /^https?:\/\//i.test(cover)) {
+    return `<img class="book-cover" src="${escapeHTML(cover)}" alt="${escapeHTML(book.title)} cover" loading="lazy" onerror="this.outerHTML='<div class=&quot;cover-placeholder&quot;>Cover unavailable</div>'">`;
+  }
+
+  return `<div class="cover-placeholder">${escapeHTML(book.title || "Fictional World")}</div>`;
+}
+
+function bookCard(book) {
+  return `
+    <article class="book-card">
+      ${getCover(book)}
+      <div class="book-info">
+        <h3 class="book-title">${escapeHTML(book.title)}</h3>
+        <p class="book-author">${escapeHTML(book.author_name || "Unknown Author")}</p>
+        <div class="book-meta">
+          ${escapeHTML(book.genre || "Fiction")}
+          · ${escapeHTML(book.status || "Ongoing")}
+        </div>
+        <button class="btn btn-primary" onclick="openBook('${escapeHTML(book.id)}')">
+          View Story
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function renderBookList(elementId, books, emptyMessage = "No books available yet.") {
+  const el = byId(elementId);
+  if (!el) return;
+
+  el.innerHTML = books.length
+    ? books.map(bookCard).join("")
+    : `<p class="muted">${escapeHTML(emptyMessage)}</p>`;
 }
 
 async function loadBooks() {
-  const { data } = await supabase.from('books').select('*').order('created_at', { ascending: false });
-  books = data || [];
-  for (const book of books) {
-    const { data: chapters } = await supabase.from('chapters').select('*').eq('book_id', String(book.id)).order('chapter_number');
-    book.chapters = chapters || [];
+  byId("bookLoading").textContent = "Loading books...";
+
+  const { data, error } = await db
+    .from("books")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Books:", error.message);
+    byId("bookLoading").textContent =
+      "Unable to load books. Check your Supabase books table permissions.";
+    return;
   }
-  renderBooks();
-  renderAuthors();
+
+  allBooks = (data || []).filter(book =>
+    String(book.status || "").toLowerCase() !== "draft" &&
+    String(book.status || "").toLowerCase() !== "unpublished"
+  );
+
+  byId("bookLoading").textContent = allBooks.length
+    ? ""
+    : "No books have been published yet.";
+
+  renderBookList("featuredBooks", allBooks.slice(0, 5), "Featured stories will appear here.");
+  renderBookList("bookGrid", allBooks);
+  renderBookList(
+    "ongoingBooks",
+    allBooks.filter(book => /ongoing/i.test(book.status || ""))
+  );
+  renderBookList(
+    "completedBooks",
+    allBooks.filter(book => /completed/i.test(book.status || ""))
+  );
+
+  searchBooks();
 }
 
-async function addBook() {
-  const title = document.getElementById('bookTitle').value;
-  if (!title) { alert("Book title is required."); return; }
-  await supabase.from('books').insert([{
-    title,
-    cover_url: pendingCoverData || null,
-    genre: document.getElementById('bookGenre').value,
-    length: document.getElementById('bookLength').value,
-    status: document.getElementById('bookStatus').value,
-    author_name: document.getElementById('bookAuthor').value,
-    tags: document.getElementById('bookTags').value,
-    synopsis: document.getElementById('bookSynopsis').value
-  }]);
-  document.getElementById('bookTitle').value = "";
-  document.getElementById('bookCoverFile').value = "";
-  document.getElementById('coverPreviewImg').classList.add('hidden');
-  pendingCoverData = null;
-  document.getElementById('bookTags').value = "";
-  document.getElementById('bookSynopsis').value = "";
-  await loadBooks();
+function searchBooks() {
+  const input = byId("bookSearch");
+  const query = input ? input.value.trim().toLowerCase() : "";
+
+  const filtered = allBooks.filter(book => {
+    const matchesGenre =
+      activeGenre === "All" ||
+      String(book.genre || "").toLowerCase() === activeGenre.toLowerCase();
+
+    const searchable = [
+      book.title,
+      book.author_name,
+      book.genre,
+      book.synopsis,
+      ...(Array.isArray(book.tags) ? book.tags : [])
+    ].join(" ").toLowerCase();
+
+    return matchesGenre && searchable.includes(query);
+  });
+
+  byId("discoverHeading").textContent =
+    query ? "Search Results" :
+    activeGenre === "All" ? "Discover Stories" : activeGenre + " Stories";
+
+  renderBookList("bookGrid", filtered, "No matching books found.");
 }
 
-async function deleteBook(bookId) {
-  if (!confirm("Delete this book and all its chapters?")) return;
-  await supabase.from('chapters').delete().eq('book_id', String(bookId));
-  await supabase.from('books').delete().eq('id', bookId);
-  await loadBooks();
-}
+byId("bookSearch").addEventListener("keydown", event => {
+  if (event.key === "Enter") searchBooks();
+});
 
-function toggleEdit(bookId) {
-  const book = books.find(b => b.id === bookId);
-  book.editing = !book.editing;
-  renderBooks();
-}
+/* ==========================================
+   BOOK DETAILS AND CHAPTERS
+========================================== */
 
-async function saveBookEdit(bookId) {
-  await supabase.from('books').update({
-    title: document.getElementById(`editTitle-${bookId}`).value,
-    genre: document.getElementById(`editGenre-${bookId}`).value,
-    length: document.getElementById(`editLength-${bookId}`).value,
-    status: document.getElementById(`editStatus-${bookId}`).value,
-    author_name: document.getElementById(`editAuthor-${bookId}`).value,
-    tags: document.getElementById(`editTags-${bookId}`).value,
-    synopsis: document.getElementById(`editSynopsis-${bookId}`).value
-  }).eq('id', bookId);
-  await loadBooks();
-}
+async function openBook(bookId) {
+  selectedBook = allBooks.find(book => String(book.id) === String(bookId));
 
-function genreOptions(selected) {
-  return GENRES.map(g => `<option value="${g}" ${g === selected ? 'selected' : ''}>${g}</option>`).join('');
-}
-function authorOptions(selected) {
-  return authors.map(a => `<option value="${a.name}" ${a.name === selected ? 'selected' : ''}>${a.name}</option>`).join('');
-}
-</script><script>
-async function addChapter(bookId) {
-  const titleInput = document.getElementById(`chTitle-${bookId}`);
-  const contentInput = document.getElementById(`chContent-${bookId}`);
-  if (!titleInput.value || !contentInput.value) { alert("Chapter needs a title and text."); return; }
-  const book = books.find(b => b.id === bookId);
-  const nextNumber = book.chapters.length ? book.chapters[book.chapters.length - 1].chapter_number + 1 : 1;
-  await supabase.from('chapters').insert([{
-    book_id: String(bookId), chapter_number: nextNumber, title: titleInput.value, content: contentInput.value, locked: false, pub_status: 'draft'
-  }]);
-  titleInput.value = ""; contentInput.value = "";
-  await loadBooks();
-}
-async function toggleLock(bookId, chapterId, currentlyLocked) {
-  await supabase.from('chapters').update({ locked: !currentlyLocked }).eq('id', chapterId);
-  await loadBooks();
-}
-async function togglePublish(bookId, chapterId, currentStatus) {
-  const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
-  await supabase.from('chapters').update({ pub_status: newStatus }).eq('id', chapterId);
-  await loadBooks();
-}
-async function deleteChapter(bookId, chapterId) {
-  if (!confirm("Delete this chapter?")) return;
-  await supabase.from('chapters').delete().eq('id', chapterId);
-  await loadBooks();
-}
+  if (!selectedBook) {
+    alert("This book could not be found.");
+    return;
+  }
 
-function renderBooks() {
-  const listDiv = document.getElementById('bookList');
-  if (!books.length) { listDiv.innerText = "No books yet — add your first one above."; return; }
-  listDiv.innerHTML = books.map(book => {
-    if (book.editing) {
-      return `
-        <div class="book-item">
-          <h4>Editing: ${book.title}</h4>
-          <input id="editTitle-${book.id}" value="${book.title}" placeholder="Book title">
-          <select id="editGenre-${book.id}">${genreOptions(book.genre)}</select>
-          <select id="editLength-${book.id}">
-            <option value="short" ${book.length==='short'?'selected':''}>Short story</option>
-            <option value="long" ${book.length==='long'?'selected':''}>Long story</option>
-          </select>
-          <select id="editStatus-${book.id}">
-            <option value="ongoing" ${book.status==='ongoing'?'selected':''}>Ongoing</option>
-            <option value="completed" ${book.status==='completed'?'selected':''}>Completed</option>
-          </select>
-          <select id="editAuthor-${book.id}">${authorOptions(book.author_name)}</select>
-          <input id="editTags-${book.id}" value="${book.tags||''}" placeholder="Tags">
-          <textarea id="editSynopsis-${book.id}" placeholder="Synopsis">${book.synopsis||''}</textarea>
-          <div style="display:flex;gap:6px;">
-            <button onclick="saveBookEdit(${book.id})">Save Changes</button>
-            <button class="secondary" onclick="toggleEdit(${book.id})">Cancel</button>
-          </div>
-        </div>`;
-    }
-    return `
-    <div class="book-item">
-      ${book.cover_url ? `<img src="${book.cover_url}" class="cover-preview small">` : ''}
-      <h4>${book.title}</h4>
-      <p>${book.genre} • ${book.length} • ${book.status}</p>
-      <p style="font-size:13px;color:#777;">${book.author_name || ''}</p>
-      <div style="clear:both;"></div>
-      <div style="display:flex;gap:6px;">
-        <button class="secondary small-btn" onclick="toggleEdit(${book.id})" style="width:auto;">Edit Book Info</button>
-        <button class="danger small-btn" onclick="deleteBook(${book.id})" style="width:auto;">Delete Book</button>
-      </div>
-      <h4 style="margin-top:12px;">Chapters</h4>
+  showPage("book");
+
+  byId("bookDetails").innerHTML = `
+    <div style="max-width:260px;margin:0 auto 20px">
+      ${getCover(selectedBook)}
+    </div>
+    <h2>${escapeHTML(selectedBook.title)}</h2>
+    <p class="muted">By ${escapeHTML(selectedBook.author_name || "Unknown Author")}</p>
+    <p>${escapeHTML(selectedBook.synopsis || "Discover this story on Fictional World Library.")}</p>
+    <p class="muted">Genre: ${escapeHTML(selectedBook.genre || "Fiction")}</p>
+    <p class="muted">Status: ${escapeHTML(selectedBook.status || "Ongoing")}</p>
+    <button class="btn btn-primary" onclick="addToLibrary()">Add to My Library</button>
+  `;
+
+  byId("chapterList").innerHTML = '<p class="loading">Loading chapters...</p>';
+
+  const { data, error } = await db
+    .from("chapters")
+    .select("id,book_id,chapter_number,title,locked,pub_status")
+    .eq("book_id", String(selectedBook.id))
+    .eq("pub_status", "published")
+    .order("chapter_number", { ascending: true });
+
+  if (error) {
+    byId("chapterList").innerHTML =
+      '<p class="error">Unable to load chapters. Check the chapters table permissions.</p>';
+    return;
+  }
+
+  selectedChapters = data || [];
+
+  if (!selectedChapters.length) {
+    byId("chapterList").innerHTML =
+      '<p class="muted">No published chapters are available yet.</p>';
+    return;
+  }
+
+  byId("chapterList").innerHTML = selectedChapters.map((chapter, index) => `
+    <div class="chapter-row">
       <div>
-        ${book.chapters.length ? book.chapters.map(ch => `
-          <div class="chapter-row">
-            <span>Ch ${ch.chapter_number}: ${ch.title}
-              <span class="tag ${ch.locked ? 'locked' : 'free'}">${ch.locked ? 'Locked' : 'Free'}</span>
-              <span class="tag">${ch.pub_status}</span>
-            </span>
-            <span>
-              <button class="secondary small-btn" onclick="toggleLock(${book.id}, ${ch.id}, ${ch.locked})">${ch.locked ? 'Unlock' : 'Lock'}</button>
-              <button class="secondary small-btn" onclick="togglePublish(${book.id}, ${ch.id}, '${ch.pub_status}')">${ch.pub_status === 'draft' ? 'Publish' : 'Unpublish'}</button>
-              <button class="danger small-btn" onclick="deleteChapter(${book.id}, ${ch.id})">Delete</button>
-            </span>
-          </div>`).join('') : "<p style='font-size:13px;color:#999;'>No chapters yet.</p>"}
+        <strong>Chapter ${escapeHTML(chapter.chapter_number)}</strong>
+        <div class="muted small">${escapeHTML(chapter.title || "Untitled Chapter")}</div>
       </div>
-      <div style="margin-top:10px;">
-        <input id="chTitle-${book.id}" placeholder="Chapter title">
-        <textarea id="chContent-${book.id}" placeholder="Chapter text"></textarea>
-        <button onclick="addChapter(${book.id})">Add Chapter (as Draft)</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-</script><script>
-async function renderEarning() {
-  const { data: txns } = await supabase.from('transactions').select('*');
-  const totalRevenue = (txns || []).reduce((sum, t) => sum + (t.amount_ngn || 0), 0);
-  document.getElementById('earnCoins').innerText = "$" + totalRevenue.toFixed(2);
+      <button class="btn ${chapter.locked ? "" : "btn-primary"}"
+        onclick="readChapter(${index})">
+        ${chapter.locked ? "Unlock · 10 coins" : "Read"}
+      </button>
+    </div>
+  `).join("");
 
-  const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-
-  const { count: todayCount } = await supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay);
-  const { count: weekCount } = await supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfWeek);
-  const { count: monthCount } = await supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth);
-  document.getElementById('statVisitorsToday').innerText = todayCount || 0;
-  document.getElementById('statVisitorsWeek').innerText = weekCount || 0;
-  document.getElementById('statVisitorsMonth').innerText = monthCount || 0;
-
-  const { data: allChapters } = await supabase.from('chapters').select('id, book_id');
-  const { data: allUnlocks } = await supabase.from('unlocks').select('chapter_id');
-  const { data: allLibrary } = await supabase.from('libary').select('book_id');
-
-  const el = document.getElementById('bookEarningsList');
-  el.innerHTML = books.map(b => {
-    const bookChapterIds = (allChapters || []).filter(c => c.book_id === String(b.id)).map(c => String(c.id));
-    const unlockCount = (allUnlocks || []).filter(u => bookChapterIds.includes(String(u.chapter_id))).length;
-    const libCount = (allLibrary || []).filter(l => l.book_id === String(b.id)).length;
-    return `
-    <div class="stat-card">
-      <div style="font-weight:bold;color:#8B5CF6;">${b.title}</div>
-      <div style="font-size:12px;color:#777;">Chapters unlocked: ${unlockCount} • In libraries: ${libCount} • Coins earned: ${unlockCount * 10}</div>
-    </div>`;
-  }).join('');
+  await addToLibrary(false);
 }
 
-async function sendNotif() {
-  const text = document.getElementById('notifMessage').value.trim();
-  if (!text) { alert("Write a message first."); return; }
-  const { data: allUsers } = await supabase.from('users').select('id');
-  if (!allUsers || !allUsers.length) { alert("No readers to notify yet."); return; }
-  const rows = allUsers.map(u => ({ user_id: u.id, message: text, is_read: false }));
-  await supabase.from('notification').insert(rows);
-  document.getElementById('notifMessage').value = "";
-  alert("Notification sent to " + allUsers.length + " reader(s).");
+async function addToLibrary(showMessageBox = true) {
+  if (!currentUser || !selectedBook) {
+    if (showMessageBox) showPage("account");
+    return;
+  }
+
+  const { error } = await db
+    .from("library")
+    .upsert({
+      user_id: currentUser.id,
+      book_id: String(selectedBook.id),
+      status: "ongoing"
+    }, {
+      onConflict: "user_id,book_id",
+      ignoreDuplicates: false
+    });
+
+  if (error) {
+    console.error("Library:", error.message);
+    if (showMessageBox) alert("Could not save this book. Check your library table permissions.");
+    return;
+  }
+
+  if (showMessageBox) alert("Book added to your library.");
 }
 
-checkAdminSession();
-</script>
-</body>
-</html>
+async function readChapter(index) {
+  if (!currentUser) {
+    showPage("account");
+    return;
+  }
+
+  const chapter = selectedChapters[index];
+  if (!chapter) return;
+
+  if (chapter.locked) {
+    const confirmed = confirm("Unlock this chapter for 10 coins?");
+    if (!confirmed) return;
+
+    const { error: unlockError } = await db.rpc("unlock_chapter", {
+      p_chapter_id: String(chapter.id)
+    });
+
+    if (unlockError) {
+      alert(unlockError.message || "Unable to unlock this chapter.");
+      return;
+    }
+
+    await refreshAccount();
+  }
+
+  selectedChapterIndex = index;
+  await displayChapter(chapter);
+}
+
+async function displayChapter(chapter) {
+  showPage("reader");
+
+  byId("readerBookTitle").textContent = selectedBook?.title || "";
+  byId("readerChapterTitle").textContent =
+    "Chapter " + chapter.chapter_number + ": " + (chapter.title || "");
+
+  byId("readerContent").textContent = "Loading chapter...";
+  showMessage("readerMessage", "");
+
+  const { data, error } = await db.rpc("get_chapter_content", {
+    p_chapter_id: String(chapter.id)
+  });
+
+  if (error) {
+    byId("readerContent").textContent = "";
+    showMessage(
+      "readerMessage",
+      error.message || "Unable to load chapter content.",
+      "error"
+    );
+    return;
+  }
+
+  let content = "";
+
+  if (typeof data === "string") {
+    content = data;
+  } else if (Array.isArray(data) && data.length) {
+    content = data[0].content || data[0].chapter_text || "";
+  } else if (data && typeof data === "object") {
+    content = data.content || data.chapter_text || "";
+  }
+
+  byId("readerContent").textContent =
+    content || "No chapter content was returned.";
+
+  byId("previousChapter").disabled = selectedChapterIndex <= 0;
+  byId("nextChapter").disabled =
+    selectedChapterIndex >= selectedChapters.length - 1;
+}
+
+async function navigateChapter(direction) {
+  const nextIndex = selectedChapterIndex + direction;
+
+  if (nextIndex < 0 || nextIndex >= selectedChapters.length) return;
+
+  const chapter = selectedChapters[nextIndex];
+
+  if (chapter.locked) {
+    const ok = confirm("This chapter costs 10 coins. Unlock it?");
+    if (!ok) return;
+
+    const { error } = await db.rpc("unlock_chapter", {
+      p_chapter_id: String(chapter.id)
+    });
+
+    if (error) {
+      alert(error.message || "Unable to unlock this chapter.");
+      return;
+    }
+  }
+
+  selectedChapterIndex = nextIndex;
+  await refreshAccount();
+  await displayChapter(chapter);
+}
+
+/* ==========================================
+   PROFILE
+========================================== */
+
+async function loadProfile() {
+  if (!currentUser) {
+    byId("profileName").textContent = "Reader Profile";
+    byId("profileEmail").textContent = "Please log in to view your profile.";
+    byId("readerId").textContent = "—";
+    return;
+  }
+
+  await refreshAccount();
+
+  const profile = currentProfile || {};
+
+  byId("profileName").textContent = profile.name || "Reader";
+  byId("profileEmail").textContent = currentUser.email || "";
+  byId("readerId").textContent = currentUser.id;
+
+  byId("profileNameInput").value = profile.name || "";
+  byId("profileGenderInput").value = profile.gender || "";
+
+  const picture = profile.profile_picture_url || "";
+
+  byId("profileAvatar").innerHTML = picture
+    ? `<img src="${escapeHTML(picture)}" alt="Profile picture">`
+    : "FW";
+}
+
+async function saveProfile() {
+  if (!currentUser) {
+    showPage("account");
+    return;
+  }
+
+  const name = byId("profileNameInput").value.trim();
+  const gender = byId("profileGenderInput").value;
+  const file = byId("profilePictureInput").files[0];
+
+  if (!name) {
+    showMessage("profileMessage", "Please enter your name.", "error");
+    return;
+  }
+
+  const updates = { name, gender };
+
+  if (file) {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      showMessage("profileMessage", "Choose a JPG, PNG, or WebP image.", "error");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      showMessage("profileMessage", "Your image must be 2 MB or smaller.", "error");
+      return;
+    }
+
+    /*
+      Image upload is not enabled here yet.
+      It requires a configured Supabase Storage bucket
+      and a verified per-user upload policy.
+    */
+    showMessage(
+      "profileMessage",
+      "Profile details can be saved, but image upload needs a configured Supabase Storage bucket.",
+      "error"
+    );
+
+    return;
+  }
+
+  const { error } = await db
+    .from("users")
+    .update(updates)
+    .eq("id", currentUser.id);
+
+  if (error) {
+    showMessage("profileMessage", error.message, "error");
+    return;
+  }
+
+  await refreshAccount();
+  await loadProfile();
+  showMessage("profileMessage", "Profile saved successfully.", "success");
+}
+
+/* ==========================================
+   LIBRARY
+========================================== */
+
+async function loadLibrary(filter = "all", button) {
+  currentLibraryFilter = filter;
+
+  if (button) {
+    document.querySelectorAll("#page-library .genre-button").forEach(el => {
+      el.classList.remove("active");
+    });
+    button.classList.add("active");
+  }
+
+  if (!currentUser) {
+    byId("libraryBooks").innerHTML =
+      '<p class="muted">Please log in to view your library.</p>';
+    byId("libraryMessage").textContent = "";
+    return;
+  }
+
+  byId("libraryMessage").textContent = "Loading your library...";
+
+  const { data, error } =
