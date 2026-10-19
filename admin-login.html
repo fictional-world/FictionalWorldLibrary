@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login | Fictional World Library</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: #10111a;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    .login {
+      width: 100%;
+      max-width: 400px;
+      padding: 30px;
+      border: 1px solid #303141;
+      border-radius: 16px;
+      background: #191a27;
+    }
+    h1 { margin-top: 0; font-size: 25px; }
+    p { color: #b8b9c8; line-height: 1.5; }
+    label { display: block; margin: 18px 0 7px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #414254;
+      border-radius: 8px;
+      background: #10111a;
+      color: white;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #d6b36a;
+      color: #151515;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #message { overflow-wrap: anywhere; }
+    a { color: #e4c67f; }
+  </style>
+</head>
+<body>
+  <main class="login">
+    <h1>Fictional World Library</h1>
+    <p>Administrator sign-in</p>
+
+    <form id="loginForm">
+      <label for="email">Admin email</label>
+      <input id="email" type="email"
+        autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+        autocomplete="current-password" required>
+
+      <button id="submitButton" type="submit">Sign In</button>
+    </form>
+
+    <p id="message" role="status"></p>
+    <p><a href="index.html">Return to the library</a></p>
+  </main>
+
+  <script>
+    const SUPABASE_URL =
+      "https://mhvphjcreqhfnulflgiy.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+
+    const client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+
+    const ADMIN_ID = "a57c6170-7026-43b4-91af-ee7459776109";
+    const message = document.getElementById("message");
+    const button = document.getElementById("submitButton");
+
+    document.getElementById("loginForm").addEventListener(
+      "submit", async function (event) {
+        event.preventDefault();
+        button.disabled = true;
+        message.textContent = "Checking your account...";
+
+        try {
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+
+          const { data, error } = await client.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) throw error;
+
+          if (data.user.id !== ADMIN_ID) {
+            await client.auth.signOut();
+            throw new Error("This account is not authorized as the administrator.");
+          }
+
+          const { data: admin, error: adminError } = await client
+            .from("admin_users")
+            .select("user_id")
+            .eq("user_id", data.user.id)
+            .maybeSingle();
+
+          if (adminError) throw adminError;
+
+          if (!admin) {
+            await client.auth.signOut();
+            throw new Error("Your account is not registered as an administrator.");
+          }
+
+          window.location.replace("admin.html");
+        } catch (error) {
+          message.textContent = error.message ||
+            "Sign-in failed. Please try again.";
+          button.disabled = false;
+        }
+      }
+    );
+  </script>
+</body>
+  </html>
