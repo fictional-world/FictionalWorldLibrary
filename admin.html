@@ -6,21 +6,16 @@
   <title>Admin Dashboard | Fictional World Library</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
       background: #10111a;
       color: #f5f5f7;
+      font-family: Arial, sans-serif;
     }
 
-    .layout {
-      display: flex;
-      min-height: 100vh;
-    }
+    .layout { display: flex; min-height: 100vh; }
 
     aside {
       width: 250px;
@@ -31,15 +26,15 @@
     }
 
     .brand {
-      margin: 0 0 8px;
       color: #e4c67f;
       font-size: 21px;
+      margin: 0 0 8px;
     }
 
     .subtitle {
-      margin: 0 0 25px;
       color: #a8a9b9;
       font-size: 13px;
+      margin-bottom: 25px;
     }
 
     nav a {
@@ -73,10 +68,7 @@
       margin-bottom: 28px;
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 27px;
-    }
+    h1 { margin: 0 0 8px; font-size: 27px; }
 
     .muted {
       color: #a8a9b9;
@@ -106,10 +98,7 @@
       background: #191a27;
     }
 
-    .card h2 {
-      margin: 0 0 12px;
-      font-size: 17px;
-    }
+    .card h2 { margin: 0 0 12px; font-size: 17px; }
 
     .card p {
       margin: 0;
@@ -118,21 +107,12 @@
       line-height: 1.6;
     }
 
-    .section-title {
-      margin: 30px 0 15px;
-      font-size: 19px;
-    }
+    .section-title { margin: 30px 0 15px; font-size: 19px; }
 
-    #status {
-      margin: 0 0 18px;
-      color: #e4c67f;
-      overflow-wrap: anywhere;
-    }
+    #status { color: #e4c67f; overflow-wrap: anywhere; }
 
     @media (max-width: 700px) {
-      .layout {
-        display: block;
-      }
+      .layout { display: block; }
 
       aside {
         width: 100%;
@@ -146,9 +126,7 @@
         gap: 3px;
       }
 
-      main {
-        padding: 20px 15px;
-      }
+      main { padding: 20px 15px; }
     }
   </style>
 </head>
@@ -185,9 +163,7 @@
       <div class="topbar">
         <div>
           <h1>Admin Dashboard</h1>
-          <p class="muted">
-            Manage Fictional World Library from one place.
-          </p>
+          <p class="muted">Manage Fictional World Library.</p>
         </div>
 
         <button class="button" id="logoutButton" type="button">
@@ -195,7 +171,7 @@
         </button>
       </div>
 
-      <p id="status" role="status">Verifying administrator account...</p>
+      <p id="status" role="status">Checking administrator access...</p>
 
       <section class="cards">
         <div class="card">
@@ -220,7 +196,7 @@
 
         <div class="card">
           <h2>Reading Activity</h2>
-          <p>Review visits, reading activity, and book performance.</p>
+          <p>Review visits and book performance.</p>
         </div>
 
         <div class="card">
@@ -234,12 +210,12 @@
       <section class="cards">
         <div class="card">
           <h2>Settings</h2>
-          <p>Review administrative settings and site information.</p>
+          <p>Review site and administrative settings.</p>
         </div>
 
         <div class="card">
           <h2>Secure Access</h2>
-          <p>Only an authenticated administrator should access these tools.</p>
+          <p>Access is restricted to the verified administrator account.</p>
         </div>
       </section>
     </main>
@@ -249,80 +225,71 @@
 
   <script>
     (async function () {
-      const SUPABASE_URL =
-        "https://mhvphjcreqhfnulflgiy.supabase.co";
-
-      const SUPABASE_PUBLISHABLE_KEY =
-        "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
-
-      const ADMIN_ID =
-        "a57c6170-7026-43b4-91af-ee7459776109";
+      const URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
+      const KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+      const ADMIN_ID = "a57c6170-7026-43b4-91af-ee7459776109";
 
       const status = document.getElementById("status");
-      const logoutButton = document.getElementById("logoutButton");
+      const logout = document.getElementById("logoutButton");
+
+      function goToLogin() {
+        window.location.replace("admin-login.html");
+      }
 
       if (!window.supabase) {
-        status.textContent =
-          "Unable to load the login service. Refresh and try again.";
+        status.textContent = "Login service unavailable. Refresh the page.";
         return;
       }
 
-      const client = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-      );
+      const client = window.supabase.createClient(URL, KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false,
+          storage: window.sessionStorage
+        }
+      });
 
       try {
-        const {
-          data: { session },
-          error
-        } = await client.auth.getSession();
+        const { data, error } = await client.auth.getSession();
 
-        if (error || !session) {
-          window.location.replace("admin-login.html");
+        if (error || !data.session) {
+          goToLogin();
           return;
         }
 
-        if (session.user.id !== ADMIN_ID) {
+        if (data.session.user.id !== ADMIN_ID) {
           await client.auth.signOut();
-          window.location.replace("admin-login.html");
+          goToLogin();
           return;
         }
 
         const { data: admin, error: adminError } = await client
           .from("admin_users")
           .select("user_id")
-          .eq("user_id", session.user.id)
+          .eq("user_id", data.session.user.id)
           .maybeSingle();
 
         if (adminError || !admin) {
+          status.textContent = "Administrator verification failed.";
           await client.auth.signOut();
-          window.location.replace("admin-login.html");
+          goToLogin();
           return;
         }
 
-        status.textContent =
-          "Signed in as the verified administrator.";
+        status.textContent = "Administrator account verified.";
 
       } catch (error) {
         status.textContent =
-          "Unable to verify administrator access. Please refresh and try again.";
+          "Could not verify access. Please sign in again.";
       }
 
-      logoutButton.addEventListener("click", async function () {
-        logoutButton.disabled = true;
-
-        const { error } = await client.auth.signOut();
-
-        if (error) {
-          status.textContent = "Sign-out failed. Please try again.";
-          logoutButton.disabled = false;
-          return;
-        }
-
-        window.location.replace("admin-login.html");
+      logout.addEventListener("click", async function () {
+        logout.disabled = true;
+        await client.auth.signOut();
+        goToLogin();
       });
     })();
   </script>
 </body>
-      </html>
+</html>
