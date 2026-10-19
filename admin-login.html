@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin Login | Fictional World Library</title>
-  <meta name="robots" content="noindex, nofollow">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -17,33 +16,39 @@
       display: grid;
       place-items: center;
       padding: 20px;
-      background: #10111a;
-      color: #fff;
       font-family: Arial, sans-serif;
+      background: #10101d;
+      color: #222238;
     }
 
-    .login {
+    .card {
       width: 100%;
-      max-width: 400px;
-      padding: 30px;
-      border: 1px solid #303141;
+      max-width: 420px;
+      background: white;
+      padding: 28px;
       border-radius: 16px;
-      background: #191a27;
     }
 
-    h1 { font-size: 25px; }
+    h1 { margin: 0 0 8px; font-size: 25px; }
 
-    p { color: #b8b9c8; line-height: 1.5; }
+    p {
+      color: #707085;
+      line-height: 1.5;
+      font-size: 14px;
+    }
 
-    label { display: block; margin: 18px 0 7px; }
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      font-size: 14px;
+      font-weight: bold;
+    }
 
     input {
       width: 100%;
-      padding: 13px;
-      border: 1px solid #414254;
+      padding: 14px;
+      border: 1px solid #d8d8e5;
       border-radius: 8px;
-      background: #10111a;
-      color: white;
       font-size: 16px;
     }
 
@@ -53,103 +58,166 @@
       padding: 14px;
       border: 0;
       border-radius: 8px;
-      background: #d6b36a;
-      color: #151515;
+      background: #6554d9;
+      color: white;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    button:disabled { opacity: 0.6; }
+    button:disabled { opacity: .6; }
 
-    #message { overflow-wrap: anywhere; }
+    #message {
+      margin-top: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
 
-    a { color: #e4c67f; }
+    .error { color: #bd3030; }
+    .success { color: #167747; }
+
+    .back {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      color: #6554d9;
+      text-decoration: none;
+      font-size: 14px;
+    }
   </style>
 </head>
 
 <body>
-  <main class="login">
-    <h1>Fictional World Library</h1>
-    <p>Administrator sign-in</p>
+  <main class="card">
+    <h1>Admin Login</h1>
+    <p>Sign in to manage Fictional World Library.</p>
 
     <form id="loginForm">
       <label for="email">Admin email</label>
-      <input id="email" type="email" autocomplete="username" required>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        required
+      >
 
       <label for="password">Password</label>
-      <input id="password" type="password"
-        autocomplete="current-password" required>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
 
-      <button id="submitButton" type="submit">Sign In</button>
+      <button id="loginButton" type="submit">Log In</button>
+      <div id="message" role="status" aria-live="polite"></div>
     </form>
 
-    <p id="message" role="status"></p>
-    <p><a href="index.html">Return to Library</a></p>
+    <a class="back" href="index.html">Return to Library</a>
   </main>
 
   <script>
-    const URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
-    const KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
-    const ADMIN_ID = "a57c6170-7026-43b4-91af-ee7459776109";
+    const SUPABASE_URL =
+      "https://mhvphjcreqhfnulflgiy.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+
+    const ADMIN_ID =
+      "a57c6170-7026-43b4-91af-ee7459776109";
 
     const message = document.getElementById("message");
-    const button = document.getElementById("submitButton");
+    const button = document.getElementById("loginButton");
+    const form = document.getElementById("loginForm");
 
-    const client = window.supabase.createClient(URL, KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: false,
-        storage: window.sessionStorage
-      }
-    });
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = type || "";
+    }
 
-    document.getElementById("loginForm").addEventListener(
-      "submit", async function (event) {
+    if (!window.supabase) {
+      showMessage(
+        "The login service failed to load. Check your internet connection and reload this page.",
+        "error"
+      );
+      button.disabled = true;
+    } else {
+      const client = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: false,
+            storage: window.sessionStorage
+          }
+        }
+      );
+
+      form.addEventListener("submit", async function(event) {
         event.preventDefault();
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
         button.disabled = true;
-        message.textContent = "Checking administrator account...";
+        showMessage("Signing in…", "");
 
         try {
-          const email = document.getElementById("email").value.trim();
-          const password = document.getElementById("password").value;
-
           const { data, error } = await client.auth.signInWithPassword({
             email,
             password
           });
 
-          if (error) throw error;
-
-          if (data.user.id !== ADMIN_ID) {
-            await client.auth.signOut();
-            throw new Error("This account is not authorized as administrator.");
+          if (error) {
+            throw new Error(
+              "Login failed: " + error.message
+            );
           }
 
-          const { data: admin, error: adminError } = await client
+          if (!data.user || data.user.id !== ADMIN_ID) {
+            await client.auth.signOut();
+            throw new Error(
+              "This account is not authorised as the administrator."
+            );
+          }
+
+          const { data: adminRecord, error: adminError } = await client
             .from("admin_users")
             .select("user_id")
-            .eq("user_id", data.user.id)
+            .eq("user_id", ADMIN_ID)
             .maybeSingle();
 
-          if (adminError) throw adminError;
-
-          if (!admin) {
-            await client.auth.signOut();
-            throw new Error("Administrator access could not be verified.");
+          if (adminError) {
+            throw new Error(
+              "Signed in, but admin verification failed: " +
+              adminError.message
+            );
           }
 
-          message.textContent = "Login successful. Opening dashboard...";
+          if (!adminRecord) {
+            await client.auth.signOut();
+            throw new Error(
+              "Your account is not registered in the admin_users table."
+            );
+          }
+
+          showMessage("Login successful. Opening dashboard…", "success");
+
           window.location.replace("admin.html");
 
         } catch (error) {
-          message.textContent = error.message ||
-            "Sign-in failed. Please try again.";
+          console.error("Admin login error:", error);
+          showMessage(
+            error.message || "Login failed. Please try again.",
+            "error"
+          );
           button.disabled = false;
         }
-      }
-    );
+      });
+    }
   </script>
 </body>
 </html>
