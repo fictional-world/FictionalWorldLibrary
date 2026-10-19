@@ -1,50 +1,477 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Authors and Publishers | Fictional World Library</title>
-<style>
-body{font-family:Arial,sans-serif;background:#f5f5f8;color:#25243a;margin:0}
-header{background:#211c35;color:white;padding:22px}
-header a{color:#d2c4ff}
-main{max-width:800px;margin:25px auto;padding:16px}
-section{background:white;padding:20px;border-radius:12px;margin-bottom:20px}
-label{display:block;margin-top:16px;font-size:14px}
-input,textarea{width:100%;padding:12px;margin-top:7px;box-sizing:border-box;border:1px solid #ddd;border-radius:7px}
-button{background:#7547e8;color:white;border:0;padding:12px;margin-top:18px;border-radius:7px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Authors | Fictional World Library</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin-guard.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      color: #202334;
+    }
+
+    header {
+      background: #17172b;
+      color: white;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 25px auto;
+      padding: 0 16px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 25px;
+      margin: 0 0 6px;
+    }
+
+    .muted {
+      color: #72758a;
+      font-size: 14px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #e5e7ef;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d9dce7;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      background: #6554d9;
+      color: white;
+    }
+
+    .danger {
+      background: #fff0f0;
+      color: #bd3030;
+    }
+
+    .secondary {
+      background: #ececf5;
+      color: #292943;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .toolbar input {
+      flex: 1;
+      min-width: 180px;
+      margin-bottom: 0;
+    }
+
+    .stats {
+      background: #f0edff;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stats strong {
+      display: block;
+      font-size: 26px;
+      margin-top: 6px;
+    }
+
+    .author-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .author {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      border: 1px solid #e8e9f0;
+      border-radius: 10px;
+      padding: 15px;
+    }
+
+    .author-name {
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .author-date {
+      font-size: 12px;
+      color: #77798b;
+      margin-top: 5px;
+    }
+
+    #message {
+      margin-top: 12px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .error {
+      color: #bd3030;
+    }
+
+    .success {
+      color: #167747;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 25px 10px;
+      color: #77798b;
+    }
+
+    @media (max-width: 480px) {
+      header h2 {
+        font-size: 17px;
+      }
+
+      main {
+        margin-top: 18px;
+      }
+
+      .panel {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<header>
-<a href="admin.html">Back to Dashboard</a>
-<h1>Authors and Publishers</h1>
-</header>
-<main>
-<section>
-<h2>Add Author</h2>
-<form>
-<label>Author Name</label>
-<input type="text" required>
-<label>Author Email</label>
-<input type="email">
-<label>Author Biography</label>
-<textarea rows="4"></textarea>
-<button type="button">Save Author</button>
-</form>
-</section>
-<section>
-<h2>Add Publisher</h2>
-<form>
-<label>Publisher Name</label>
-<input type="text" required>
-<label>Contact Email</label>
-<input type="email">
-<label>Website</label>
-<input type="url">
-<button type="button">Save Publisher</button>
-</form>
-</section>
-</main>
+  <header>
+    <h2>Fictional World Library</h2>
+    <a href="admin.html">← Back to Dashboard</a>
+  </header>
+
+  <main>
+    <div class="top">
+      <div>
+        <h1>Manage Authors</h1>
+        <div class="muted">
+          Add and manage authors registered in your library database.
+        </div>
+      </div>
+
+      <button class="secondary" id="refreshBtn" type="button">
+        Refresh
+      </button>
+    </div>
+
+    <section class="stats">
+      <span class="muted">Total authors</span>
+      <strong id="authorCount">—</strong>
+    </section>
+
+    <section class="panel">
+      <h3>Add an Author</h3>
+
+      <form id="authorForm">
+        <label for="authorName">Author's name</label>
+
+        <input
+          id="authorName"
+          type="text"
+          placeholder="Enter author's name"
+          maxlength="150"
+          required
+        >
+
+        <button class="primary" id="saveBtn" type="submit">
+          Add Author
+        </button>
+
+        <div id="message" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h3>Author Directory</h3>
+
+      <div class="toolbar">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search authors..."
+          aria-label="Search authors"
+        >
+      </div>
+
+      <div style="height: 18px"></div>
+
+      <div id="authorList" class="author-list">
+        <div class="empty">Verifying administrator access...</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    let authors = [];
+    let pageReady = false;
+
+    function showMessage(text, type = "") {
+      const box = $("message");
+      box.textContent = text;
+      box.className = type;
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
+
+    function formatDate(value) {
+      if (!value) return "Date unavailable";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "Date unavailable";
+      }
+
+      return date.toLocaleDateString();
+    }
+
+    async function loadAuthors() {
+      if (!pageReady) return;
+
+      $("refreshBtn").disabled = true;
+      $("authorList").innerHTML =
+        '<div class="empty">Loading authors...</div>';
+
+      try {
+        const { data, error } = await window.adminSupabase
+          .from("authors")
+          .select("id, names, created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        authors = data || [];
+
+        $("authorCount").textContent = authors.length;
+
+        renderAuthors();
+      } catch (error) {
+        $("authorList").innerHTML =
+          '<div class="empty error">Could not load authors. Check the Supabase permissions and try again.</div>';
+
+        console.error("Loading authors failed:", error);
+      } finally {
+        $("refreshBtn").disabled = false;
+      }
+    }
+
+    function renderAuthors() {
+      const query = $("searchInput").value.trim().toLowerCase();
+
+      const filtered = authors.filter((author) =>
+        String(author.names || "").toLowerCase().includes(query)
+      );
+
+      if (!filtered.length) {
+        $("authorList").innerHTML =
+          '<div class="empty">No authors found.</div>';
+        return;
+      }
+
+      $("authorList").innerHTML = filtered.map((author) => `
+        <article class="author">
+          <div>
+            <div class="author-name">${escapeHTML(author.names)}</div>
+            <div class="author-date">
+              Added ${escapeHTML(formatDate(author.created_at))}
+            </div>
+          </div>
+
+          <button
+            class="danger"
+            type="button"
+            data-delete-id="${escapeHTML(author.id)}"
+          >
+            Delete
+          </button>
+        </article>
+      `).join("");
+    }
+
+    $("authorForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!pageReady) return;
+
+      const name = $("authorName").value.trim();
+
+      if (!name) {
+        showMessage("Please enter an author's name.", "error");
+        return;
+      }
+
+      $("saveBtn").disabled = true;
+      showMessage("Adding author...");
+
+      try {
+        const { error } = await window.adminSupabase
+          .from("authors")
+          .insert([{ names: name }]);
+
+        if (error) throw error;
+
+        $("authorName").value = "";
+        showMessage("Author added successfully.", "success");
+
+        await loadAuthors();
+      } catch (error) {
+        console.error("Adding author failed:", error);
+
+        showMessage(
+          "Could not add author. Check the authors table permissions and try again.",
+          "error"
+        );
+      } finally {
+        $("saveBtn").disabled = false;
+      }
+    });
+
+    $("authorList").addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-delete-id]");
+
+      if (!button || !pageReady) return;
+
+      const id = button.dataset.deleteId;
+      const author = authors.find((item) => String(item.id) === id);
+
+      if (!author) return;
+
+      const confirmed = confirm(
+        `Delete author "${author.names}"? This action cannot be undone.`
+      );
+
+      if (!confirmed) return;
+
+      button.disabled = true;
+
+      try {
+        const { error } = await window.adminSupabase
+          .from("authors")
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+
+        showMessage("Author deleted.", "success");
+        await loadAuthors();
+      } catch (error) {
+        console.error("Deleting author failed:", error);
+
+        showMessage(
+          "Could not delete author. Check database permissions and whether the author is linked to other records.",
+          "error"
+        );
+
+        button.disabled = false;
+      }
+    });
+
+    $("searchInput").addEventListener("input", renderAuthors);
+
+    $("refreshBtn").addEventListener("click", loadAuthors);
+
+    (async function initialisePage() {
+      try {
+        const authorised = await window.adminReady;
+
+        if (!authorised) return;
+
+        pageReady = true;
+        await loadAuthors();
+      } catch (error) {
+        console.error("Admin verification failed:", error);
+        window.location.replace("admin-login.html");
+      }
+    })();
+  </script>
 </body>
-</html>
+  </html>
