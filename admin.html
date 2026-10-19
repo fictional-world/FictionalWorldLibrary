@@ -1,128 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fictional World Library | Admin Dashboard</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f5f5f8;--panel:#fff;--text:#25243a;--muted:#85849a;--accent:#7547e8;--border:#e9e7f0;--sidebar:#211c35}
-body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select,textarea{font:inherit}
-.layout{display:flex;min-height:100vh}
-.sidebar{width:245px;background:var(--sidebar);color:white;padding:26px 16px;flex-shrink:0}
-.brand{font-size:19px;font-weight:700;line-height:1.5;padding:0 10px 28px}
-.brand span{display:block;color:#b9a4ff;font-size:12px;font-weight:400;letter-spacing:2px;text-transform:uppercase}
-.nav-label{padding:15px 10px 8px;color:#a7a1bb;font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
-.nav-item{display:block;width:100%;padding:12px;margin-bottom:4px;color:#e4e0f0;text-decoration:none;border-radius:8px;font-size:13px}
-.nav-item.active,.nav-item:hover{background:var(--accent);color:white}
-.main{flex:1;min-width:0}
-.topbar{min-height:76px;padding:18px 28px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:16px}
-.topbar h1{font-size:21px}
-.topbar p{color:var(--muted);font-size:12px;margin-top:5px}
-.admin-badge{border:1px solid var(--border);border-radius:30px;padding:9px 13px;font-size:12px}
-.content{padding:28px;max-width:1500px;margin:auto}
-.welcome{margin-bottom:25px}
-.welcome h2{font-size:25px;margin-bottom:8px}
-.welcome p,.section-heading p{color:var(--muted);font-size:13px;line-height:1.6}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:28px}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;min-width:0}
-.stat-label{color:var(--muted);font-size:12px;margin-bottom:16px}
-.stat-value{font-size:27px;font-weight:700}
-.stat-note{font-size:11px;color:var(--muted);margin-top:9px}
-.section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
-.section-heading h3{font-size:17px}
-.quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:28px}
-.action-card h4{font-size:14px;margin-bottom:9px}
-.action-card p,.management-card p{color:var(--muted);font-size:12px;line-height:1.7;margin-bottom:17px}
-.button{display:inline-block;background:var(--accent);color:white;border:0;border-radius:7px;padding:11px 15px;font-size:12px;text-decoration:none}
-.management{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
-.management-card h3{margin-bottom:9px;font-size:16px}
-.status{display:inline-block;background:#f0ebff;color:#6740c5;padding:6px 9px;border-radius:20px;font-size:10px}
-.notice{background:#fff8e8;border:1px solid #f1dfb5;border-radius:10px;padding:16px;color:#755b22;font-size:12px;line-height:1.7}
-.footer{color:var(--muted);font-size:11px;text-align:center;padding:24px 0 5px}
-@media(max-width:1050px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:700px){
-.layout{display:block}.sidebar{width:100%;padding:16px}
-.brand{padding-bottom:12px}.nav-label{display:none}
-.nav-list{display:flex;overflow-x:auto;gap:6px;padding-bottom:3px}
-.nav-item{width:auto;flex-shrink:0;white-space:nowrap;margin:0;padding:11px}
-.topbar{padding:16px}.content{padding:18px 14px}
-.stats{gap:10px}.card{padding:15px}.stat-value{font-size:22px}
-.quick-actions,.management{grid-template-columns:1fr}
-.welcome h2{font-size:22px}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard | Fictional World Library</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #10111a;
+      color: #f5f5f7;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    aside {
+      width: 250px;
+      flex-shrink: 0;
+      padding: 24px 16px;
+      background: #191a27;
+      border-right: 1px solid #303141;
+    }
+
+    .brand {
+      margin: 0 0 8px;
+      color: #e4c67f;
+      font-size: 21px;
+    }
+
+    .subtitle {
+      margin: 0 0 25px;
+      color: #a8a9b9;
+      font-size: 13px;
+    }
+
+    nav a {
+      display: block;
+      padding: 12px;
+      margin: 5px 0;
+      border-radius: 7px;
+      color: #e7e7ed;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background: #303141;
+      color: #e4c67f;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 27px;
+    }
+
+    .muted {
+      color: #a8a9b9;
+      line-height: 1.6;
+    }
+
+    .button {
+      padding: 11px 15px;
+      border: 0;
+      border-radius: 7px;
+      background: #e4c67f;
+      color: #171717;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      padding: 22px;
+      border: 1px solid #303141;
+      border-radius: 12px;
+      background: #191a27;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 17px;
+    }
+
+    .card p {
+      margin: 0;
+      color: #a8a9b9;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      margin: 30px 0 15px;
+      font-size: 19px;
+    }
+
+    #status {
+      margin: 0 0 18px;
+      color: #e4c67f;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 700px) {
+      .layout {
+        display: block;
+      }
+
+      aside {
+        width: 100%;
+        border-right: 0;
+        border-bottom: 1px solid #303141;
+      }
+
+      nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 3px;
+      }
+
+      main {
+        padding: 20px 15px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="layout">
-<aside class="sidebar">
-<div class="brand">Fictional World<span>Library Administration</span></div>
-<div class="nav-label">Main Menu</div>
-<nav class="nav-list">
-<a class="nav-item active" href="admin.html">Overview</a>
-<a class="nav-item" href="admin-books.html">Books & Chapters</a>
-<a class="nav-item" href="admin-authors.html">Authors</a>
-<a class="nav-item" href="admin-publishers.html">Publishers</a>
-<a class="nav-item" href="admin-readers.html">Readers</a>
-<a class="nav-item" href="admin-library.html">Book Performance</a>
-<a class="nav-item" href="admin-reviews.html">Book Reviews</a>
-<a class="nav-item" href="admin-genres.html">Genres</a>
-<a class="nav-item" href="admin-reading-activity.html">Reading Activity</a>
-<a class="nav-item" href="admin-unlocks.html">Chapter Unlocks</a>
-<a class="nav-item" href="admin-reports.html">Reports</a>
-<a class="nav-item" href="admin-transactions.html">Transactions</a>
-<a class="nav-item" href="admin-subscriptions.html">Subscriptions</a>
-<a class="nav-item" href="admin-notifications.html">Notifications</a>
-<a class="nav-item" href="admin-visitors.html">Visitors & Analytics</a>
-<a class="nav-item" href="admin-settings.html">Settings</a>
-</nav>
-</aside>
+  <div class="layout">
+    <aside>
+      <h2 class="brand">Fictional World</h2>
+      <p class="subtitle">Library Administration</p>
 
-<main class="main">
-<header class="topbar">
-<div><h1>Admin Dashboard</h1><p>Fictional World Library management</p></div>
-<div class="admin-badge">Administrator</div>
-</header>
+      <nav>
+        <a class="active" href="admin.html">Dashboard</a>
+        <a href="admin-books.html">Books & Chapters</a>
+        <a href="admin-authors.html">Authors</a>
+        <a href="admin-publishers.html">Publishers</a>
+        <a href="admin-readers.html">Readers</a>
+        <a href="admin-transactions.html">Transactions</a>
+        <a href="admin-subscriptions.html">Subscriptions</a>
+        <a href="admin-notifications.html">Notifications</a>
+        <a href="admin-analytics.html">Analytics</a>
+        <a href="admin-visitors.html">Visitors</a>
+        <a href="admin-library.html">Book Performance</a>
+        <a href="admin-chapters.html">Chapter Management</a>
+        <a href="admin-unlocks.html">Chapter Unlocks</a>
+        <a href="admin-reading-activity.html">Reading Activity</a>
+        <a href="admin-genres.html">Genres</a>
+        <a href="admin-reviews.html">Book Reviews</a>
+        <a href="admin-reports.html">Reports</a>
+        <a href="admin-settings.html">Settings</a>
+      </nav>
+    </aside>
 
-<div class="content">
-<section class="welcome">
-<h2>Welcome to your dashboard</h2>
-<p>Manage books, authors, readers and activity across your library.</p>
-</section>
+    <main>
+      <div class="topbar">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p class="muted">
+            Manage Fictional World Library from one place.
+          </p>
+        </div>
 
-<section class="stats">
-<div class="card"><div class="stat-label">Total Books</div><div class="stat-value">—</div><div class="stat-note">Published and unpublished books</div></div>
-<div class="card"><div class="stat-label">Registered Readers</div><div class="stat-value">—</div><div class="stat-note">Reader accounts</div></div>
-<div class="card"><div class="stat-label">Total Authors</div><div class="stat-value">—</div><div class="stat-note">Registered authors</div></div>
-<div class="card"><div class="stat-label">Total Visitors</div><div class="stat-value">—</div><div class="stat-note">Website visits</div></div>
-</section>
+        <button class="button" id="logoutButton" type="button">
+          Sign Out
+        </button>
+      </div>
 
-<section>
-<div class="section-heading"><div><h3>Quick Actions</h3><p>Frequently used management tools</p></div></div>
-<div class="quick-actions">
-<div class="card action-card"><h4>Books & Chapters</h4><p>Add books, covers, descriptions and chapters.</p><a class="button" href="admin-books.html">Manage Books</a></div>
-<div class="card action-card"><h4>Authors</h4><p>Manage author details and their stories.</p><a class="button" href="admin-authors.html">Manage Authors</a></div>
-<div class="card action-card"><h4>Book Performance</h4><p>Review book activity, unlocks, library additions and reviews.</p><a class="button" href="admin-library.html">View Performance</a></div>
-</div>
-</section>
+      <p id="status" role="status">Verifying administrator account...</p>
 
-<section class="management">
-<div class="card management-card"><h3>Books & Chapters</h3><p>Add books, manage chapters and control publication status.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Authors & Publishers</h3><p>Manage author profiles and publisher information.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Reader Accounts</h3><p>Review registered readers and account information.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Book Reviews</h3><p>Review ratings and feedback associated with individual books.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Transactions & Subscriptions</h3><p>Review payment records and subscription statuses.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Reading Activity</h3><p>Review reading activity and chapter unlock records.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Visitors & Reports</h3><p>Review available traffic and performance statistics.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Notifications & Settings</h3><p>Manage reader announcements and administrative preferences.</p><span class="status">Connection pending</span></div>
-<div class="card management-card"><h3>Genres</h3><p>Manage the genres used to organise books.</p><span class="status">Connection pending</span></div>
-</section>
+      <section class="cards">
+        <div class="card">
+          <h2>Books & Chapters</h2>
+          <p>Add books, upload chapters, and manage publication status.</p>
+        </div>
 
-<div class="notice"><strong>Setup status</strong><br>This dashboard is an interface. Live figures and management actions will become available after the database connection and permissions are implemented.</div>
-<div class="footer">Fictional World Library · Administration</div>
-</div>
-</main>
-</div>
+        <div class="card">
+          <h2>Authors & Publishers</h2>
+          <p>Manage author information and publisher records.</p>
+        </div>
+
+        <div class="card">
+          <h2>Readers</h2>
+          <p>Review registered reader accounts.</p>
+        </div>
+
+        <div class="card">
+          <h2>Payments</h2>
+          <p>Review transactions, subscriptions, and chapter unlocks.</p>
+        </div>
+
+        <div class="card">
+          <h2>Reading Activity</h2>
+          <p>Review visits, reading activity, and book performance.</p>
+        </div>
+
+        <div class="card">
+          <h2>Content & Reports</h2>
+          <p>Manage genres, book reviews, reports, and notifications.</p>
+        </div>
+      </section>
+
+      <h2 class="section-title">Administration</h2>
+
+      <section class="cards">
+        <div class="card">
+          <h2>Settings</h2>
+          <p>Review administrative settings and site information.</p>
+        </div>
+
+        <div class="card">
+          <h2>Secure Access</h2>
+          <p>Only an authenticated administrator should access these tools.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    (async function () {
+      const SUPABASE_URL =
+        "https://mhvphjcreqhfnulflgiy.supabase.co";
+
+      const SUPABASE_PUBLISHABLE_KEY =
+        "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+
+      const ADMIN_ID =
+        "a57c6170-7026-43b4-91af-ee7459776109";
+
+      const status = document.getElementById("status");
+      const logoutButton = document.getElementById("logoutButton");
+
+      if (!window.supabase) {
+        status.textContent =
+          "Unable to load the login service. Refresh and try again.";
+        return;
+      }
+
+      const client = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+      try {
+        const {
+          data: { session },
+          error
+        } = await client.auth.getSession();
+
+        if (error || !session) {
+          window.location.replace("admin-login.html");
+          return;
+        }
+
+        if (session.user.id !== ADMIN_ID) {
+          await client.auth.signOut();
+          window.location.replace("admin-login.html");
+          return;
+        }
+
+        const { data: admin, error: adminError } = await client
+          .from("admin_users")
+          .select("user_id")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+
+        if (adminError || !admin) {
+          await client.auth.signOut();
+          window.location.replace("admin-login.html");
+          return;
+        }
+
+        status.textContent =
+          "Signed in as the verified administrator.";
+
+      } catch (error) {
+        status.textContent =
+          "Unable to verify administrator access. Please refresh and try again.";
+      }
+
+      logoutButton.addEventListener("click", async function () {
+        logoutButton.disabled = true;
+
+        const { error } = await client.auth.signOut();
+
+        if (error) {
+          status.textContent = "Sign-out failed. Please try again.";
+          logoutButton.disabled = false;
+          return;
+        }
+
+        window.location.replace("admin-login.html");
+      });
+    })();
+  </script>
 </body>
-                                                                                               </html>
+      </html>
