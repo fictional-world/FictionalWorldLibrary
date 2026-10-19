@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin Login | Fictional World Library</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -17,6 +20,7 @@
       color: #fff;
       font-family: Arial, sans-serif;
     }
+
     .login {
       width: 100%;
       max-width: 400px;
@@ -25,9 +29,19 @@
       border-radius: 16px;
       background: #191a27;
     }
-    h1 { margin-top: 0; font-size: 25px; }
-    p { color: #b8b9c8; line-height: 1.5; }
-    label { display: block; margin: 18px 0 7px; }
+
+    h1 { font-size: 25px; }
+
+    p {
+      color: #b8b9c8;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 18px 0 7px;
+    }
+
     input {
       width: 100%;
       padding: 13px;
@@ -37,6 +51,7 @@
       color: white;
       font-size: 16px;
     }
+
     button {
       width: 100%;
       margin-top: 22px;
@@ -49,10 +64,15 @@
       font-weight: bold;
       cursor: pointer;
     }
+
+    button:disabled { opacity: 0.6; }
+
     #message { overflow-wrap: anywhere; }
+
     a { color: #e4c67f; }
   </style>
 </head>
+
 <body>
   <main class="login">
     <h1>Fictional World Library</h1>
@@ -60,18 +80,26 @@
 
     <form id="loginForm">
       <label for="email">Admin email</label>
-      <input id="email" type="email"
-        autocomplete="username" required>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        required
+      >
 
       <label for="password">Password</label>
-      <input id="password" type="password"
-        autocomplete="current-password" required>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
 
       <button id="submitButton" type="submit">Sign In</button>
     </form>
 
     <p id="message" role="status"></p>
-    <p><a href="index.html">Return to the library</a></p>
+    <p><a href="index.html">Return to Library</a></p>
   </main>
 
   <script>
@@ -81,65 +109,76 @@
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
 
+    const ADMIN_ID =
+      "a57c6170-7026-43b4-91af-ee7459776109";
+
     const client = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
         auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false
         }
       }
     );
 
-    const ADMIN_ID = "a57c6170-7026-43b4-91af-ee7459776109";
-    const message = document.getElementById("message");
+    const form = document.getElementById("loginForm");
     const button = document.getElementById("submitButton");
+    const message = document.getElementById("message");
 
-    document.getElementById("loginForm").addEventListener(
-      "submit", async function (event) {
-        event.preventDefault();
-        button.disabled = true;
-        message.textContent = "Checking your account...";
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-        try {
-          const email = document.getElementById("email").value.trim();
-          const password = document.getElementById("password").value;
+      button.disabled = true;
+      message.textContent = "Verifying administrator account...";
 
-          const { data, error } = await client.auth.signInWithPassword({
-            email,
-            password
-          });
+      try {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
 
-          if (error) throw error;
+        const { data, error } = await client.auth.signInWithPassword({
+          email,
+          password
+        });
 
-          if (data.user.id !== ADMIN_ID) {
-            await client.auth.signOut();
-            throw new Error("This account is not authorized as the administrator.");
-          }
+        if (error) throw error;
 
-          const { data: admin, error: adminError } = await client
-            .from("admin_users")
-            .select("user_id")
-            .eq("user_id", data.user.id)
-            .maybeSingle();
-
-          if (adminError) throw adminError;
-
-          if (!admin) {
-            await client.auth.signOut();
-            throw new Error("Your account is not registered as an administrator.");
-          }
-
-          window.location.replace("admin.html");
-        } catch (error) {
-          message.textContent = error.message ||
-            "Sign-in failed. Please try again.";
-          button.disabled = false;
+        if (data.user.id !== ADMIN_ID) {
+          await client.auth.signOut();
+          throw new Error("This account is not authorized as administrator.");
         }
+
+        const { data: admin, error: adminError } = await client
+          .from("admin_users")
+          .select("user_id")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+
+        if (adminError) throw adminError;
+
+        if (!admin) {
+          await client.auth.signOut();
+          throw new Error("Administrator access was not verified.");
+        }
+
+        /*
+          This temporary session is not persisted across page loads.
+          The dashboard must be updated to use the same session strategy.
+        */
+        message.textContent =
+          "Account verified. Preparing the dashboard...";
+
+        window.location.replace("admin.html");
+
+      } catch (error) {
+        message.textContent =
+          error.message || "Sign-in failed. Please try again.";
+
+        button.disabled = false;
       }
-    );
+    });
   </script>
 </body>
-  </html>
+</html>
