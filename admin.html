@@ -1,330 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fictional World Library — Admin Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--bg:#10101b;--surface:#191927;--card:#202033;--text:#f7f4ff;--muted:#aaa7bd;--accent:#c7a3ff;--line:#34334a;--green:#6ee7ad;--red:#ff8798}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-button,input{font:inherit}
-button{cursor:pointer;border:0;border-radius:9px;padding:11px 15px;font-weight:700}
-.primary{background:var(--accent);color:#171022}
-.secondary{background:var(--card);color:var(--text);border:1px solid var(--line)}
-input{width:100%;padding:12px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:9px;margin:7px 0 14px}
-label{font-size:13px;color:var(--muted)}
-header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-header strong{font-size:18px}
-main{max-width:1250px;margin:auto;padding:22px}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-#loginPanel{max-width:420px;margin:8vh auto;background:var(--surface);padding:25px;border:1px solid var(--line);border-radius:16px}
-#loginPanel h1{font-size:24px}
-#app{display:none}
-#notice{padding:12px;margin:14px 0;border-radius:9px;background:var(--card);color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:20px 0}
-.stat,.panel{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px}
-.stat span{display:block;color:var(--muted);font-size:13px;margin-bottom:12px}
-.stat strong{font-size:25px;overflow-wrap:anywhere}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
-nav button.active{background:var(--accent);color:#171022}
-.panel{margin-top:14px}
-.panel h2{font-size:18px;margin-top:0}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:650px}
-th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top;max-width:300px;overflow-wrap:anywhere}
-th{color:var(--muted);font-weight:600}
-#busy{display:none;color:var(--accent);padding:10px 0}
-@media(max-width:600px){main{padding:13px}header{padding:14px}#loginPanel{margin:5vh 14px;padding:19px}.stat strong{font-size:21px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard | Fictional World Library</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #10111a;
+      color: #f5f5f7;
+      font-family: Arial, sans-serif;
+    }
+
+    .layout { display: flex; min-height: 100vh; }
+
+    aside {
+      width: 250px;
+      flex-shrink: 0;
+      padding: 24px 16px;
+      background: #191a27;
+      border-right: 1px solid #303141;
+    }
+
+    .brand {
+      color: #e4c67f;
+      font-size: 21px;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: #a8a9b9;
+      font-size: 13px;
+      margin-bottom: 25px;
+    }
+
+    nav a {
+      display: block;
+      padding: 12px;
+      margin: 5px 0;
+      border-radius: 7px;
+      color: #e7e7ed;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background: #303141;
+      color: #e4c67f;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    h1 { margin: 0 0 8px; font-size: 27px; }
+
+    .muted {
+      color: #a8a9b9;
+      line-height: 1.6;
+    }
+
+    .button {
+      padding: 11px 15px;
+      border: 0;
+      border-radius: 7px;
+      background: #e4c67f;
+      color: #171717;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      padding: 22px;
+      border: 1px solid #303141;
+      border-radius: 12px;
+      background: #191a27;
+    }
+
+    .card h2 { margin: 0 0 12px; font-size: 17px; }
+
+    .card p {
+      margin: 0;
+      color: #a8a9b9;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section-title { margin: 30px 0 15px; font-size: 19px; }
+
+    #status { color: #e4c67f; overflow-wrap: anywhere; }
+
+    @media (max-width: 700px) {
+      .layout { display: block; }
+
+      aside {
+        width: 100%;
+        border-right: 0;
+        border-bottom: 1px solid #303141;
+      }
+
+      nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 3px;
+      }
+
+      main { padding: 20px 15px; }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="layout">
+    <aside>
+      <h2 class="brand">Fictional World</h2>
+      <p class="subtitle">Library Administration</p>
 
-<section id="loginPanel">
-<h1>Fictional World Library</h1>
-<p class="muted">Administrator sign in</p>
-<form id="loginForm">
-<label for="email">Admin email</label>
-<input id="email" type="email" autocomplete="username" required>
-<label for="password">Password</label>
-<input id="password" type="password" autocomplete="current-password" required>
-<button class="primary" type="submit">Sign in</button>
-</form>
-<div id="loginMessage" class="muted"></div>
-</section>
+      <nav>
+        <a class="active" href="admin.html">Dashboard</a>
+        <a href="admin-books.html">Books & Chapters</a>
+        <a href="admin-authors.html">Authors</a>
+        <a href="admin-publishers.html">Publishers</a>
+        <a href="admin-readers.html">Readers</a>
+        <a href="admin-transactions.html">Transactions</a>
+        <a href="admin-subscriptions.html">Subscriptions</a>
+        <a href="admin-notifications.html">Notifications</a>
+        <a href="admin-analytics.html">Analytics</a>
+        <a href="admin-visitors.html">Visitors</a>
+        <a href="admin-library.html">Book Performance</a>
+        <a href="admin-chapters.html">Chapter Management</a>
+        <a href="admin-unlocks.html">Chapter Unlocks</a>
+        <a href="admin-reading-activity.html">Reading Activity</a>
+        <a href="admin-genres.html">Genres</a>
+        <a href="admin-reviews.html">Book Reviews</a>
+        <a href="admin-reports.html">Reports</a>
+        <a href="admin-settings.html">Settings</a>
+      </nav>
+    </aside>
 
-<div id="app">
-<header>
-<strong>Fictional World Library · Admin</strong>
-<button id="logoutButton" class="secondary">Log out</button>
-</header>
-<main>
-<p class="muted">Admin dashboard · Supabase database</p>
-<div id="notice">Connecting to database…</div>
-<div id="busy">Loading records…</div>
+    <main>
+      <div class="topbar">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p class="muted">Manage Fictional World Library.</p>
+        </div>
 
-<section class="stats">
-<div class="stat"><span>Reader records</span><strong id="readerCount">—</strong></div>
-<div class="stat"><span>Books</span><strong id="bookCount">—</strong></div>
-<div class="stat"><span>Transactions</span><strong id="transactionCount">—</strong></div>
-<div class="stat"><span>Chapter unlocks</span><strong id="unlockCount">—</strong></div>
-<div class="stat"><span>Subscriptions</span><strong id="subscriptionCount">—</strong></div>
-<div class="stat"><span>Payment records</span><strong id="paymentCount">—</strong></div>
-</section>
+        <button class="button" id="logoutButton" type="button">
+          Sign Out
+        </button>
+      </div>
 
-<nav id="tabs">
-<button class="secondary active" data-table="users">Readers</button>
-<button class="secondary" data-table="transactions">Transactions</button>
-<button class="secondary" data-table="unlocks">Chapter unlocks</button>
-<button class="secondary" data-table="subscriptions">Subscriptions</button>
-<button class="secondary" data-table="payments">Payments</button>
-<button class="secondary" data-table="books">Books</button>
-<button class="secondary" data-table="visits">Activity</button>
-<button class="secondary" data-table="notifications">Notifications</button>
-</nav>
+      <p id="status" role="status">Checking administrator access...</p>
 
-<section class="panel">
-<h2 id="tableTitle">Readers</h2>
-<p id="tableDescription" class="muted small">Reader accounts stored in the database.</p>
-<button id="refreshButton" class="secondary">Refresh records</button>
-<div class="table-wrap">
-<table>
-<thead id="tableHead"></thead>
-<tbody id="tableBody"></tbody>
-</table>
-</div>
-</section>
-</main>
-</div>
+      <section class="cards">
+        <div class="card">
+          <h2>Books & Chapters</h2>
+          <p>Add books, upload chapters, and manage publication status.</p>
+        </div>
 
-<script>
-const SUPABASE_URL="https://mhvphjcreqhfnulflgiy.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+        <div class="card">
+          <h2>Authors & Publishers</h2>
+          <p>Manage author information and publisher records.</p>
+        </div>
 
-const $=id=>document.getElementById(id);
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-let currentUser=null;
-let currentTable="users";
-let loadedTables={};
+        <div class="card">
+          <h2>Readers</h2>
+          <p>Review registered reader accounts.</p>
+        </div>
 
-const tableOptions={
-users:["users"],
-transactions:["transactions"],
-unlocks:["unlocks"],
-subscriptions:["subscriptions","subscription"],
-payments:["payments"],
-books:["books"],
-visits:["visits"],
-notifications:["notifications","notification"]
-};
+        <div class="card">
+          <h2>Payments</h2>
+          <p>Review transactions, subscriptions, and chapter unlocks.</p>
+        </div>
 
-const descriptions={
-users:"Reader profile records.",
-transactions:"Coin purchases and transaction records.",
-unlocks:"Chapters unlocked by readers.",
-subscriptions:"Reader subscription records and status.",
-payments:"Payment records saved by the payment integration.",
-books:"Books stored in the shared database.",
-visits:"Reader activity and visit records, if recorded.",
-notifications:"Notifications saved in the database."
-};
+        <div class="card">
+          <h2>Reading Activity</h2>
+          <p>Review visits and book performance.</p>
+        </div>
 
-function message(text){
-$("notice").textContent=text;
-}
+        <div class="card">
+          <h2>Content & Reports</h2>
+          <p>Manage genres, book reviews, reports, and notifications.</p>
+        </div>
+      </section>
 
-function escapeHtml(value){
-return String(value??"").replace(/[&<>"']/g,c=>({
-"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-}[c]));
-}
+      <h2 class="section-title">Administration</h2>
 
-function readable(value){
-if(value===null||value===undefined)return "—";
-if(typeof value==="object")return JSON.stringify(value);
-return String(value);
-}
+      <section class="cards">
+        <div class="card">
+          <h2>Settings</h2>
+          <p>Review site and administrative settings.</p>
+        </div>
 
-async function isAdmin(user){
-if(!user)return false;
+        <div class="card">
+          <h2>Secure Access</h2>
+          <p>Access is restricted to the verified administrator account.</p>
+        </div>
+      </section>
+    </main>
+  </div>
 
-const result=await db.from("admin_users")
-.select("*")
-.eq("user_id",user.id)
-.limit(1);
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-if(!result.error&&result.data&&result.data.length>0)return true;
+  <script>
+    (async function () {
+      const URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
+      const KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+      const ADMIN_ID = "a57c6170-7026-43b4-91af-ee7459776109";
 
-const fallback=await db.from("admin_users")
-.select("*")
-.eq("id",user.id)
-.limit(1);
+      const status = document.getElementById("status");
+      const logout = document.getElementById("logoutButton");
 
-return !fallback.error&&fallback.data&&fallback.data.length>0;
-}
+      function goToLogin() {
+        window.location.replace("admin-login.html");
+      }
 
-async function enterDashboard(user){
-currentUser=user;
+      if (!window.supabase) {
+        status.textContent = "Login service unavailable. Refresh the page.";
+        return;
+      }
 
-$("loginPanel").style.display="none";
-$("app").style.display="block";
-message("Checking administrator access…");
+      const client = window.supabase.createClient(URL, KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false,
+          storage: window.sessionStorage
+        }
+      });
 
-const allowed=await isAdmin(user);
+      try {
+        const { data, error } = await client.auth.getSession();
 
-if(!allowed){
-await db.auth.signOut();
-currentUser=null;
-$("app").style.display="none";
-$("loginPanel").style.display="block";
-$("loginMessage").textContent="This account does not have administrator access. Check the admin_users table and its Supabase access policies.";
-return;
-}
+        if (error || !data.session) {
+          goToLogin();
+          return;
+        }
 
-message("Administrator access confirmed. Loading database records…");
-await refreshAll();
-}
+        if (data.session.user.id !== ADMIN_ID) {
+          await client.auth.signOut();
+          goToLogin();
+          return;
+        }
 
-async function readTable(candidates){
-let lastError=null;
+        const { data: admin, error: adminError } = await client
+          .from("admin_users")
+          .select("user_id")
+          .eq("user_id", data.session.user.id)
+          .maybeSingle();
 
-for(const name of candidates){
-const result=await db.from(name).select("*").limit(200);
-if(!result.error)return {name,rows:result.data||[]};
-lastError=result.error;
-}
+        if (adminError || !admin) {
+          status.textContent = "Administrator verification failed.";
+          await client.auth.signOut();
+          goToLogin();
+          return;
+        }
 
-return {
-name:candidates[0],
-rows:[],
-error:lastError?lastError.message:"Could not read database table."
-};
-}
+        status.textContent = "Administrator account verified.";
 
-async function loadOne(key){
-loadedTables[key]=await readTable(tableOptions[key]);
-}
+      } catch (error) {
+        status.textContent =
+          "Could not verify access. Please sign in again.";
+      }
 
-function count(key){
-const item=loadedTables[key];
-return item&&!item.error?item.rows.length:"—";
-}
-
-async function refreshAll(){
-if(!currentUser)return;
-
-$("busy").style.display="block";
-
-const keys=[
-"users","transactions","unlocks","subscriptions",
-"payments","books","visits","notifications"
-];
-
-await Promise.all(keys.map(loadOne));
-
-$("readerCount").textContent=count("users");
-$("bookCount").textContent=count("books");
-$("transactionCount").textContent=count("transactions");
-$("unlockCount").textContent=count("unlocks");
-$("subscriptionCount").textContent=count("subscriptions");
-$("paymentCount").textContent=count("payments");
-
-renderTable(currentTable);
-$("busy").style.display="none";
-
-const errors=keys
-.filter(key=>loadedTables[key]&&loadedTables[key].error)
-.map(key=>key+": "+loadedTables[key].error);
-
-message(errors.length
-?"Some tables could not be read:\n"+errors.join("\n")+"\nCheck table names and Supabase Row Level Security policies."
-:"Database records loaded. Select a section or refresh to fetch the latest records.");
-}
-
-function renderTable(key){
-currentTable=key;
-const item=loadedTables[key]||{rows:[],name:key};
-
-$("tableTitle").textContent=key.charAt(0).toUpperCase()+key.slice(1);
-$("tableDescription").textContent=descriptions[key]||"";
-document.querySelectorAll("#tabs button").forEach(button=>{
-button.classList.toggle("active",button.dataset.table===key);
-});
-
-if(item.error){
-$("tableHead").innerHTML="<tr><th>Database message</th></tr>";
-$("tableBody").innerHTML="<tr><td>"+escapeHtml(item.error)+"</td></tr>";
-return;
-}
-
-const rows=item.rows||[];
-
-if(!rows.length){
-$("tableHead").innerHTML="<tr><th>Records</th></tr>";
-$("tableBody").innerHTML='<tr><td class="muted">No records found.</td></tr>';
-return;
-}
-
-const columns=[...new Set(rows.flatMap(row=>Object.keys(row)))].slice(0,12);
-
-$("tableHead").innerHTML="<tr>"+columns.map(column=>
-"<th>"+escapeHtml(column)+"</th>"
-).join("")+"</tr>";
-
-$("tableBody").innerHTML=rows.map(row=>
-"<tr>"+columns.map(column=>
-"<td>"+escapeHtml(readable(row[column]))+"</td>"
-).join("")+"</tr>"
-).join("");
-}
-
-$("loginForm").addEventListener("submit",async event=>{
-event.preventDefault();
-$("loginMessage").textContent="Signing in…";
-
-const {data,error}=await db.auth.signInWithPassword({
-email:$("email").value.trim(),
-password:$("password").value
-});
-
-if(error){
-$("loginMessage").textContent=error.message;
-return;
-}
-
-await enterDashboard(data.user);
-});
-
-$("logoutButton").addEventListener("click",async()=>{
-await db.auth.signOut();
-currentUser=null;
-$("app").style.display="none";
-$("loginPanel").style.display="block";
-$("password").value="";
-$("loginMessage").textContent="You have signed out.";
-});
-
-$("tabs").addEventListener("click",event=>{
-const button=event.target.closest("button[data-table]");
-if(button)renderTable(button.dataset.table);
-});
-
-$("refreshButton").addEventListener("click",refreshAll);
-
-(async function init(){
-const {data,error}=await db.auth.getSession();
-
-if(error){
-$("loginMessage").textContent=error.message;
-return;
-}
-
-if(data.session){
-await enterDashboard(data.session.user);
-}
-})();
-</script>
+      logout.addEventListener("click", async function () {
+        logout.disabled = true;
+        await client.auth.signOut();
+        goToLogin();
+      });
+    })();
+  </script>
 </body>
-</html>
+  </html>
