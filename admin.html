@@ -43,293 +43,287 @@ th{color:var(--muted);font-weight:600}
 <body>
 
 <section id="loginPanel">
-  <h1>Fictional World Library</h1>
-  <p class="muted">Administrator sign in</p>
-  <form id="loginForm">
-    <label for="email">Admin email</label>
-    <input id="email" type="email" autocomplete="username" required>
-    <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="current-password" required>
-    <button class="primary" type="submit">Sign in</button>
-  </form>
-  <div id="loginMessage" class="muted"></div>
+<h1>Fictional World Library</h1>
+<p class="muted">Administrator sign in</p>
+<form id="loginForm">
+<label for="email">Admin email</label>
+<input id="email" type="email" autocomplete="username" required>
+<label for="password">Password</label>
+<input id="password" type="password" autocomplete="current-password" required>
+<button class="primary" type="submit">Sign in</button>
+</form>
+<div id="loginMessage" class="muted"></div>
 </section>
 
 <div id="app">
 <header>
-  <strong>Fictional World Library · Admin</strong>
-  <button id="logoutButton" class="secondary">Log out</button>
+<strong>Fictional World Library · Admin</strong>
+<button id="logoutButton" class="secondary">Log out</button>
 </header>
 <main>
-  <p class="muted">Live dashboard · Data loaded from Supabase</p>
-  <div id="notice">Connecting to database…</div>
-  <div id="busy">Loading records…</div>
-  <section class="stats">
-    <div class="stat"><span>Reader records</span><strong id="readerCount">—</strong></div>
-    <div class="stat"><span>Books</span><strong id="bookCount">—</strong></div>
-    <div class="stat"><span>Transactions</span><strong id="transactionCount">—</strong></div>
-    <div class="stat"><span>Chapter unlocks</span><strong id="unlockCount">—</strong></div>
-    <div class="stat"><span>Subscriptions</span><strong id="subscriptionCount">—</strong></div>
-    <div class="stat"><span>Payment records</span><strong id="paymentCount">—</strong></div>
-  </section>
+<p class="muted">Admin dashboard · Supabase database</p>
+<div id="notice">Connecting to database…</div>
+<div id="busy">Loading records…</div>
 
-  <nav id="tabs">
-    <button class="secondary active" data-table="users">Readers</button>
-    <button class="secondary" data-table="transactions">Transactions</button>
-    <button class="secondary" data-table="unlocks">Chapter unlocks</button>
-    <button class="secondary" data-table="subscriptions">Subscriptions</button>
-    <button class="secondary" data-table="payments">Payments</button>
-    <button class="secondary" data-table="books">Books</button>
-    <button class="secondary" data-table="visits">Visits</button>
-    <button class="secondary" data-table="notifications">Notifications</button>
-  </nav>
+<section class="stats">
+<div class="stat"><span>Reader records</span><strong id="readerCount">—</strong></div>
+<div class="stat"><span>Books</span><strong id="bookCount">—</strong></div>
+<div class="stat"><span>Transactions</span><strong id="transactionCount">—</strong></div>
+<div class="stat"><span>Chapter unlocks</span><strong id="unlockCount">—</strong></div>
+<div class="stat"><span>Subscriptions</span><strong id="subscriptionCount">—</strong></div>
+<div class="stat"><span>Payment records</span><strong id="paymentCount">—</strong></div>
+</section>
 
-  <section class="panel">
-    <h2 id="tableTitle">Readers</h2>
-    <p id="tableDescription" class="muted small">Reader accounts stored in the database.</p>
-    <button id="refreshButton" class="secondary">Refresh records</button>
-    <div class="table-wrap">
-      <table>
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-  </section>
+<nav id="tabs">
+<button class="secondary active" data-table="users">Readers</button>
+<button class="secondary" data-table="transactions">Transactions</button>
+<button class="secondary" data-table="unlocks">Chapter unlocks</button>
+<button class="secondary" data-table="subscriptions">Subscriptions</button>
+<button class="secondary" data-table="payments">Payments</button>
+<button class="secondary" data-table="books">Books</button>
+<button class="secondary" data-table="visits">Activity</button>
+<button class="secondary" data-table="notifications">Notifications</button>
+</nav>
+
+<section class="panel">
+<h2 id="tableTitle">Readers</h2>
+<p id="tableDescription" class="muted small">Reader accounts stored in the database.</p>
+<button id="refreshButton" class="secondary">Refresh records</button>
+<div class="table-wrap">
+<table>
+<thead id="tableHead"></thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+</section>
 </main>
 </div>
 
 <script>
-/* Enter your existing Supabase project anon/public key below.
-   Never put a service-role key in this HTML file. */
-const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+const SUPABASE_URL="https://mhvphjcreqhfnulflgiy.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
 
-const $ = id => document.getElementById(id);
-const configMissing = !SUPABASE_ANON_KEY ||
-  SUPABASE_ANON_KEY === "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+const $=id=>document.getElementById(id);
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let currentUser=null;
+let currentTable="users";
+let loadedTables={};
 
-let db = null;
-let currentTable = "users";
-let currentUser = null;
-let loadedTables = {};
-
-const tableOptions = {
-  users: ["users"],
-  transactions: ["transactions"],
-  unlocks: ["unlocks", "chapter_unlocks"],
-  subscriptions: ["subscriptions", "subscription"],
-  payments: ["payments", "transactions"],
-  books: ["books"],
-  visits: ["visits"],
-  notifications: ["notifications", "notification"]
+const tableOptions={
+users:["users"],
+transactions:["transactions"],
+unlocks:["unlocks"],
+subscriptions:["subscriptions","subscription"],
+payments:["payments"],
+books:["books"],
+visits:["visits"],
+notifications:["notifications","notification"]
 };
 
-const descriptions = {
-  users: "Reader profile records. These are not the same as raw authentication records.",
-  transactions: "Coin purchases and other transaction records saved by the reader website.",
-  unlocks: "Records of chapters unlocked by readers.",
-  subscriptions: "Reader subscription records and their current status.",
-  payments: "Payment records saved by the payment integration.",
-  books: "Books stored in the shared database.",
-  visits: "Visit records, if the reader website saves them.",
-  notifications: "Notifications saved in the shared database."
+const descriptions={
+users:"Reader profile records.",
+transactions:"Coin purchases and transaction records.",
+unlocks:"Chapters unlocked by readers.",
+subscriptions:"Reader subscription records and status.",
+payments:"Payment records saved by the payment integration.",
+books:"Books stored in the shared database.",
+visits:"Reader activity and visit records, if recorded.",
+notifications:"Notifications saved in the database."
 };
 
-function message(text) {
-  $("notice").textContent = text;
+function message(text){
+$("notice").textContent=text;
 }
 
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-  }[c]));
+function escapeHtml(value){
+return String(value??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
 }
 
-function readable(value) {
-  if (value === null || value === undefined) return "—";
-  if (typeof value === "object") return JSON.stringify(value);
-  return String(value);
+function readable(value){
+if(value===null||value===undefined)return "—";
+if(typeof value==="object")return JSON.stringify(value);
+return String(value);
 }
 
-function makeClient() {
-  if (configMissing) {
-    $("loginMessage").textContent =
-      "Add your Supabase anon/public key in SUPABASE_ANON_KEY before using this dashboard.";
-    return false;
-  }
-  if (!db) db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  return true;
+async function isAdmin(user){
+if(!user)return false;
+
+const result=await db.from("admin_users")
+.select("*")
+.eq("user_id",user.id)
+.limit(1);
+
+if(!result.error&&result.data&&result.data.length>0)return true;
+
+const fallback=await db.from("admin_users")
+.select("*")
+.eq("id",user.id)
+.limit(1);
+
+return !fallback.error&&fallback.data&&fallback.data.length>0;
 }
 
-async function isAdmin(user) {
-  if (!user || !db) return false;
+async function enterDashboard(user){
+currentUser=user;
 
-  /* Supports the common admin_users.user_id or admin_users.id layout.
-     The admin_users table must have a SELECT policy for authorized admins. */
-  for (const column of ["user_id", "id"]) {
-    const result = await db.from("admin_users")
-      .select(column)
-      .eq(column, user.id)
-      .limit(1);
+$("loginPanel").style.display="none";
+$("app").style.display="block";
+message("Checking administrator access…");
 
-    if (!result.error && result.data && result.data.length) return true;
-  }
-  return false;
+const allowed=await isAdmin(user);
+
+if(!allowed){
+await db.auth.signOut();
+currentUser=null;
+$("app").style.display="none";
+$("loginPanel").style.display="block";
+$("loginMessage").textContent="This account does not have administrator access. Check the admin_users table and its Supabase access policies.";
+return;
 }
 
-async function enterDashboard(user) {
-  currentUser = user;
-  $("loginPanel").style.display = "none";
-  $("app").style.display = "block";
-  message("Signed in. Checking administrator access…");
-
-  const allowed = await isAdmin(user);
-  if (!allowed) {
-    await db.auth.signOut();
-    currentUser = null;
-    $("app").style.display = "none";
-    $("loginPanel").style.display = "block";
-    $("loginMessage").textContent =
-      "This account is not listed in admin_users, or its access policy prevents verification. Sign in with your authorized admin account.";
-    return;
-  }
-
-  message("Administrator access confirmed. Loading live records.");
-  await refreshAll();
+message("Administrator access confirmed. Loading database records…");
+await refreshAll();
 }
 
-async function readTable(candidates) {
-  let lastError = null;
+async function readTable(candidates){
+let lastError=null;
 
-  for (const name of candidates) {
-    const result = await db.from(name).select("*").limit(200);
-    if (!result.error) return {name, rows: result.data || []};
-    lastError = result.error;
-  }
-
-  return {
-    name: candidates[0],
-    rows: [],
-    error: lastError ? lastError.message : "Table could not be read."
-  };
+for(const name of candidates){
+const result=await db.from(name).select("*").limit(200);
+if(!result.error)return {name,rows:result.data||[]};
+lastError=result.error;
 }
 
-async function loadOne(key) {
-  const result = await readTable(tableOptions[key]);
-  loadedTables[key] = result;
-  return result;
+return {
+name:candidates[0],
+rows:[],
+error:lastError?lastError.message:"Could not read database table."
+};
 }
 
-async function refreshAll() {
-  if (!db || !currentUser) return;
-  $("busy").style.display = "block";
-
-  const keys = ["users","transactions","unlocks","subscriptions","payments","books","visits","notifications"];
-  await Promise.all(keys.map(loadOne));
-
-  $("readerCount").textContent = count("users");
-  $("bookCount").textContent = count("books");
-  $("transactionCount").textContent = count("transactions");
-  $("unlockCount").textContent = count("unlocks");
-  $("subscriptionCount").textContent = count("subscriptions");
-  $("paymentCount").textContent = count("payments");
-
-  renderTable(currentTable);
-  $("busy").style.display = "none";
-
-  const errors = keys
-    .filter(k => loadedTables[k] && loadedTables[k].error)
-    .map(k => k + ": " + loadedTables[k].error);
-
-  message(errors.length
-    ? "Dashboard loaded with database access issues:\n" + errors.join("\n") +
-      "\nCheck the actual table names and Supabase Row Level Security policies."
-    : "Live records loaded. Use Refresh records to fetch the latest database data.");
+async function loadOne(key){
+loadedTables[key]=await readTable(tableOptions[key]);
 }
 
-function count(key) {
-  const item = loadedTables[key];
-  return item && !item.error ? item.rows.length : "—";
+function count(key){
+const item=loadedTables[key];
+return item&&!item.error?item.rows.length:"—";
 }
 
-function renderTable(key) {
-  currentTable = key;
-  const item = loadedTables[key] || {rows:[], name:key};
-  $("tableTitle").textContent =
-    key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ");
-  $("tableDescription").textContent = descriptions[key] || "";
-  document.querySelectorAll("#tabs button").forEach(button => {
-    button.classList.toggle("active", button.dataset.table === key);
-  });
+async function refreshAll(){
+if(!currentUser)return;
 
-  if (item.error) {
-    $("tableHead").innerHTML = "<tr><th>Database message</th></tr>";
-    $("tableBody").innerHTML =
-      '<tr><td>' + escapeHtml(item.error) + '</td></tr>';
-    return;
-  }
+$("busy").style.display="block";
 
-  const rows = item.rows || [];
-  if (!rows.length) {
-    $("tableHead").innerHTML = "<tr><th>Records</th></tr>";
-    $("tableBody").innerHTML =
-      '<tr><td class="muted">No records found in this table.</td></tr>';
-    return;
-  }
+const keys=[
+"users","transactions","unlocks","subscriptions",
+"payments","books","visits","notifications"
+];
 
-  const columns = [...new Set(rows.flatMap(row => Object.keys(row)))].slice(0, 12);
-  $("tableHead").innerHTML = "<tr>" +
-    columns.map(c => "<th>" + escapeHtml(c) + "</th>").join("") +
-    "</tr>";
+await Promise.all(keys.map(loadOne));
 
-  $("tableBody").innerHTML = rows.map(row =>
-    "<tr>" + columns.map(column =>
-      "<td>" + escapeHtml(readable(row[column])) + "</td>"
-    ).join("") + "</tr>"
-  ).join("");
+$("readerCount").textContent=count("users");
+$("bookCount").textContent=count("books");
+$("transactionCount").textContent=count("transactions");
+$("unlockCount").textContent=count("unlocks");
+$("subscriptionCount").textContent=count("subscriptions");
+$("paymentCount").textContent=count("payments");
+
+renderTable(currentTable);
+$("busy").style.display="none";
+
+const errors=keys
+.filter(key=>loadedTables[key]&&loadedTables[key].error)
+.map(key=>key+": "+loadedTables[key].error);
+
+message(errors.length
+?"Some tables could not be read:\n"+errors.join("\n")+"\nCheck table names and Supabase Row Level Security policies."
+:"Database records loaded. Select a section or refresh to fetch the latest records.");
 }
 
-$("loginForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  if (!makeClient()) return;
+function renderTable(key){
+currentTable=key;
+const item=loadedTables[key]||{rows:[],name:key};
 
-  $("loginMessage").textContent = "Signing in…";
-  const {data, error} = await db.auth.signInWithPassword({
-    email: $("email").value.trim(),
-    password: $("password").value
-  });
-
-  if (error) {
-    $("loginMessage").textContent = error.message;
-    return;
-  }
-  await enterDashboard(data.user);
+$("tableTitle").textContent=key.charAt(0).toUpperCase()+key.slice(1);
+$("tableDescription").textContent=descriptions[key]||"";
+document.querySelectorAll("#tabs button").forEach(button=>{
+button.classList.toggle("active",button.dataset.table===key);
 });
 
-$("logoutButton").addEventListener("click", async () => {
-  if (db) await db.auth.signOut();
-  currentUser = null;
-  $("app").style.display = "none";
-  $("loginPanel").style.display = "block";
-  $("password").value = "";
-  $("loginMessage").textContent = "You have signed out.";
+if(item.error){
+$("tableHead").innerHTML="<tr><th>Database message</th></tr>";
+$("tableBody").innerHTML="<tr><td>"+escapeHtml(item.error)+"</td></tr>";
+return;
+}
+
+const rows=item.rows||[];
+
+if(!rows.length){
+$("tableHead").innerHTML="<tr><th>Records</th></tr>";
+$("tableBody").innerHTML='<tr><td class="muted">No records found.</td></tr>';
+return;
+}
+
+const columns=[...new Set(rows.flatMap(row=>Object.keys(row)))].slice(0,12);
+
+$("tableHead").innerHTML="<tr>"+columns.map(column=>
+"<th>"+escapeHtml(column)+"</th>"
+).join("")+"</tr>";
+
+$("tableBody").innerHTML=rows.map(row=>
+"<tr>"+columns.map(column=>
+"<td>"+escapeHtml(readable(row[column]))+"</td>"
+).join("")+"</tr>"
+).join("");
+}
+
+$("loginForm").addEventListener("submit",async event=>{
+event.preventDefault();
+$("loginMessage").textContent="Signing in…";
+
+const {data,error}=await db.auth.signInWithPassword({
+email:$("email").value.trim(),
+password:$("password").value
 });
 
-$("tabs").addEventListener("click", event => {
-  const button = event.target.closest("button[data-table]");
-  if (button) renderTable(button.dataset.table);
+if(error){
+$("loginMessage").textContent=error.message;
+return;
+}
+
+await enterDashboard(data.user);
 });
 
-$("refreshButton").addEventListener("click", refreshAll);
+$("logoutButton").addEventListener("click",async()=>{
+await db.auth.signOut();
+currentUser=null;
+$("app").style.display="none";
+$("loginPanel").style.display="block";
+$("password").value="";
+$("loginMessage").textContent="You have signed out.";
+});
 
-(async function init() {
-  if (!makeClient()) return;
-  const {data, error} = await db.auth.getSession();
-  if (error) {
-    $("loginMessage").textContent = error.message;
-    return;
-  }
-  if (data.session) await enterDashboard(data.session.user);
+$("tabs").addEventListener("click",event=>{
+const button=event.target.closest("button[data-table]");
+if(button)renderTable(button.dataset.table);
+});
+
+$("refreshButton").addEventListener("click",refreshAll);
+
+(async function init(){
+const {data,error}=await db.auth.getSession();
+
+if(error){
+$("loginMessage").textContent=error.message;
+return;
+}
+
+if(data.session){
+await enterDashboard(data.session.user);
+}
 })();
 </script>
 </body>
