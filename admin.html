@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fictional World Library — Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{--ink:#24133f;--purple:#4b2678;--pale:#f5f1fa;--line:#e7e0ef;--muted:#766b85}
 *{box-sizing:border-box}
@@ -56,6 +57,7 @@ td{max-width:300px;overflow-wrap:anywhere}
 }
 </style>
 </head>
+
 <body>
 <div class="layout">
 <aside class="side">
@@ -64,6 +66,7 @@ td{max-width:300px;overflow-wrap:anywhere}
 <nav class="nav" id="nav"></nav>
 <button class="secondary" id="signout" style="margin-top:18px;width:100%">sign out</button>
 </aside>
+
 <main class="main">
 <div class="top">
 <div>
@@ -80,8 +83,21 @@ td{max-width:300px;overflow-wrap:anywhere}
 <script>
 const SUPABASE_URL='https://mhvphjcreqhfnulflgiy.supabase.co';
 const SUPABASE_KEY='sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC';
+const ADMIN_ID='a57c6170-7026-43b4-91af-ee7459776109';
 
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+/* Use the same session storage as admin-login.html. */
+const db=window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY,
+  {
+    auth:{
+      persistSession:true,
+      autoRefreshToken:true,
+      detectSessionInUrl:false,
+      storage:window.sessionStorage
+    }
+  }
+);
 
 const sections=[
 'dashboard','books','chapters','authors','readers',
@@ -92,6 +108,7 @@ const sections=[
 let currentUser=null;
 let active='dashboard';
 let booksCache=[];
+let redirecting=false;
 
 const $=id=>document.getElementById(id);
 
@@ -99,6 +116,7 @@ function msg(s,bad=false){
 $('message').textContent=s;
 $('message').classList.remove('hidden');
 $('message').classList.toggle('error',bad);
+$('message').classList.toggle('success',!bad);
 }
 
 function esc(v){
@@ -110,8 +128,7 @@ return String(v??'').replace(/[&<>"']/g,c=>({
 
 function nav(){
 $('nav').innerHTML=sections.map(s=>{
-const page=s;
-return `<button class="${page===active?'active':''}" data-page="${esc(page)}">${esc(page)}</button>`;
+return `<button class="${s===active?'active':''}" data-page="${esc(s)}">${esc(s)}</button>`;
 }).join('');
 
 $('nav').querySelectorAll('button').forEach(b=>{
@@ -167,7 +184,6 @@ return;
 
 let mapping={
 'Readers':'users',
-'Payments':'transactions',
 'Transactions':'transactions',
 'Subscriptions':'subscription',
 'Notifications':'notification',
@@ -197,8 +213,10 @@ $('content').innerHTML=`<div class="panel">
 <h2>${esc(page)}</h2>
 <p class="error">Could not load this section: ${esc(e.message||e)}</p>
 <p class="muted">This may mean an existing RLS policy does not allow this query, or the table name differs.</p>
-<button onclick="show('${esc(page)}')">Try again</button>
+<button id="retrySection">Try again</button>
 </div>`;
+const retry=$('retrySection');
+if(retry)retry.onclick=()=>show(page);
 }
 }
 
@@ -249,7 +267,7 @@ $('content').innerHTML=`<div class="panel">
 <h2>books</h2>
 <div class="tools">
 <input id="booksearch" placeholder="search title or author">
-<button class="secondary" onclick="show('Books')">refresh</button>
+<button class="secondary" id="refreshBooks">refresh</button>
 </div>
 <div id="bookrows"></div>
 </div>`;
@@ -261,6 +279,8 @@ renderBooks(booksCache.filter(b=>JSON.stringify(b).toLowerCase().includes(e.targ
 };
 
 $('bookform').onsubmit=saveBook;
+
+$('refreshBooks').onclick=()=>show('Books');
 
 $('clearbook').onclick=()=>{
 setTimeout(()=>$('bookform').elements.id.value='',0);
@@ -416,10 +436,14 @@ await db.auth.signOut();
 location.href='admin-login.html';
 }
 
-/* Corrected admin session and access check */
 async function init(){
 nav();
 $('signout').onclick=signOut;
+
+if(!window.supabase){
+$('content').innerHTML='<div class="panel"><p class="error">The Supabase login service could not load. Check your connection and reload.</p></div>';
+return;
+}
 
 try{
 const {data,error}=await db.auth.getSession();
@@ -427,12 +451,19 @@ const {data,error}=await db.auth.getSession();
 if(error)throw error;
 
 if(!data.session){
-location.href='admin-login.html';
+location.replace('admin-login.html');
 return;
 }
 
 currentUser=data.session.user;
 $('who').textContent=currentUser.email||'';
+
+/* Verify both the signed-in account and its admin table record. */
+if(currentUser.id!==ADMIN_ID){
+$('content').innerHTML='<div class="panel"><h2>Admin access denied</h2><p>This account is not the designated administrator.</p><button id="returnlogin">Return to login</button></div>';
+$('returnlogin').onclick=signOut;
+return;
+}
 
 const check=await db
 .from('admin_users')
@@ -465,19 +496,21 @@ await show('Dashboard');
 $('content').innerHTML=`<div class="panel">
 <h2>Admin could not load</h2>
 <p class="error">${esc(e.message||e)}</p>
-<button onclick="location.reload()">Try again</button>
+<button id="retryInit">Try again</button>
 </div>`;
+$('retryInit').onclick=init;
 }
 }
 
+/* Avoid redirecting for token refresh or other normal auth events. */
 db.auth.onAuthStateChange((event,session)=>{
-if(event==='SIGNED_OUT'){
-location.href='admin-login.html';
+if(event==='SIGNED_OUT'&&!redirecting){
+redirecting=true;
+location.replace('admin-login.html');
 }
 });
 
-/* Removed the pagehide auto-sign-out listener. */
 init();
 </script>
 </body>
-</html>
+  </html>
