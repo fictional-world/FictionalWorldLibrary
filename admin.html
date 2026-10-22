@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fictional World Library — Admin</title>
+<title>fictional world library — admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--ink:#24133f;--purple:#4b2678;--pale:#f5f1fa;--line:#e7e0ef;--muted:#766b85}
@@ -59,17 +59,16 @@ td{max-width:300px;overflow-wrap:anywhere}
 <body>
 <div class="layout">
 <aside class="side">
-<p class="brand">Fictional World</p>
-<p class="sub">Library Admin</p>
+<p class="brand">fictional world</p>
+<p class="sub">library admin</p>
 <nav class="nav" id="nav"></nav>
-<button class="secondary" id="signout" style="margin-top:18px;width:100%">Sign out</button>
+<button class="secondary" id="signout" style="margin-top:18px;width:100%">sign out</button>
 </aside>
-
 <main class="main">
 <div class="top">
 <div>
-<h1 id="heading">Dashboard</h1>
-<div class="muted">Manage Fictional World Library</div>
+<h1 id="heading">dashboard</h1>
+<div class="muted">manage fictional world library</div>
 </div>
 <div id="who" class="muted"></div>
 </div>
@@ -83,13 +82,10 @@ const SUPABASE_URL='https://mhvphjcreqhfnulflgiy.supabase.co';
 const SUPABASE_KEY='sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const sections=[
-'Dashboard','Books','Chapters','Authors','Readers',
-'Payments','Transactions','Subscriptions',
-'Notifications','Visitors & Analytics','Settings'
-];
+const sections=['dashboard','books','chapters','authors','readers','payments','transactions','subscriptions','notifications','visitors & analytics','settings'];
+let currentUser=null,active='dashboard',booksCache=[];
+let leavingPage=false;
 
-let currentUser=null,active='Dashboard',booksCache=[];
 const $=id=>document.getElementById(id);
 
 function msg(s,bad=false){
@@ -100,24 +96,29 @@ setTimeout(()=>$('message').classList.add('hidden'),5000);
 }
 
 function esc(v){
-return String(v??'').replace(/[&<>"']/g,c=>({
-'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-}[c]));
+return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 function nav(){
-$('nav').innerHTML=sections.map(s=>
-`<button class="${s===active?'active':''}" data-page="${esc(s)}">${esc(s)}</button>`
+$('nav').innerHTML=sections.map(page=>
+`<button class="${page===active?'active':''}" data-page="${esc(page)}">${esc(page)}</button>`
 ).join('');
-$('nav').querySelectorAll('button').forEach(b=>
-b.onclick=()=>show(b.dataset.page)
-);
+
+$('nav').querySelectorAll('button').forEach(b=>{
+b.onclick=()=>show(b.dataset.page);
+});
 }
 
 function table(rows){
-if(!rows.length)return '<p class="muted">No records found, or access is restricted by your existing RLS policies.</p>';
+if(!rows.length)return '<p class="muted">no records found, or access is restricted by your existing rls policies.</p>';
+
 let keys=[...new Set(rows.flatMap(r=>Object.keys(r)))].slice(0,8);
-return `<div class="tablewrap"><table><thead><tr>${keys.map(k=>`<th>${esc(k.replaceAll('_',' '))}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(typeof r[k]==='object'?JSON.stringify(r[k]):r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+
+return `<div class="tablewrap"><table><thead><tr>
+${keys.map(k=>`<th>${esc(k.replaceAll('_',' '))}</th>`).join('')}
+</tr></thead><tbody>
+${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(typeof r[k]==='object'?JSON.stringify(r[k]):r[k])}</td>`).join('')}</tr>`).join('')}
+</tbody></table></div>`;
 }
 
 async function get(tableName,limit=100){
@@ -133,10 +134,12 @@ catch{return '—'}
 }
 
 async function show(page){
-active=page;
+page=page.toLowerCase();
+page=page==='visitors & analytics'?'Visitors & Analytics':page.charAt(0).toUpperCase()+page.slice(1);
+active=page.toLowerCase();
 nav();
-$('heading').textContent=page;
-$('content').innerHTML='<div class="panel">Loading…</div>';
+$('heading').textContent=page.toLowerCase();
+$('content').innerHTML='<div class="panel">loading…</div>';
 
 try{
 if(page==='Dashboard')return await dashboard();
@@ -145,131 +148,164 @@ if(page==='Chapters')return await chapterPage();
 if(page==='Authors')return await authorPage();
 if(page==='Settings')return settingsPage();
 
-const mapping={
+if(page==='Payments'){
+$('content').innerHTML='<div class="panel"><h2>payments</h2><p class="muted">no separate payments table is connected. check transactions for any payment records stored there.</p></div>';
+return;
+}
+
+let mapping={
 'Readers':'users',
-'Payments':null,
 'Transactions':'transactions',
 'Subscriptions':'subscription',
 'Notifications':'notification',
 'Visitors & Analytics':'visits'
 };
 
-if(page==='Payments'){
-$('content').innerHTML=`<div class="panel"><h2>Payments</h2><p>Payment records are not available yet because the database does not currently contain a payments table.</p><p class="muted">We can add payment tracking when payment verification is ready.</p></div>`;
-return;
-}
+const data=await get(mapping[page]);
 
-const tableName=mapping[page];
-if(!tableName)throw new Error('No database table is configured for this section.');
-
-const data=await get(tableName);
-$('content').innerHTML=`<div class="panel"><h2>${esc(page)}</h2><div class="tools"><input id="filter" placeholder="Search records"><button class="secondary" id="refresh">Refresh</button></div><div id="records">${table(data)}</div></div>`;
+$('content').innerHTML=`<div class="panel">
+<h2>${esc(page.toLowerCase())}</h2>
+<div class="tools">
+<input id="filter" placeholder="search records">
+<button class="secondary" id="refresh">refresh</button>
+</div>
+<div id="records">${table(data)}</div>
+</div>`;
 
 $('refresh').onclick=()=>show(page);
+
 $('filter').oninput=e=>{
 let q=e.target.value.toLowerCase();
 $('records').innerHTML=table(data.filter(r=>JSON.stringify(r).toLowerCase().includes(q)));
 };
 
 }catch(e){
-$('content').innerHTML=`<div class="panel"><h2>${esc(page)}</h2><p class="error">Could not load this section: ${esc(e.message||e)}</p><p class="muted">Check the table name and its database permissions.</p><button id="retry">Try again</button></div>`;
-$('retry').onclick=()=>show(page);
+$('content').innerHTML=`<div class="panel">
+<h2>${esc(page.toLowerCase())}</h2>
+<p class="error">could not load this section: ${esc(e.message||e)}</p>
+<p class="muted">this may mean the existing rls policy does not allow this query, or the table name differs.</p>
+<button onclick="show('${esc(page)}')">try again</button>
+</div>`;
 }
 }
 
 async function dashboard(){
 let names=['users','books','chapters','transactions','visits','subscription'];
-let labels=['Readers','Books','Chapters','Transactions','Visitors','Subscriptions'];
 let counts=await Promise.all(names.map(metric));
 
-$('content').innerHTML=`<div class="cards">${names.map((n,i)=>`<div class="card"><small>${esc(labels[i])}</small><div class="num">${counts[i]}</div></div>`).join('')}</div>
-<div class="panel"><h2>Quick actions</h2><div class="tools">
-<button onclick="show('Books')">Manage books</button>
-<button onclick="show('Chapters')">Manage chapters</button>
-<button onclick="show('Authors')">Manage authors</button>
-<button onclick="show('Readers')">View readers</button>
-<button onclick="show('Transactions')">View transactions</button>
+$('content').innerHTML=`<div class="cards">
+${names.map((n,i)=>`<div class="card"><small>${esc(n.replaceAll('_',' '))}</small><div class="num">${counts[i]}</div></div>`).join('')}
+</div>
+<div class="panel"><h2>quick actions</h2><div class="tools">
+<button onclick="show('Books')">manage books</button>
+<button onclick="show('Chapters')">manage chapters</button>
+<button onclick="show('Authors')">manage authors</button>
+<button onclick="show('Readers')">view readers</button>
+<button onclick="show('Payments')">view payments</button>
 </div></div>
-<div class="panel"><h2>Recent books</h2>${table(await get('books',10))}</div>`;
+<div class="panel"><h2>recent books</h2>${table(await get('books',10))}</div>`;
 }
 
 async function bookPage(){
 booksCache=await get('books',500);
-$('content').innerHTML=`<div class="panel"><h2>Add / edit book</h2>
-<form id="bookform"><input type="hidden" name="id">
+
+$('content').innerHTML=`<div class="panel"><h2>add / edit book</h2>
+<form id="bookform">
+<input type="hidden" name="id">
 <div class="formgrid">
-<label>Title<input name="title" required></label>
-<label>Author name<input name="author_name" required></label>
-<label>Cover URL<input name="cover_url"></label>
-<label>Genre<input name="genre"></label>
-<label>Length<select name="length"><option>Short</option><option>Long</option></select></label>
-<label>Status<select name="status"><option>Ongoing</option><option>Completed</option></select></label>
-<label>Tags<input name="tags" placeholder="Comma-separated"></label>
-<label>Synopsis<textarea name="synopsis"></textarea></label>
-</div><div class="tools" style="margin-top:12px">
-<button type="submit">Save book</button>
-<button type="reset" class="secondary" id="clearbook">Clear</button>
-</div></form></div>
-<div class="panel"><h2>Books</h2><div class="tools">
-<input id="booksearch" placeholder="Search title or author">
-<button class="secondary" id="refreshbooks">Refresh</button>
-</div><div id="bookrows"></div></div>`;
+<label>title<input name="title" required></label>
+<label>author name<input name="author_name" required></label>
+<label>cover url<input name="cover_url"></label>
+<label>genre<input name="genre"></label>
+<label>length<select name="length"><option>Short</option><option>Long</option></select></label>
+<label>status<select name="status"><option>Ongoing</option><option>Completed</option></select></label>
+<label>tags<input name="tags" placeholder="comma-separated"></label>
+<label>synopsis<textarea name="synopsis"></textarea></label>
+</div>
+<div class="tools" style="margin-top:12px">
+<button type="submit">save book</button>
+<button type="reset" class="secondary" id="clearbook">clear</button>
+</div>
+</form></div>
+
+<div class="panel"><h2>books</h2>
+<div class="tools">
+<input id="booksearch" placeholder="search title or author">
+<button class="secondary" onclick="show('Books')">refresh</button>
+</div>
+<div id="bookrows"></div>
+</div>`;
 
 renderBooks(booksCache);
+
 $('booksearch').oninput=e=>renderBooks(booksCache.filter(b=>JSON.stringify(b).toLowerCase().includes(e.target.value.toLowerCase())));
-$('refreshbooks').onclick=()=>show('Books');
 $('bookform').onsubmit=saveBook;
 $('clearbook').onclick=()=>setTimeout(()=>$('bookform').elements.id.value='',0);
 }
 
 function renderBooks(rows){
-$('bookrows').innerHTML=rows.map(b=>`<div class="notice"><b>${esc(b.title)}</b> — ${esc(b.author_name)} <span class="status">${esc(b.status)}</span><div class="rowbuttons" style="margin-top:8px"><button class="secondary" data-edit="${esc(b.id)}">Edit</button><button class="danger" data-delete="${esc(b.id)}">Delete</button></div></div>`).join('')||'<p class="muted">No books found.</p>';
+$('bookrows').innerHTML=rows.map(b=>`<div class="notice">
+<b>${esc(b.title)}</b> — ${esc(b.author_name)}
+<span class="status">${esc(b.status)}</span>
+<div class="rowbuttons" style="margin-top:8px">
+<button class="secondary" data-edit="${esc(b.id)}">edit</button>
+<button class="danger" data-delete="${esc(b.id)}">delete</button>
+</div></div>`).join('')||'<p class="muted">no books found.</p>';
 
 $('bookrows').querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>{
 let b=booksCache.find(x=>String(x.id)===btn.dataset.edit);
 if(!b)return;
 let f=$('bookform');
-['id','title','author_name','cover_url','genre','length','status','synopsis'].forEach(k=>{if(f.elements[k])f.elements[k].value=b[k]??''});
+['id','title','author_name','cover_url','genre','length','status','synopsis'].forEach(k=>{
+if(f.elements[k])f.elements[k].value=b[k]??'';
+});
 f.elements.tags.value=Array.isArray(b.tags)?b.tags.join(', '):(b.tags||'');
 f.scrollIntoView({behavior:'smooth'});
 });
 
 $('bookrows').querySelectorAll('[data-delete]').forEach(btn=>btn.onclick=async()=>{
-if(!confirm('Delete this book?'))return;
+if(!confirm('delete this book?'))return;
 let {error}=await db.from('books').delete().eq('id',btn.dataset.delete);
 if(error)return msg(error.message,true);
-msg('Book deleted');
+msg('book deleted');
 show('Books');
 });
 }
 
 async function saveBook(e){
 e.preventDefault();
-let f=e.target,v=Object.fromEntries(new FormData(f)),id=v.id;
+let f=e.target,v=Object.fromEntries(new FormData(f));
+let id=v.id;
 delete v.id;
 v.tags=v.tags?v.tags.split(',').map(x=>x.trim()).filter(Boolean):[];
 if(!v.cover_url)delete v.cover_url;
 if(!v.synopsis)delete v.synopsis;
+
 let result=id?await db.from('books').update(v).eq('id',id):await db.from('books').insert(v);
+
 if(result.error)return msg(result.error.message,true);
-msg('Book saved');
+msg('book saved');
 show('Books');
 }
 
 async function chapterPage(){
 let rows=await get('chapters',500);
-let books=booksCache.length?booksCache:await get('books',500);
+let bookOptions=booksCache.length?booksCache:await get('books',500);
 
-$('content').innerHTML=`<div class="panel"><h2>Add chapter</h2>
+$('content').innerHTML=`<div class="panel"><h2>add chapter</h2>
 <form id="chapterform"><div class="formgrid">
-<label>Book<select name="book_id" required>${books.map(b=>`<option value="${esc(b.id)}">${esc(b.title)}</option>`).join('')}</select></label>
-<label>Chapter number<input name="chapter_number" type="number" min="1" required></label>
-<label>Title<input name="title" required></label>
-<label>Access<select name="locked"><option value="false">Free</option><option value="true">Locked / paid</option></select></label>
-<label>Publish status<select name="pub_status"><option>published</option><option>draft</option></select></label>
-<label>Content<textarea name="content" required></textarea></label>
-</div><div class="tools" style="margin-top:12px"><button>Save chapter</button></div></form></div>
-<div class="panel"><h2>Chapters</h2>${table(rows)}</div>`;
+<label>book<select name="book_id" required>
+${bookOptions.map(b=>`<option value="${esc(b.id)}">${esc(b.title)}</option>`).join('')}
+</select></label>
+<label>chapter number<input name="chapter_number" type="number" min="1" required></label>
+<label>title<input name="title" required></label>
+<label>access<select name="locked"><option value="false">free</option><option value="true">locked / paid</option></select></label>
+<label>publish status<select name="pub_status"><option>published</option><option>draft</option></select></label>
+<label>content<textarea name="content" required></textarea></label>
+</div>
+<div class="tools" style="margin-top:12px"><button>save chapter</button></div>
+</form></div>
+<div class="panel"><h2>chapters</h2>${table(rows)}</div>`;
 
 $('chapterform').onsubmit=async e=>{
 e.preventDefault();
@@ -278,22 +314,35 @@ v.locked=v.locked==='true';
 v.chapter_number=Number(v.chapter_number);
 let {error}=await db.from('chapters').insert(v);
 if(error)return msg(error.message,true);
-msg('Chapter saved');
+msg('chapter saved');
 show('Chapters');
 };
 }
 
 async function authorPage(){
-let rows=await get('books',500),authors={};
-rows.forEach(b=>{let n=(b.author_name||'').trim();if(n)(authors[n]??=[]).push(b)});
+let rows=await get('books',500);
+let authors={};
 
-$('content').innerHTML=`<div class="panel"><h2>Author management</h2>
-<p class="muted">Authors are listed from author names currently attached to books. Editing a name updates books carrying that name.</p>
+rows.forEach(b=>{
+let n=(b.author_name||'').trim();
+if(n)(authors[n]??=[]).push(b);
+});
+
+$('content').innerHTML=`<div class="panel">
+<h2>author management</h2>
+<p class="muted">authors are listed from the names attached to books. changing a name updates the books carrying that name.</p>
 <form id="authorform"><div class="formgrid">
-<label>Current author name<select name="old">${Object.keys(authors).map(n=>`<option>${esc(n)}</option>`).join('')}</select></label>
-<label>Author name<input name="next" required></label>
-</div><div class="tools" style="margin-top:12px"><button>Update author name</button></div></form></div>
-<div class="panel"><h2>Authors and their books</h2>${Object.entries(authors).map(([n,bs])=>`<div class="notice"><b>${esc(n)}</b> · ${bs.length} book(s)<ul>${bs.map(b=>`<li>${esc(b.title)}</li>`).join('')}</ul></div>`).join('')||'<p>No authors found in books yet.</p>'}</div>`;
+<label>current author name<select name="old">
+${Object.keys(authors).map(n=>`<option>${esc(n)}</option>`).join('')}
+</select></label>
+<label>new author name<input name="next" required></label>
+</div>
+<div class="tools" style="margin-top:12px"><button>update author name</button></div>
+</form></div>
+
+<div class="panel"><h2>authors and their books</h2>
+${Object.entries(authors).map(([n,bs])=>`<div class="notice"><b>${esc(n)}</b> · ${bs.length} book(s)<ul>${bs.map(b=>`<li>${esc(b.title)}</li>`).join('')}</ul></div>`).join('')||'<p>no authors found in books yet.</p>'}
+</div>`;
 
 $('authorform').onsubmit=async e=>{
 e.preventDefault();
@@ -301,31 +350,35 @@ let f=e.target,old=f.elements.old.value,next=f.elements.next.value.trim();
 if(!old||!next)return;
 let {error}=await db.from('books').update({author_name:next}).eq('author_name',old);
 if(error)return msg(error.message,true);
-msg('Author name updated across books');
+msg('author name updated across books');
 show('Authors');
 };
 }
 
 function settingsPage(){
-$('content').innerHTML=`<div class="panel"><h2>Admin security</h2>
-<p>Signed in as ${esc(currentUser?.email||'')}</p>
-<p class="muted">This page uses Supabase authentication and checks your account against the existing admin_users table. Keep RLS enabled and never place a service-role key in this file.</p>
-<button id="settingsout">Sign out</button></div>`;
+$('content').innerHTML=`<div class="panel">
+<h2>admin security</h2>
+<p>signed in as ${esc(currentUser?.email||'')}</p>
+<p class="muted">this page uses supabase authentication and checks your account against the existing admin_users table. keep rls enabled and never place a service-role key in this file.</p>
+<button id="settingsout">sign out</button>
+</div>`;
 $('settingsout').onclick=signOut;
 }
 
 async function signOut(){
-await db.auth.signOut();
-location.href='admin-login.html';
+leavingPage=true;
+await db.auth.signOut({scope:'local'});
+location.replace('admin-login.html');
 }
 
 async function init(){
 nav();
 $('signout').onclick=signOut;
+
 const {data:{session}}=await db.auth.getSession();
 
 if(!session){
-location.href='admin-login.html';
+location.replace('admin-login.html');
 return;
 }
 
@@ -333,27 +386,26 @@ currentUser=session.user;
 $('who').textContent=currentUser.email;
 
 let check=await db.from('admin_users').select('*').eq('user_id',currentUser.id).maybeSingle();
+
 if(check.error||!check.data){
 check=await db.from('admin_users').select('*').eq('id',currentUser.id).maybeSingle();
 }
 
 if(check.error||!check.data){
-document.body.innerHTML=`<main style="padding:30px;font-family:Arial">
-<h2>Admin access denied</h2>
-<p>Your signed-in account was not found in admin_users, or its existing RLS policy does not allow this check.</p>
-<button id="returnlogin">Return to login</button></main>`;
-document.getElementById('returnlogin').onclick=async()=>{
-await db.auth.signOut();
-location.href='admin-login.html';
-};
+document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>admin access denied</h2><p>your signed-in account was not found in admin_users, or its existing rls policy does not allow this check.</p><button onclick="db.auth.signOut({scope:\'local\'}).then(()=>location.replace(\'admin-login.html\'))">return to login</button></main>';
 return;
 }
 
 await show('Dashboard');
 }
 
-db.auth.onAuthStateChange((event)=>{
-if(event==='SIGNED_OUT')location.href='admin-login.html';
+db.auth.onAuthStateChange((event,session)=>{
+if(event==='SIGNED_OUT'&&!leavingPage)location.replace('admin-login.html');
+});
+
+// attempt to clear this admin page's local session when leaving it
+window.addEventListener('pagehide',()=>{
+db.auth.signOut({scope:'local'});
 });
 
 init();
