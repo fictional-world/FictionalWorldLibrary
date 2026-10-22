@@ -1,35 +1,362 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fictional World Library — Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--ink:#24133f;--purple:#4b2678;--pale:#f5f1fa;--line:#e7e0ef;--muted:#766b85}*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:#f8f7fa;color:#241b31}button,input,select,textarea{font:inherit}button{border:0;border-radius:8px;padding:10px 13px;background:var(--purple);color:#fff;cursor:pointer}button.secondary{background:#eee7f5;color:var(--ink)}button.danger{background:#a52b48}.layout{display:grid;grid-template-columns:225px 1fr;min-height:100vh}.side{background:#211333;color:#fff;padding:22px 14px}.brand{font-size:18px;font-weight:700;margin:0 8px 5px}.sub{font-size:12px;color:#c9bdd9;margin:0 8px 24px}.nav{display:grid;gap:5px}.nav button{background:transparent;text-align:left;color:#e9e0f2}.nav button.active,.nav button:hover{background:#4b2678}.main{padding:24px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.top h1{margin:0;font-size:25px}.muted{color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:18px}.card,.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:16px}.card small{color:var(--muted)}.num{font-size:25px;font-weight:700;margin-top:8px;color:var(--purple)}.panel{margin-bottom:16px}.panel h2{font-size:17px;margin:0 0 14px}.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tools input,.tools select,input,select,textarea{border:1px solid #d9d0e3;border-radius:8px;padding:10px;background:white;max-width:100%}.tools input{flex:1;min-width:150px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:600px}th,td{padding:10px;text-align:left;border-bottom:1px solid #eee8f3;vertical-align:top}th{font-size:12px;color:var(--muted);background:#faf8fc}td{max-width:300px;overflow-wrap:anywhere}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.formgrid label{display:grid;gap:5px;color:var(--muted);font-size:12px}.formgrid textarea{min-height:85px}.hidden{display:none!important}.notice{padding:12px;background:var(--pale);border-radius:8px;margin-bottom:12px}.rowbuttons{display:flex;gap:6px;flex-wrap:wrap}.status{padding:4px 7px;border-radius:99px;background:#f0e9f8}.error{color:#a52b48}.success{color:#26734d}@media(max-width:720px){.layout{grid-template-columns:1fr}.side{padding:14px}.nav{grid-template-columns:repeat(2,minmax(0,1fr))}.main{padding:14px}.top{align-items:flex-start;flex-direction:column}}
-</style></head>
-<body><div class="layout"><aside class="side"><p class="brand">Fictional World</p><p class="sub">Library Admin</p><nav class="nav" id="nav"></nav><button class="secondary" id="signout" style="margin-top:18px;width:100%">Sign out</button></aside><main class="main"><div class="top"><div><h1 id="heading">Dashboard</h1><div class="muted">Manage Fictional World Library</div></div><div id="who" class="muted"></div></div><div id="message" class="notice hidden"></div><section id="content"></section></main></div>
+:root{--ink:#24133f;--purple:#4b2678;--pale:#f5f1fa;--line:#e7e0ef;--muted:#766b85}
+*{box-sizing:border-box}
+body{margin:0;font:14px Arial,sans-serif;background:#f8f7fa;color:#241b31}
+button,input,select,textarea{font:inherit}
+button{border:0;border-radius:8px;padding:10px 13px;background:var(--purple);color:#fff;cursor:pointer}
+button.secondary{background:#eee7f5;color:var(--ink)}
+button.danger{background:#a52b48}
+.layout{display:grid;grid-template-columns:225px 1fr;min-height:100vh}
+.side{background:#211333;color:#fff;padding:22px 14px}
+.brand{font-size:18px;font-weight:700;margin:0 8px 5px}
+.sub{font-size:12px;color:#c9bdd9;margin:0 8px 24px}
+.nav{display:grid;gap:5px}
+.nav button{background:transparent;text-align:left;color:#e9e0f2}
+.nav button.active,.nav button:hover{background:#4b2678}
+.main{padding:24px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.top h1{margin:0;font-size:25px}
+.muted{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:18px}
+.card,.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:16px}
+.card small{color:var(--muted)}
+.num{font-size:25px;font-weight:700;margin-top:8px;color:var(--purple)}
+.panel{margin-bottom:16px}
+.panel h2{font-size:17px;margin:0 0 14px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools input,.tools select,input,select,textarea{border:1px solid #d9d0e3;border-radius:8px;padding:10px;background:white;max-width:100%}
+.tools input{flex:1;min-width:150px}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:600px}
+th,td{padding:10px;text-align:left;border-bottom:1px solid #eee8f3;vertical-align:top}
+th{font-size:12px;color:var(--muted);background:#faf8fc}
+td{max-width:300px;overflow-wrap:anywhere}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.formgrid label{display:grid;gap:5px;color:var(--muted);font-size:12px}
+.formgrid textarea{min-height:85px}
+.hidden{display:none!important}
+.notice{padding:12px;background:var(--pale);border-radius:8px;margin-bottom:12px}
+.rowbuttons{display:flex;gap:6px;flex-wrap:wrap}
+.status{padding:4px 7px;border-radius:99px;background:#f0e9f8}
+.error{color:#a52b48}
+.success{color:#26734d}
+@media(max-width:720px){
+.layout{grid-template-columns:1fr}
+.side{padding:14px}
+.nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+.main{padding:14px}
+.top{align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<p class="brand">Fictional World</p>
+<p class="sub">Library Admin</p>
+<nav class="nav" id="nav"></nav>
+<button class="secondary" id="signout" style="margin-top:18px;width:100%">Sign out</button>
+</aside>
+
+<main class="main">
+<div class="top">
+<div>
+<h1 id="heading">Dashboard</h1>
+<div class="muted">Manage Fictional World Library</div>
+</div>
+<div id="who" class="muted"></div>
+</div>
+<div id="message" class="notice hidden"></div>
+<section id="content"></section>
+</main>
+</div>
+
 <script>
 const SUPABASE_URL='https://mhvphjcreqhfnulflgiy.supabase.co';
 const SUPABASE_KEY='sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const sections=['Dashboard','Books','Chapters','Authors','Readers','Payments','Transactions','Subscriptions','Notifications','Visitors & Analytics','Settings'];
-let currentUser=null, active='Dashboard', booksCache=[];
+
+const sections=[
+'Dashboard','Books','Chapters','Authors','Readers',
+'Payments','Transactions','Subscriptions',
+'Notifications','Visitors & Analytics','Settings'
+];
+
+let currentUser=null,active='Dashboard',booksCache=[];
 const $=id=>document.getElementById(id);
-function msg(s,bad=false){$('message').textContent=s;$('message').classList.remove('hidden');$('message').classList.toggle('error',bad);setTimeout(()=>$('message').classList.add('hidden'),5000)}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function nav(){ $('nav').innerHTML=sections.map(s=>`<button class="${s===active?'active':''}" data-page="${esc(s)}">${esc(s)}</button>`).join('');$('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.page)); }
-function table(rows){if(!rows.length)return '<p class="muted">No records found, or access is restricted by your existing RLS policies.</p>';let keys=[...new Set(rows.flatMap(r=>Object.keys(r)))].slice(0,8);return `<div class="tablewrap"><table><thead><tr>${keys.map(k=>`<th>${esc(k.replaceAll('_',' '))}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(typeof r[k]==='object'?JSON.stringify(r[k]):r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
-async function get(tableName,limit=100){let r=await db.from(tableName).select('*').order('created_at',{ascending:false}).limit(limit);if(r.error)r=await db.from(tableName).select('*').limit(limit);if(r.error)throw r.error;return r.data||[]}
-async function metric(name){try{return (await get(name,1000)).length}catch{return '—'}}
-async function show(page){active=page;nav();$('heading').textContent=page;$('content').innerHTML='<div class="panel">Loading…</div>';try{if(page==='Dashboard')return await dashboard();if(page==='Books')return await bookPage();if(page==='Chapters')return await chapterPage();if(page==='Authors')return await authorPage();if(page==='Settings')return settingsPage();let mapping={'Readers':'users','Payments':'payments','Transactions':'transactions','Subscriptions':'subscriptions','Notifications':'notifications','Visitors & Analytics':'visits'};const data=await get(mapping[page]);$('content').innerHTML=`<div class="panel"><h2>${esc(page)}</h2><div class="tools"><input id="filter" placeholder="Search records"><button class="secondary" id="refresh">Refresh</button></div><div id="records">${table(data)}</div></div>`;$('refresh').onclick=()=>show(page);$('filter').oninput=e=>{let q=e.target.value.toLowerCase();$('records').innerHTML=table(data.filter(r=>JSON.stringify(r).toLowerCase().includes(q)))}}catch(e){$('content').innerHTML=`<div class="panel"><h2>${esc(page)}</h2><p class="error">Could not load this section: ${esc(e.message||e)}</p><p class="muted">This may mean the existing RLS policy does not allow this query, or the table name differs.</p><button onclick="show('${esc(page)}')">Try again</button></div>`}}
-async function dashboard(){let names=['users','books','chapters','payments','visits','subscriptions'];let counts=await Promise.all(names.map(metric));$('content').innerHTML=`<div class="cards">${names.map((n,i)=>`<div class="card"><small>${esc(n.replaceAll('_',' '))}</small><div class="num">${counts[i]}</div></div>`).join('')}</div><div class="panel"><h2>Quick actions</h2><div class="tools"><button onclick="show('Books')">Manage books</button><button onclick="show('Chapters')">Manage chapters</button><button onclick="show('Authors')">Manage authors</button><button onclick="show('Readers')">View readers</button><button onclick="show('Payments')">View payments</button></div></div><div class="panel"><h2>Recent books</h2>${table(await get('books',10))}</div>`}
-async function bookPage(){booksCache=await get('books',500);$('content').innerHTML=`<div class="panel"><h2>Add / edit book</h2><form id="bookform"><input type="hidden" name="id"><div class="formgrid"><label>Title<input name="title" required></label><label>Author name<input name="author_name" required></label><label>Cover URL<input name="cover_url"></label><label>Genre<input name="genre"></label><label>Length<select name="length"><option>Short</option><option>Long</option></select></label><label>Status<select name="status"><option>Ongoing</option><option>Completed</option></select></label><label>Tags<input name="tags" placeholder="Comma-separated"></label><label>Synopsis<textarea name="synopsis"></textarea></label></div><div class="tools" style="margin-top:12px"><button type="submit">Save book</button><button type="reset" class="secondary" id="clearbook">Clear</button></div></form></div><div class="panel"><h2>Books</h2><div class="tools"><input id="booksearch" placeholder="Search title or author"><button class="secondary" onclick="show('Books')">Refresh</button></div><div id="bookrows"></div></div>`;renderBooks(booksCache);$('booksearch').oninput=e=>renderBooks(booksCache.filter(b=>JSON.stringify(b).toLowerCase().includes(e.target.value.toLowerCase())));$('bookform').onsubmit=saveBook;$('clearbook').onclick=()=>setTimeout(()=>{$('bookform').elements.id.value=''},0)}
-function renderBooks(rows){$('bookrows').innerHTML=rows.map(b=>`<div class="notice"><b>${esc(b.title)}</b> — ${esc(b.author_name)} <span class="status">${esc(b.status)}</span><div class="rowbuttons" style="margin-top:8px"><button class="secondary" data-edit="${esc(b.id)}">Edit</button><button class="danger" data-delete="${esc(b.id)}">Delete</button></div></div>`).join('')||'<p class="muted">No books found.</p>';$('bookrows').querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>{let b=booksCache.find(x=>String(x.id)===btn.dataset.edit);if(!b)return;let f=$('bookform');['id','title','author_name','cover_url','genre','length','status','synopsis'].forEach(k=>{if(f.elements[k])f.elements[k].value=b[k]??''});f.elements.tags.value=Array.isArray(b.tags)?b.tags.join(', '):(b.tags||'');f.scrollIntoView({behavior:'smooth'})});$('bookrows').querySelectorAll('[data-delete]').forEach(btn=>btn.onclick=async()=>{if(!confirm('Delete this book?'))return;let {error}=await db.from('books').delete().eq('id',btn.dataset.delete);if(error)return msg(error.message,true);msg('Book deleted');show('Books')})}
-async function saveBook(e){e.preventDefault();let f=e.target, v=Object.fromEntries(new FormData(f));let id=v.id;delete v.id;v.tags=v.tags?v.tags.split(',').map(x=>x.trim()).filter(Boolean):[];if(!v.cover_url)delete v.cover_url;if(!v.synopsis)delete v.synopsis;let result=id?await db.from('books').update(v).eq('id',id):await db.from('books').insert(v);if(result.error)return msg(result.error.message,true);msg('Book saved');show('Books')}
-async function chapterPage(){let rows=await get('chapters',500);$('content').innerHTML=`<div class="panel"><h2>Add chapter</h2><form id="chapterform"><div class="formgrid"><label>Book<select name="book_id" required>${booksCache.length?booksCache.map(b=>`<option value="${esc(b.id)}">${esc(b.title)}</option>`).join(''):(await get('books',500)).map(b=>`<option value="${esc(b.id)}">${esc(b.title)}</option>`).join('')}</select></label><label>Chapter number<input name="chapter_number" type="number" min="1" required></label><label>Title<input name="title" required></label><label>Access<select name="locked"><option value="false">Free</option><option value="true">Locked / paid</option></select></label><label>Publish status<select name="pub_status"><option>published</option><option>draft</option></select></label><label>Content<textarea name="content" required></textarea></label></div><div class="tools" style="margin-top:12px"><button>Save chapter</button></div></form></div><div class="panel"><h2>Chapters</h2>${table(rows)}</div>`;$('chapterform').onsubmit=async e=>{e.preventDefault();let v=Object.fromEntries(new FormData(e.target));v.locked=v.locked==='true';v.chapter_number=Number(v.chapter_number);let {error}=await db.from('chapters').insert(v);if(error)return msg(error.message,true);msg('Chapter saved');show('Chapters')}}
-async function authorPage(){let rows=await get('books',500);let authors={};rows.forEach(b=>{let n=(b.author_name||'').trim();if(n)(authors[n]??=[]).push(b)});$('content').innerHTML=`<div class="panel"><h2>Author management</h2><p class="muted">Authors are listed from the author names currently attached to books. Editing a name updates the books carrying that name.</p><form id="authorform"><div class="formgrid"><label>Current author name<select name="old">${Object.keys(authors).map(n=>`<option>${esc(n)}</option>`).join('')}</select></label><label>Author name<input name="next" required></label></div><div class="tools" style="margin-top:12px"><button>Update author name</button></div></form></div><div class="panel"><h2>Authors and their books</h2>${Object.entries(authors).map(([n,bs])=>`<div class="notice"><b>${esc(n)}</b> · ${bs.length} book(s)<ul>${bs.map(b=>`<li>${esc(b.title)}</li>`).join('')}</ul></div>`).join('')||'<p>No authors found in books yet.</p>'}</div>`;$('authorform').onsubmit=async e=>{e.preventDefault();let f=e.target,old=f.elements.old.value,next=f.elements.next.value.trim();if(!old||!next)return;let {error}=await db.from('books').update({author_name:next}).eq('author_name',old);if(error)return msg(error.message,true);msg('Author name updated across books');show('Authors')}}
-function settingsPage(){$('content').innerHTML=`<div class="panel"><h2>Admin security</h2><p>Signed in as ${esc(currentUser?.email||'')}</p><p class="muted">This page uses Supabase authentication and checks your account against the existing admin_users table. Keep RLS enabled and never place a service-role key in this file.</p><button id="settingsout">Sign out</button></div>`;$('settingsout').onclick=signOut}
-async function signOut(){await db.auth.signOut();location.href='admin-login.html'}
-async function init(){nav();$('signout').onclick=signOut;const {data:{session}}=await db.auth.getSession();if(!session){location.href='admin-login.html';return}currentUser=session.user;$('who').textContent=currentUser.email;let check=await db.from('admin_users').select('*').eq('user_id',currentUser.id).maybeSingle();if(check.error||!check.data){check=await db.from('admin_users').select('*').eq('id',currentUser.id).maybeSingle()}if(check.error||!check.data){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access denied</h2><p>Your signed-in account was not found in admin_users, or its existing RLS policy does not allow this check.</p><button onclick="db.auth.signOut().then(()=>location.href=\'admin-login.html\')">Return to login</button></main>';return}await show('Dashboard')}
-db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')location.href='admin-login.html'});init();
-</script></body></html>
+
+function msg(s,bad=false){
+$('message').textContent=s;
+$('message').classList.remove('hidden');
+$('message').classList.toggle('error',bad);
+setTimeout(()=>$('message').classList.add('hidden'),5000);
+}
+
+function esc(v){
+return String(v??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+}
+
+function nav(){
+$('nav').innerHTML=sections.map(s=>
+`<button class="${s===active?'active':''}" data-page="${esc(s)}">${esc(s)}</button>`
+).join('');
+$('nav').querySelectorAll('button').forEach(b=>
+b.onclick=()=>show(b.dataset.page)
+);
+}
+
+function table(rows){
+if(!rows.length)return '<p class="muted">No records found, or access is restricted by your existing RLS policies.</p>';
+let keys=[...new Set(rows.flatMap(r=>Object.keys(r)))].slice(0,8);
+return `<div class="tablewrap"><table><thead><tr>${keys.map(k=>`<th>${esc(k.replaceAll('_',' '))}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(typeof r[k]==='object'?JSON.stringify(r[k]):r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+async function get(tableName,limit=100){
+let r=await db.from(tableName).select('*').order('created_at',{ascending:false}).limit(limit);
+if(r.error)r=await db.from(tableName).select('*').limit(limit);
+if(r.error)throw r.error;
+return r.data||[];
+}
+
+async function metric(name){
+try{return (await get(name,1000)).length}
+catch{return '—'}
+}
+
+async function show(page){
+active=page;
+nav();
+$('heading').textContent=page;
+$('content').innerHTML='<div class="panel">Loading…</div>';
+
+try{
+if(page==='Dashboard')return await dashboard();
+if(page==='Books')return await bookPage();
+if(page==='Chapters')return await chapterPage();
+if(page==='Authors')return await authorPage();
+if(page==='Settings')return settingsPage();
+
+const mapping={
+'Readers':'users',
+'Payments':null,
+'Transactions':'transactions',
+'Subscriptions':'subscription',
+'Notifications':'notification',
+'Visitors & Analytics':'visits'
+};
+
+if(page==='Payments'){
+$('content').innerHTML=`<div class="panel"><h2>Payments</h2><p>Payment records are not available yet because the database does not currently contain a payments table.</p><p class="muted">We can add payment tracking when payment verification is ready.</p></div>`;
+return;
+}
+
+const tableName=mapping[page];
+if(!tableName)throw new Error('No database table is configured for this section.');
+
+const data=await get(tableName);
+$('content').innerHTML=`<div class="panel"><h2>${esc(page)}</h2><div class="tools"><input id="filter" placeholder="Search records"><button class="secondary" id="refresh">Refresh</button></div><div id="records">${table(data)}</div></div>`;
+
+$('refresh').onclick=()=>show(page);
+$('filter').oninput=e=>{
+let q=e.target.value.toLowerCase();
+$('records').innerHTML=table(data.filter(r=>JSON.stringify(r).toLowerCase().includes(q)));
+};
+
+}catch(e){
+$('content').innerHTML=`<div class="panel"><h2>${esc(page)}</h2><p class="error">Could not load this section: ${esc(e.message||e)}</p><p class="muted">Check the table name and its database permissions.</p><button id="retry">Try again</button></div>`;
+$('retry').onclick=()=>show(page);
+}
+}
+
+async function dashboard(){
+let names=['users','books','chapters','transactions','visits','subscription'];
+let labels=['Readers','Books','Chapters','Transactions','Visitors','Subscriptions'];
+let counts=await Promise.all(names.map(metric));
+
+$('content').innerHTML=`<div class="cards">${names.map((n,i)=>`<div class="card"><small>${esc(labels[i])}</small><div class="num">${counts[i]}</div></div>`).join('')}</div>
+<div class="panel"><h2>Quick actions</h2><div class="tools">
+<button onclick="show('Books')">Manage books</button>
+<button onclick="show('Chapters')">Manage chapters</button>
+<button onclick="show('Authors')">Manage authors</button>
+<button onclick="show('Readers')">View readers</button>
+<button onclick="show('Transactions')">View transactions</button>
+</div></div>
+<div class="panel"><h2>Recent books</h2>${table(await get('books',10))}</div>`;
+}
+
+async function bookPage(){
+booksCache=await get('books',500);
+$('content').innerHTML=`<div class="panel"><h2>Add / edit book</h2>
+<form id="bookform"><input type="hidden" name="id">
+<div class="formgrid">
+<label>Title<input name="title" required></label>
+<label>Author name<input name="author_name" required></label>
+<label>Cover URL<input name="cover_url"></label>
+<label>Genre<input name="genre"></label>
+<label>Length<select name="length"><option>Short</option><option>Long</option></select></label>
+<label>Status<select name="status"><option>Ongoing</option><option>Completed</option></select></label>
+<label>Tags<input name="tags" placeholder="Comma-separated"></label>
+<label>Synopsis<textarea name="synopsis"></textarea></label>
+</div><div class="tools" style="margin-top:12px">
+<button type="submit">Save book</button>
+<button type="reset" class="secondary" id="clearbook">Clear</button>
+</div></form></div>
+<div class="panel"><h2>Books</h2><div class="tools">
+<input id="booksearch" placeholder="Search title or author">
+<button class="secondary" id="refreshbooks">Refresh</button>
+</div><div id="bookrows"></div></div>`;
+
+renderBooks(booksCache);
+$('booksearch').oninput=e=>renderBooks(booksCache.filter(b=>JSON.stringify(b).toLowerCase().includes(e.target.value.toLowerCase())));
+$('refreshbooks').onclick=()=>show('Books');
+$('bookform').onsubmit=saveBook;
+$('clearbook').onclick=()=>setTimeout(()=>$('bookform').elements.id.value='',0);
+}
+
+function renderBooks(rows){
+$('bookrows').innerHTML=rows.map(b=>`<div class="notice"><b>${esc(b.title)}</b> — ${esc(b.author_name)} <span class="status">${esc(b.status)}</span><div class="rowbuttons" style="margin-top:8px"><button class="secondary" data-edit="${esc(b.id)}">Edit</button><button class="danger" data-delete="${esc(b.id)}">Delete</button></div></div>`).join('')||'<p class="muted">No books found.</p>';
+
+$('bookrows').querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>{
+let b=booksCache.find(x=>String(x.id)===btn.dataset.edit);
+if(!b)return;
+let f=$('bookform');
+['id','title','author_name','cover_url','genre','length','status','synopsis'].forEach(k=>{if(f.elements[k])f.elements[k].value=b[k]??''});
+f.elements.tags.value=Array.isArray(b.tags)?b.tags.join(', '):(b.tags||'');
+f.scrollIntoView({behavior:'smooth'});
+});
+
+$('bookrows').querySelectorAll('[data-delete]').forEach(btn=>btn.onclick=async()=>{
+if(!confirm('Delete this book?'))return;
+let {error}=await db.from('books').delete().eq('id',btn.dataset.delete);
+if(error)return msg(error.message,true);
+msg('Book deleted');
+show('Books');
+});
+}
+
+async function saveBook(e){
+e.preventDefault();
+let f=e.target,v=Object.fromEntries(new FormData(f)),id=v.id;
+delete v.id;
+v.tags=v.tags?v.tags.split(',').map(x=>x.trim()).filter(Boolean):[];
+if(!v.cover_url)delete v.cover_url;
+if(!v.synopsis)delete v.synopsis;
+let result=id?await db.from('books').update(v).eq('id',id):await db.from('books').insert(v);
+if(result.error)return msg(result.error.message,true);
+msg('Book saved');
+show('Books');
+}
+
+async function chapterPage(){
+let rows=await get('chapters',500);
+let books=booksCache.length?booksCache:await get('books',500);
+
+$('content').innerHTML=`<div class="panel"><h2>Add chapter</h2>
+<form id="chapterform"><div class="formgrid">
+<label>Book<select name="book_id" required>${books.map(b=>`<option value="${esc(b.id)}">${esc(b.title)}</option>`).join('')}</select></label>
+<label>Chapter number<input name="chapter_number" type="number" min="1" required></label>
+<label>Title<input name="title" required></label>
+<label>Access<select name="locked"><option value="false">Free</option><option value="true">Locked / paid</option></select></label>
+<label>Publish status<select name="pub_status"><option>published</option><option>draft</option></select></label>
+<label>Content<textarea name="content" required></textarea></label>
+</div><div class="tools" style="margin-top:12px"><button>Save chapter</button></div></form></div>
+<div class="panel"><h2>Chapters</h2>${table(rows)}</div>`;
+
+$('chapterform').onsubmit=async e=>{
+e.preventDefault();
+let v=Object.fromEntries(new FormData(e.target));
+v.locked=v.locked==='true';
+v.chapter_number=Number(v.chapter_number);
+let {error}=await db.from('chapters').insert(v);
+if(error)return msg(error.message,true);
+msg('Chapter saved');
+show('Chapters');
+};
+}
+
+async function authorPage(){
+let rows=await get('books',500),authors={};
+rows.forEach(b=>{let n=(b.author_name||'').trim();if(n)(authors[n]??=[]).push(b)});
+
+$('content').innerHTML=`<div class="panel"><h2>Author management</h2>
+<p class="muted">Authors are listed from author names currently attached to books. Editing a name updates books carrying that name.</p>
+<form id="authorform"><div class="formgrid">
+<label>Current author name<select name="old">${Object.keys(authors).map(n=>`<option>${esc(n)}</option>`).join('')}</select></label>
+<label>Author name<input name="next" required></label>
+</div><div class="tools" style="margin-top:12px"><button>Update author name</button></div></form></div>
+<div class="panel"><h2>Authors and their books</h2>${Object.entries(authors).map(([n,bs])=>`<div class="notice"><b>${esc(n)}</b> · ${bs.length} book(s)<ul>${bs.map(b=>`<li>${esc(b.title)}</li>`).join('')}</ul></div>`).join('')||'<p>No authors found in books yet.</p>'}</div>`;
+
+$('authorform').onsubmit=async e=>{
+e.preventDefault();
+let f=e.target,old=f.elements.old.value,next=f.elements.next.value.trim();
+if(!old||!next)return;
+let {error}=await db.from('books').update({author_name:next}).eq('author_name',old);
+if(error)return msg(error.message,true);
+msg('Author name updated across books');
+show('Authors');
+};
+}
+
+function settingsPage(){
+$('content').innerHTML=`<div class="panel"><h2>Admin security</h2>
+<p>Signed in as ${esc(currentUser?.email||'')}</p>
+<p class="muted">This page uses Supabase authentication and checks your account against the existing admin_users table. Keep RLS enabled and never place a service-role key in this file.</p>
+<button id="settingsout">Sign out</button></div>`;
+$('settingsout').onclick=signOut;
+}
+
+async function signOut(){
+await db.auth.signOut();
+location.href='admin-login.html';
+}
+
+async function init(){
+nav();
+$('signout').onclick=signOut;
+const {data:{session}}=await db.auth.getSession();
+
+if(!session){
+location.href='admin-login.html';
+return;
+}
+
+currentUser=session.user;
+$('who').textContent=currentUser.email;
+
+let check=await db.from('admin_users').select('*').eq('user_id',currentUser.id).maybeSingle();
+if(check.error||!check.data){
+check=await db.from('admin_users').select('*').eq('id',currentUser.id).maybeSingle();
+}
+
+if(check.error||!check.data){
+document.body.innerHTML=`<main style="padding:30px;font-family:Arial">
+<h2>Admin access denied</h2>
+<p>Your signed-in account was not found in admin_users, or its existing RLS policy does not allow this check.</p>
+<button id="returnlogin">Return to login</button></main>`;
+document.getElementById('returnlogin').onclick=async()=>{
+await db.auth.signOut();
+location.href='admin-login.html';
+};
+return;
+}
+
+await show('Dashboard');
+}
+
+db.auth.onAuthStateChange((event)=>{
+if(event==='SIGNED_OUT')location.href='admin-login.html';
+});
+
+init();
+</script>
+</body>
+</html>
