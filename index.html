@@ -5,12 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#10101b">
 <title>Fictional World Library</title>
-<meta name="description" content="Find a story that fits your taste. 😉 Discover romance, werewolf, mafia, billionaire and paranormal fiction.">
-<meta property="og:title" content="Fictional World Library">
-<meta property="og:description" content="Find a story that fits your taste. 😉">
-<meta property="og:type" content="website">
-<link rel="icon" href="/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="description" content="Find a story that fits your taste. 😉">
+<link rel="icon" href="https://i.postimg.cc/W3BCGxmQ/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#10101b;--surface:#191927;--card:#202033;--text:#f7f4ff;--muted:#aaa7bd;--accent:#c7a3ff;--gold:#f4cf86;--line:#34334a;--danger:#ff8e9d;--success:#7ee0b0}
@@ -73,15 +69,15 @@ h1,h2,h3{font-family:'Playfair Display',serif}
 .price{font-size:30px;font-weight:700;margin:12px 0}
 .plan ul{padding-left:20px;color:var(--muted);line-height:2}
 .profile-head{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-.avatar{width:65px;height:65px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:25px}
+.avatar{width:65px;height:65px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:25px;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
 .stat{background:var(--card);padding:18px;border-radius:12px}
 .stat strong{font-size:24px;display:block;margin-top:8px}
 .reader-text{font-family:'Playfair Display',serif;font-size:19px;line-height:2;white-space:pre-wrap}
 .chapter-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .chapter-label{flex:1;min-width:120px}
 .chapter-price{font-size:12px;font-weight:700;white-space:nowrap}
-.chapter-price.free{color:var(--success)}
-.chapter-price.locked{color:var(--gold)}
+.chapter-price.free{color:var(--success)}.chapter-price.locked{color:var(--gold)}
 .bottom-nav{display:none}
 footer{border-top:1px solid var(--line);padding:28px 20px;color:var(--muted);font-size:12px;text-align:center;line-height:2}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:12px 18px;border-radius:10px;z-index:30;display:none;max-width:90%;text-align:center}
@@ -94,7 +90,7 @@ footer{border-top:1px solid var(--line);padding:28px 20px;color:var(--muted);fon
 <header class="topbar">
 <div class="top-inner">
 <a class="brand" href="#" data-page="home">
-<img src="/logo.png" alt="Fictional World logo">
+<img src="https://i.postimg.cc/W3BCGxmQ/logo.png" alt="Fictional World Library logo">
 <span><strong>FICTIONAL WORLD</strong><small>LIBRARY</small></span>
 </a>
 <nav class="navlinks">
@@ -106,7 +102,7 @@ footer{border-top:1px solid var(--line);padding:28px 20px;color:var(--muted);fon
 <div class="top-actions">
 <button class="btn desktop-only" data-page="wallet">🪙 <span id="coin-count">0</span></button>
 <button class="icon-btn" id="theme-toggle" aria-label="Change theme">☼</button>
-<button class="btn primary" id="login-nav" data-page="account">Log in</button>
+<button class="btn primary" id="login-nav" data-page="account">My Account</button>
 </div>
 </div>
 </header>
@@ -153,7 +149,9 @@ footer{border-top:1px solid var(--line);padding:28px 20px;color:var(--muted);fon
 <section class="page" id="page-reset"><div class="form panel"><h1>Reset password</h1><form id="reset-form"><div class="field"><label>Email address</label><input id="reset-email" type="email" required></div><button class="btn primary">Send reset link</button></form></div></section>
 <section class="page" id="page-profile">
 <div class="eyebrow">Your account</div><h1>My Profile</h1>
-<div class="panel"><div class="profile-head"><div class="avatar">♡</div><div><h2 id="profile-name">Reader</h2><p class="muted" id="profile-email">Sign in to view your profile</p></div></div>
+<div class="panel"><div class="profile-head"><div class="avatar" id="profile-avatar">♡</div><div><h2 id="profile-name">Reader</h2><p class="muted" id="profile-email">Sign in to view your profile</p></div></div>
+<p><strong>Reader ID:</strong> <span id="profile-reader-id">—</span></p>
+<p><strong>Gender:</strong> <span id="profile-gender">Not provided</span></p>
 <div class="field"><label for="profile-display-name">Display name</label><input id="profile-display-name" placeholder="Your display name"></div>
 <button class="btn primary" id="save-profile">Save profile</button> <button class="btn" id="logout-btn">Log out</button></div>
 <div class="grid-three"><div class="stat">Coin balance<strong id="profile-coins">0</strong></div><div class="stat">Saved books<strong id="profile-saved">0</strong></div><div class="stat">Membership<strong id="profile-tier">Free</strong></div></div>
@@ -232,20 +230,21 @@ function escapeHTML(value="") {
 }
 
 function showPage(name) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  if (name === "profile" || name === "account") name = reader ? "profile" : "account";
   const page = $("page-" + name);
   if (!page) return;
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   page.classList.add("active");
-  document.querySelectorAll("[data-page]").forEach(b => {
-    b.classList.toggle("active", b.dataset.page === name);
-  });
+  document.querySelectorAll("[data-page]").forEach(b => b.classList.toggle("active", b.dataset.page === name));
   window.scrollTo({top:0,behavior:"smooth"});
+  if (name === "profile" && reader) loadProfile();
+  if (name === "notifications") loadNotifications();
+  if (name === "wallet" && reader) loadTransactions();
 }
 
 function renderGenres() {
   ["home-genres","browse-genres"].forEach(id => {
-    const box = $(id);
-    box.innerHTML = genres.map(g =>
+    $(id).innerHTML = genres.map(g =>
       `<button class="genre ${g===selectedGenre?"active":""}" data-genre="${escapeHTML(g)}">${escapeHTML(g)}</button>`
     ).join("");
   });
@@ -259,13 +258,12 @@ function bookCard(book) {
   const cover = book.cover_url || book.cover_image || "";
   return `<article class="book-card" data-open-book="${id}" tabindex="0" role="button">
     <div class="cover">${cover ? `<img loading="lazy" src="${escapeHTML(cover)}" alt="${title}" onerror="this.remove()">` : ""}
-      <div class="cover-fallback">${title}</div>
-    </div>
+      <div class="cover-fallback">${title}</div></div>
     <h3>${title}</h3><p>${author}</p><span class="tag">${genre}</span>
   </article>`;
 }
 
-function renderBookList(target, list) {
+function renderBookList(target,list) {
   $(target).innerHTML = list.length ? list.map(bookCard).join("") : `<div class="empty">No stories to display yet.</div>`;
 }
 
@@ -280,78 +278,86 @@ function filteredBooks() {
 
 function renderBooks() {
   const featured = books.filter(b => b.featured === true);
-  renderBookList("featured-books", featured.slice(0,5).concat(books.filter(b => !b.featured).slice(0, Math.max(0,5-featured.length))));
-  renderBookList("ongoing-books", books.filter(b => /ongoing/i.test(b.status || "")).slice(0,5));
-  renderBookList("completed-books", books.filter(b => /completed/i.test(b.status || "")).slice(0,5));
+  renderBookList("featured-books",featured.slice(0,5).concat(books.filter(b=>!b.featured).slice(0,Math.max(0,5-featured.length))));
+  renderBookList("ongoing-books",books.filter(b=>/ongoing/i.test(b.status||"")).slice(0,5));
+  renderBookList("completed-books",books.filter(b=>/completed/i.test(b.status||"")).slice(0,5));
   const list = filteredBooks();
-  renderBookList("all-books", list);
+  renderBookList("all-books",list);
   $("book-total").textContent = `${list.length} stories`;
   $("browse-heading").textContent = selectedGenre === "All" ? "All stories" : selectedGenre;
   renderGenres();
 }
 
 async function loadBooks() {
+  $("all-books").innerHTML = `<p class="muted">Loading stories...</p>`;
   const {data,error} = await supabase.from("books").select("*").limit(100);
   if (error) {
-    console.error("Books:", error.message);
-    books = [];
-    renderBooks();
+    console.error("Books:",error.message);
+    $("all-books").innerHTML = `<div class="empty">Stories could not be loaded. Please refresh and try again.</div>`;
+    notify("Unable to load stories. Please try again.");
     return;
   }
-  books = (data || []).filter(b => b.status === undefined || /published|ongoing|completed/i.test(String(b.status)));
+  // Keep all rows returned by Supabase; do not accidentally hide books due to status wording.
+  books = data || [];
   renderBooks();
 }
-  function renderPackages() {
+
+function renderPackages() {
   const packages = [
     {id:"coins_100",coins:100,price:"$2.99"},
     {id:"coins_300",coins:300,price:"$7.99"},
     {id:"coins_600",coins:600,price:"$14.99"},
     {id:"coins_1200",coins:1200,price:"$27.99"}
   ];
-  $("coin-packages").innerHTML = packages.map(p => `
+  $("coin-packages").innerHTML = packages.map(p=>`
     <div class="plan"><div class="eyebrow">Coin package</div><h2>${p.coins.toLocaleString()} coins</h2><div class="price">${p.price}</div>
-    <button class="btn primary buy-product" data-type="coins" data-id="${p.id}" style="width:100%">Get coins</button></div>
-  `).join("");
+    <button class="btn primary buy-product" data-type="coins" data-id="${p.id}" style="width:100%">Get coins</button></div>`).join("");
+
   const plans = [
     {id:"readers_pass",name:"Readers Pass",monthly:"$5.99",yearly:"$49.99",coins:50,benefits:["50 monthly coins","5% eligible discount","Ad-free reading"]},
     {id:"vip_reader",name:"VIP Reader",monthly:"$9.99",yearly:"$89.99",coins:150,benefits:["150 monthly coins","9% eligible discount","Ad-free reading","Priority support"]},
     {id:"exclusive_reader",name:"Exclusive Reader",monthly:"$19.99",yearly:"$179.99",coins:300,benefits:["300 monthly coins","15% eligible discount","Ad-free reading","Two monthly chapter unlocks","Priority support"]}
   ];
-  $("membership-plans").innerHTML = plans.map((p,i) => `
+  $("membership-plans").innerHTML = plans.map((p,i)=>`
     <div class="plan ${i===1?"featured":""}"><div class="eyebrow">${i===1?"Popular choice":"Reader membership"}</div>
     <h2>${p.name}</h2><div class="price">${p.monthly}<small class="muted"> / month</small></div>
-    <p class="muted">${p.yearly} when billed yearly</p><ul><li>${p.coins} monthly coins</li>${p.benefits.slice(1).map(x=>`<li>${x}</li>`).join("")}</ul>
-    <button class="btn primary buy-product" data-type="membership" data-id="${p.id}" style="width:100%">Choose plan</button></div>
-  `).join("");
-}
-
-async function getSession() {
-  const {data} = await supabase.auth.getSession();
-  reader = data.session?.user || null;
-  updateAccountUI();
-  if (reader) {
-    await loadProfile();
-    await loadLibrary();
-    await loadTransactions();
-  }
+    <p class="muted">${p.yearly} when billed yearly</p><ul>${p.benefits.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <button class="btn primary buy-product" data-type="membership" data-id="${p.id}" style="width:100%">Choose plan</button></div>`).join("");
 }
 
 function updateAccountUI() {
-  $("login-nav").textContent = reader ? "My account" : "Log in";
-  $("profile-email").textContent = reader?.email || "Sign in to view your profile";
-  $("profile-name").textContent = reader?.user_metadata?.display_name || "Reader";
+  $("login-nav").textContent = "My Account";
+  if (!reader) {
+    $("profile-email").textContent = "Sign in to view your profile";
+    $("profile-name").textContent = "Reader";
+    $("profile-reader-id").textContent = "—";
+    $("profile-gender").textContent = "Not provided";
+    $("profile-avatar").textContent = "♡";
+    return;
+  }
+  $("profile-email").textContent = reader.email || "";
+  $("profile-name").textContent = reader.user_metadata?.display_name || reader.email?.split("@")[0] || "Reader";
 }
 
 async function loadProfile() {
   if (!reader) return;
   const {data,error} = await supabase.from("users").select("*").eq("auth_user_id",reader.id).maybeSingle();
   if (error) console.warn("Profile:",error.message);
-  const coins = Number(data?.coin_balance ?? data?.coins ?? 0);
+  const profile = data || {};
+  const name = profile.name || reader.user_metadata?.display_name || reader.email?.split("@")[0] || "Reader";
+  const avatar = profile.avatar_url || profile.profile_picture || profile.photo_url || reader.user_metadata?.avatar_url || reader.user_metadata?.picture || "";
+  const gender = profile.gender || reader.user_metadata?.gender || "Not provided";
+  const coins = Number(profile.coin_balance ?? profile.coins ?? 0);
   $("coin-count").textContent = coins;
   $("wallet-coins").textContent = coins;
   $("profile-coins").textContent = coins;
-  $("profile-display-name").value = data?.name || reader.user_metadata?.display_name || "";
-  $("profile-tier").textContent = data?.subscription_tier || "Free";
+  $("profile-display-name").value = name;
+  $("profile-name").textContent = name;
+  $("profile-email").textContent = reader.email || profile.email || "Email not available";
+  $("profile-reader-id").textContent = profile.id ?? reader.id;
+  $("profile-gender").textContent = gender;
+  $("profile-tier").textContent = profile.subscription_tier || profile.tier || "Free";
+  $("profile-avatar").innerHTML = avatar ? `<img src="${escapeHTML(avatar)}" alt="Profile picture" onerror="this.parentElement.textContent='♡'">` : "♡";
 }
 
 async function loadLibrary() {
@@ -377,28 +383,90 @@ async function loadTransactions() {
   const {data,error} = await supabase.from("transactions").select("*").eq("user_id",reader.id).order("created_at",{ascending:false}).limit(20);
   if (error) {
     console.warn("Transactions:",error.message);
+    $("transactions").innerHTML = `<p class="muted">Transaction history is unavailable right now.</p>`;
     return;
   }
-  $("transactions").innerHTML = data?.length ? data.map(t =>
-    `<div class="chapter-row"><span>${escapeHTML(t.payment_status || "Transaction")} · ${escapeHTML(t.amount_ngn ?? "")} NGN</span><span>${escapeHTML(t.coins_added ?? "")} coins</span></div>`
-  ).join("") : `<p class="muted">No transactions yet.</p>`;
+  $("transactions").innerHTML = data?.length ? data.map(t=>`
+    <div class="chapter-row"><span>${escapeHTML(t.payment_status||"Transaction")} · ${escapeHTML(t.amount_ngn??"")} NGN</span><span>${escapeHTML(t.coins_added??"")} coins</span></div>`).join("") : `<p class="muted">No transactions yet.</p>`;
+}
+  async function loadNotifications() {
+  const list = $("notification-list");
+  if (!reader) {
+    list.innerHTML = `<p class="muted">Log in to view your notifications.</p>`;
+    return;
+  }
+
+  list.innerHTML = `<p class="muted">Loading notifications...</p>`;
+  const items = [];
+
+  const {data:notices,error:noticeError} = await supabase
+    .from("notifications").select("*").order("created_at",{ascending:false}).limit(30);
+
+  if (!noticeError && notices) {
+    notices.forEach(n=>{
+      const target = n.user_id ?? n.auth_user_id ?? n.reader_id;
+      if (!target || String(target)===String(reader.id)) {
+        items.push({
+          date:n.created_at,
+          title:n.title || n.subject || "Notification",
+          message:n.message || n.body || n.content || "",
+          type:"admin"
+        });
+      }
+    });
+  }
+
+  const {data:transactions,error:txError} = await supabase
+    .from("transactions").select("*").eq("user_id",reader.id)
+    .order("created_at",{ascending:false}).limit(20);
+
+  if (!txError && transactions) {
+    transactions.forEach(t=>{
+      items.push({
+        date:t.created_at,
+        title:`Payment ${String(t.payment_status||"update").replace(/_/g," ")}`,
+        message:`${t.amount_ngn??""} NGN${t.coins_added?` · ${t.coins_added} coins`:""}${t.failure_reason?` · ${t.failure_reason}`:""}`,
+        type:"payment"
+      });
+    });
+  }
+
+  const {data:subscriptions,error:subError} = await supabase
+    .from("subscriptions").select("*").eq("user_id",reader.id)
+    .order("created_at",{ascending:false}).limit(10);
+
+  if (!subError && subscriptions) {
+    subscriptions.forEach(s=>{
+      items.push({
+        date:s.created_at || s.updated_at,
+        title:"Subscription update",
+        message:`${s.tier || s.plan || "Membership"} · ${s.status || "Status updated"}`,
+        type:"subscription"
+      });
+    });
+  }
+
+  items.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+  list.innerHTML = items.length ? items.map(n=>`
+    <article class="chapter-row"><div class="chapter-label">
+    <strong>${escapeHTML(n.title)}</strong><p class="muted">${escapeHTML(n.message)}</p>
+    <small class="muted">${n.date?escapeHTML(new Date(n.date).toLocaleString()):""}</small></div>
+    <span class="tag">${escapeHTML(n.type)}</span></article>`).join("") :
+    `<p class="muted">You're all caught up. No notifications are available.</p>`;
 }
 
 async function openBook(id) {
   currentBook = books.find(b=>String(b.id)===String(id));
   if (!currentBook) return;
-
   $("detail-title").textContent = currentBook.title || "Untitled story";
   $("detail-author").textContent = currentBook.author || currentBook.author_name || "";
   $("detail-genre").textContent = currentBook.genre || "Fiction";
   $("detail-description").textContent = currentBook.synopsis || currentBook.description || "Discover this story on Fictional World Library.";
   $("detail-status").textContent = currentBook.status || "";
-
   const cover = currentBook.cover_url || currentBook.cover_image;
   $("detail-cover").innerHTML = cover
     ? `<img src="${escapeHTML(cover)}" alt="" style="width:100%;height:100%;object-fit:cover">`
     : `<div class="cover-fallback">${escapeHTML(currentBook.title)}</div>`;
-
   $("save-book").textContent = libraryIds.has(String(id)) ? "✓ In my library" : "＋ Add to library";
   $("chapter-list").innerHTML = `<p class="muted">Loading chapters...</p>`;
   showPage("book");
@@ -409,19 +477,16 @@ async function openBook(id) {
     $("chapter-list").innerHTML = `<p class="muted">Chapters could not be loaded. Please try again.</p>`;
     return;
   }
-
-  chapters = (data || []).filter(c => String(c.pub_status || "").trim().toLowerCase() === "published");
+  chapters = (data||[]).filter(c=>String(c.pub_status||"").trim().toLowerCase()==="published");
   renderChapterList();
 }
 
 function renderChapterList() {
-  $("chapter-list").innerHTML = chapters.length ? chapters.map((c,i) => {
+  $("chapter-list").innerHTML = chapters.length ? chapters.map((c,i)=>{
     const locked = c.locked === true && !unlockedChapterIds.has(String(c.id));
-    return `<div class="chapter-row">
-      <span class="chapter-label">${locked ? "🔒" : "📖"} ${escapeHTML(c.title || `Chapter ${i+1}`)}</span>
-      <span class="chapter-price ${locked ? "locked" : "free"}">${locked ? "10 coins" : "FREE"}</span>
-      <button class="btn ${locked ? "" : "primary"} open-chapter" data-index="${i}">${locked ? "Unlock" : "Read"}</button>
-    </div>`;
+    return `<div class="chapter-row"><span class="chapter-label">${locked?"🔒":"📖"} ${escapeHTML(c.title||`Chapter ${i+1}`)}</span>
+    <span class="chapter-price ${locked?"locked":"free"}">${locked?"10 coins":"FREE"}</span>
+    <button class="btn ${locked?"":"primary"} open-chapter" data-index="${i}">${locked?"Unlock":"Read"}</button></div>`;
   }).join("") : `<div class="empty">No published chapters are available yet.</div>`;
 }
 
@@ -431,49 +496,39 @@ async function openChapter(index) {
     showPage("account");
     return;
   }
-
   const chapter = chapters[index];
-  if (!chapter) {
-    notify("Chapter not found.");
-    return;
-  }
-
+  if (!chapter) return;
   const chapterId = String(chapter.id);
   const isLocked = chapter.locked === true && !unlockedChapterIds.has(chapterId);
 
   if (isLocked) {
-    const confirmed = confirm("Unlock this chapter for 10 coins?");
-    if (!confirmed) return;
-
-    const {data: unlockData,error: unlockError} = await supabase.rpc("unlock_chapter",{p_chapter_id:chapterId});
+    if (!confirm("Unlock this chapter for 10 coins?")) return;
+    const {data:unlockData,error:unlockError} = await supabase.rpc("unlock_chapter",{p_chapter_id:chapterId});
     if (unlockError) {
       console.error("Unlock error:",unlockError);
       notify(unlockError.message || "Unable to unlock chapter.");
       return;
     }
-
     if (unlockData?.success !== true) {
       notify("The chapter could not be unlocked.");
       return;
     }
-
     unlockedChapterIds.add(chapterId);
     await loadProfile();
     renderChapterList();
-     }
-    const {data,error} = await supabase.rpc("get_chapter_content",{p_chapter_id:chapterId});
+  }
+
+  const {data,error} = await supabase.rpc("get_chapter_content",{p_chapter_id:chapterId});
   if (error) {
     console.error("Chapter content error:",error);
     notify(error.message || "The chapter could not be opened.");
     return;
   }
-
-  const content = typeof data === "string" ? data : data?.content || "";
+  const content = typeof data==="string" ? data : data?.content || "";
   if (!content) {
     notify("Chapter content is unavailable.");
     return;
   }
-
   displayChapter(index,chapter,content);
 }
 
@@ -482,8 +537,8 @@ function displayChapter(index,chapter,content) {
   $("reader-book-title").textContent = currentBook?.title || "";
   $("reader-chapter-title").textContent = chapter.title || `Chapter ${index+1}`;
   $("reader-content").textContent = content;
-  $("previous-chapter").disabled = index <= 0;
-  $("next-chapter").disabled = index >= chapters.length-1;
+  $("previous-chapter").disabled = index<=0;
+  $("next-chapter").disabled = index>=chapters.length-1;
   showPage("reader");
 }
 
@@ -493,22 +548,18 @@ async function buyProduct(type,id) {
     showPage("account");
     return;
   }
-
   notify("Connecting to secure checkout...");
   const {data,error} = await supabase.functions.invoke("initialize-payment",{
     body:{product_type:type,product_id:id,billing_cycle:"monthly"}
   });
-
   if (error || !data?.authorization_url) {
     notify("Checkout could not be started. Please try again later.");
     console.error(error || data);
     return;
   }
-
   window.location.href = data.authorization_url;
-}
-
-$("year").textContent = new Date().getFullYear();
+    }
+  $("year").textContent = new Date().getFullYear();
 
 document.addEventListener("click",async e=>{
   const pageButton = e.target.closest("[data-page]");
@@ -550,7 +601,6 @@ $("theme-toggle").addEventListener("click",()=>{
   document.body.classList.toggle("light");
   localStorage.setItem("fw-theme",document.body.classList.contains("light")?"light":"dark");
 });
-
 $("settings-theme").addEventListener("click",()=>$("theme-toggle").click());
 if (localStorage.getItem("fw-theme")==="light") document.body.classList.add("light");
 
@@ -563,15 +613,19 @@ $("switch-auth").addEventListener("click",()=>{
   $("auth-submit").textContent = isRegister ? "Create account" : "Log in";
   $("switch-auth").textContent = isRegister ? "Already have an account? Log in" : "Create an account";
 });
-  $("auth-form").addEventListener("submit",async e=>{
+
+$("auth-form").addEventListener("submit",async e=>{
   e.preventDefault();
   const email = $("auth-email").value.trim();
   const password = $("auth-password").value;
   $("auth-message").textContent = "Please wait...";
-
   let result;
+
   if (isRegister) {
-    result = await supabase.auth.signUp({email,password,options:{data:{display_name:$("auth-name").value.trim()}}});
+    result = await supabase.auth.signUp({
+      email,password,
+      options:{data:{display_name:$("auth-name").value.trim()}}
+    });
   } else {
     result = await supabase.auth.signInWithPassword({email,password});
   }
@@ -580,7 +634,6 @@ $("switch-auth").addEventListener("click",()=>{
     $("auth-message").textContent = result.error.message;
     return;
   }
-
   if (isRegister && !result.data.session) {
     $("auth-message").textContent = "Check your email to confirm your account.";
     return;
@@ -592,7 +645,7 @@ $("switch-auth").addEventListener("click",()=>{
   await loadProfile();
   await loadLibrary();
   await loadTransactions();
-  showPage("home");
+  showPage("profile");
 });
 
 $("forgot-password").addEventListener("click",()=>showPage("reset"));
@@ -604,7 +657,11 @@ $("reset-form").addEventListener("submit",async e=>{
 });
 
 $("logout-btn").addEventListener("click",async()=>{
-  await supabase.auth.signOut();
+  const {error} = await supabase.auth.signOut();
+  if (error) {
+    notify(error.message || "Could not sign out.");
+    return;
+  }
   reader = null;
   libraryIds.clear();
   unlockedChapterIds.clear();
@@ -612,6 +669,8 @@ $("logout-btn").addEventListener("click",async()=>{
   $("coin-count").textContent = "0";
   $("wallet-coins").textContent = "0";
   $("profile-coins").textContent = "0";
+  $("profile-saved").textContent = "0";
+  $("transactions").innerHTML = `<p class="muted">Log in to view transactions.</p>`;
   notify("You have logged out.");
   showPage("home");
 });
@@ -622,7 +681,6 @@ $("save-profile").addEventListener("click",async()=>{
     showPage("account");
     return;
   }
-
   const name = $("profile-display-name").value.trim();
   const {error} = await supabase.auth.updateUser({data:{display_name:name}});
   if (error) notify(error.message);
@@ -631,19 +689,18 @@ $("save-profile").addEventListener("click",async()=>{
     notify("Profile updated.");
   }
 });
-  $("save-book").addEventListener("click",async()=>{
+
+$("save-book").addEventListener("click",async()=>{
   if (!reader || !currentBook) {
     notify("Please log in to save stories.");
     showPage("account");
     return;
   }
-
   const id = String(currentBook.id);
   if (libraryIds.has(id)) {
     notify("This story is already in your library.");
     return;
   }
-
   const {error} = await supabase.from("library").insert({user_id:reader.id,book_id:id});
   if (error) notify(error.message);
   else {
@@ -658,18 +715,27 @@ $("start-reading").addEventListener("click",()=>{
   if (chapters.length) openChapter(0);
   else notify("No chapters are available yet.");
 });
-
 $("back-to-book").addEventListener("click",()=>showPage("book"));
-$("previous-chapter").addEventListener("click",()=> {
-  if (currentChapterIndex > 0) openChapter(currentChapterIndex-1);
+$("previous-chapter").addEventListener("click",()=>{
+  if (currentChapterIndex>0) openChapter(currentChapterIndex-1);
 });
-$("next-chapter").addEventListener("click",()=> {
-  if (currentChapterIndex < chapters.length-1) openChapter(currentChapterIndex+1);
+$("next-chapter").addEventListener("click",()=>{
+  if (currentChapterIndex<chapters.length-1) openChapter(currentChapterIndex+1);
 });
 
 supabase.auth.onAuthStateChange((_event,session)=>{
   reader = session?.user || null;
   updateAccountUI();
+  if (reader) {
+    Promise.resolve().then(async()=>{
+      await loadProfile();
+      await loadLibrary();
+      await loadTransactions();
+      if ($("page-account").classList.contains("active")) showPage("profile");
+    });
+  } else {
+    libraryIds.clear();
+  }
 });
 
 renderGenres();
