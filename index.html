@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#10101b">
 <title>Fictional World Library</title>
-<meta name="description" content="Discover your next obsession. Read romance, werewolf, mafia, billionaire and paranormal fiction.">
+<meta name="description" content="Find a story that fits your taste. 😉 Discover romance, werewolf, mafia, billionaire and paranormal fiction.">
+<meta property="og:title" content="Fictional World Library">
+<meta property="og:description" content="Find a story that fits your taste. 😉">
+<meta property="og:type" content="website">
+<link rel="icon" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -90,7 +94,7 @@ footer{border-top:1px solid var(--line);padding:28px 20px;color:var(--muted);fon
 <header class="topbar">
 <div class="top-inner">
 <a class="brand" href="#" data-page="home">
-<img src="https://i.postimg.cc/W3BCGxmQ/logo.png" alt="Fictional World logo">
+<img src="/logo.png" alt="Fictional World logo">
 <span><strong>FICTIONAL WORLD</strong><small>LIBRARY</small></span>
 </a>
 <nav class="navlinks">
@@ -118,8 +122,8 @@ footer{border-top:1px solid var(--line);padding:28px 20px;color:var(--muted);fon
 <div class="section"><div class="section-head"><h2>Stories to fall into</h2><button class="btn" data-page="browse">View all</button></div><div class="book-grid" id="featured-books"></div></div>
 <div class="section"><div class="section-head"><h2>Ongoing stories</h2><span class="muted">New chapters await</span></div><div class="book-grid" id="ongoing-books"></div></div>
 <div class="section"><div class="section-head"><h2>Completed reads</h2><span class="muted">Read at your pace</span></div><div class="book-grid" id="completed-books"></div></div>
-</section>
-<section class="page" id="page-browse">
+</section 
+  class="page" id="page-browse">
 <div class="section-head"><div><div class="eyebrow">Discover</div><h1>Find your next story</h1></div></div>
 <div class="searchbar"><input id="search-input" placeholder="Search titles, authors or genres..."><button class="btn primary" id="search-btn">Search</button></div>
 <div class="genre-list" id="browse-genres"></div>
@@ -188,13 +192,13 @@ footer{border-top:1px solid var(--line);padding:28px 20px;color:var(--muted);fon
 <p class="notice">Applications are reviewed in approximately 3–7 working days. Contract terms and rewards are subject to the applicable written agreement.</p>
 </section>
 <section class="page" id="page-settings"><div class="eyebrow">Make it yours</div><h1>Settings</h1><div class="panel"><h2>Appearance</h2><p class="muted">Choose a theme for your reading experience.</p><button class="btn" id="settings-theme">Switch light/dark mode</button></div><div class="panel"><h2>Account</h2><button class="btn" data-page="profile">My profile</button> <button class="btn" data-page="account">Log in / Register</button></div><div class="panel"><h2>Information</h2><p><a href="about.html">About us</a></p><p><a href="terms.html">Terms &amp; Conditions</a></p><p><a href="privacy.html">Privacy policy</a></p></div></section>
-<section class="page" id="page-about"><h1>About Fictional World Library</h1><div class="panel"><p>Fictional World Library is a home for readers who want to discover captivating stories, explore new worlds and follow characters they won't forget.</p><p>Your Stories. Your Worlds. Your Next Obsession.</p></div></section>
+<section class="page" id="page-about"><h1>About Fictional World Library</h1><div class="panel"><p>Fictional World Library is a home for readers who want to discover captivating stories, explore new worlds and follow characters they won't forget.</p><p>Find a story that fits your taste. 😉</p></div></section>
 <section class="page" id="page-terms"><h1>Terms &amp; Conditions</h1><div class="panel"><p>Use of Fictional World Library is subject to the platform's applicable terms, content rules, payment policies and author agreements.</p><p>Purchases, chapter access, memberships and author arrangements are governed by their applicable written terms. Contact support if you need help.</p></div></section>
 <section class="page" id="page-privacy"><h1>Privacy Policy</h1><div class="panel"><p>Fictional World Library uses account information to provide reader features, protect accounts and support transactions.</p><p>Never share your password or payment security details. For privacy enquiries, email fictionalworldlibary@gmail.com.</p></div></section>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </main>
 <nav class="bottom-nav"><button data-page="home" class="active">⌂<span>Home</span></button><button data-page="library">▤<span>Library</span></button><button data-page="more">•••<span>More</span></button><button data-page="notifications">♡<span>Updates</span></button><button data-page="profile">○<span>Profile</span></button></nav>
-<footer><div>FICTIONAL WORLD LIBRARY</div><div>Your Stories. Your Worlds. Your Next Obsession.</div><div><a href="about.html">About</a> · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="mailto:fictionalworldlibary@gmail.com">Contact</a></div><div>© <span id="year"></span> Fictional World Library</div></footer>
+<footer><div>FICTIONAL WORLD LIBRARY</div><div>Find a story that fits your taste. 😉</div><div><a href="about.html">About</a> · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="mailto:fictionalworldlibary@gmail.com">Contact</a></div><div>© <span id="year"></span> Fictional World Library</div></footer>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
@@ -297,8 +301,7 @@ async function loadBooks() {
   books = (data || []).filter(b => b.status === undefined || /published|ongoing|completed/i.test(String(b.status)));
   renderBooks();
 }
-
-function renderPackages() {
+  function renderPackages() {
   const packages = [
     {id:"coins_100",coins:100,price:"$2.99"},
     {id:"coins_300",coins:300,price:"$7.99"},
@@ -309,7 +312,7 @@ function renderPackages() {
     <div class="plan"><div class="eyebrow">Coin package</div><h2>${p.coins.toLocaleString()} coins</h2><div class="price">${p.price}</div>
     <button class="btn primary buy-product" data-type="coins" data-id="${p.id}" style="width:100%">Get coins</button></div>
   `).join("");
-    const plans = [
+  const plans = [
     {id:"readers_pass",name:"Readers Pass",monthly:"$5.99",yearly:"$49.99",coins:50,benefits:["50 monthly coins","5% eligible discount","Ad-free reading"]},
     {id:"vip_reader",name:"VIP Reader",monthly:"$9.99",yearly:"$89.99",coins:150,benefits:["150 monthly coins","9% eligible discount","Ad-free reading","Priority support"]},
     {id:"exclusive_reader",name:"Exclusive Reader",monthly:"$19.99",yearly:"$179.99",coins:300,benefits:["300 monthly coins","15% eligible discount","Ad-free reading","Two monthly chapter unlocks","Priority support"]}
@@ -341,7 +344,7 @@ function updateAccountUI() {
 
 async function loadProfile() {
   if (!reader) return;
-  const {data,error} = await supabase.from("users").select("*").eq("id",reader.id).maybeSingle();
+  const {data,error} = await supabase.from("users").select("*").eq("auth_user_id",reader.id).maybeSingle();
   if (error) console.warn("Profile:",error.message);
   const coins = Number(data?.coin_balance ?? data?.coins ?? 0);
   $("coin-count").textContent = coins;
@@ -421,7 +424,8 @@ function renderChapterList() {
     </div>`;
   }).join("") : `<div class="empty">No published chapters are available yet.</div>`;
 }
-  async function openChapter(index) {
+
+async function openChapter(index) {
   if (!reader) {
     notify("Please log in to read chapters.");
     showPage("account");
@@ -456,9 +460,8 @@ function renderChapterList() {
     unlockedChapterIds.add(chapterId);
     await loadProfile();
     renderChapterList();
-  }
-
-  const {data,error} = await supabase.rpc("get_chapter_content",{p_chapter_id:chapterId});
+     }
+    const {data,error} = await supabase.rpc("get_chapter_content",{p_chapter_id:chapterId});
   if (error) {
     console.error("Chapter content error:",error);
     notify(error.message || "The chapter could not be opened.");
@@ -529,7 +532,8 @@ document.addEventListener("click",async e=>{
 
   const purchase = e.target.closest(".buy-product");
   if (purchase) await buyProduct(purchase.dataset.type,purchase.dataset.id);
-    const libraryFilter = e.target.closest("[data-library-filter]");
+
+  const libraryFilter = e.target.closest("[data-library-filter]");
   if (libraryFilter) {
     const status = libraryFilter.dataset.libraryFilter;
     renderBookList("library-books",books.filter(b=>
@@ -559,8 +563,7 @@ $("switch-auth").addEventListener("click",()=>{
   $("auth-submit").textContent = isRegister ? "Create account" : "Log in";
   $("switch-auth").textContent = isRegister ? "Already have an account? Log in" : "Create an account";
 });
-
-$("auth-form").addEventListener("submit",async e=>{
+  $("auth-form").addEventListener("submit",async e=>{
   e.preventDefault();
   const email = $("auth-email").value.trim();
   const password = $("auth-password").value;
@@ -628,8 +631,7 @@ $("save-profile").addEventListener("click",async()=>{
     notify("Profile updated.");
   }
 });
-
-$("save-book").addEventListener("click",async()=>{
+  $("save-book").addEventListener("click",async()=>{
   if (!reader || !currentBook) {
     notify("Please log in to save stories.");
     showPage("account");
