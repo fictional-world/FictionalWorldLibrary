@@ -8,7 +8,7 @@ async function handleReaderLogin(email, password) {
 
     return result;
   } catch (error) {
-    alert(error.message);
+    alert(error.message || "Login failed.");
     return null;
   }
 }
@@ -17,11 +17,15 @@ async function handleReaderRegistration(email, password, name) {
   try {
     const result = await registerReader(email, password, name);
 
-    alert("Registration submitted. Check your email if confirmation is required.");
+    if (result?.user) {
+      alert("Registration successful. Please check your email if confirmation is required.");
+    } else {
+      alert("Registration submitted successfully.");
+    }
 
     return result;
   } catch (error) {
-    alert(error.message);
+    alert(error.message || "Registration failed.");
     return null;
   }
 }
@@ -31,6 +35,6 @@ async function handleReaderLogout() {
     await logoutReader();
     window.location.href = "index.html";
   } catch (error) {
-    alert(error.message);
+    alert(error.message || "Logout failed.");
   }
 }
