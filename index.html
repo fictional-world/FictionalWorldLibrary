@@ -117,9 +117,13 @@ async function loadBooks() {
   ];
   const el = $("coin-packages");
   if (el) el.innerHTML = packages.map(p => `
-    <div class=\"plan\"><div class=\"eyebrow\">Coin package</div><h2>${p.coins.toLocaleString()} coins</h2><div class=\"price\">${p.price}</div>
-    <button class=\"btn primary buy-product\" data-type=\"coins\" data-id=\"${p.id}\" style=\"width:100%\">Get coins</button></div>`
-  ).join("");
+    <div class=\"plan\">
+      <div class=\"eyebrow\">Coin package</div>
+      <h2>${p.coins.toLocaleString()} coins</h2>
+      <div class=\"price\">${p.price}</div>
+      <button class=\"btn primary buy-product\" data-type=\"coins\" data-id=\"${p.id}\" style=\"width:100%\">Get coins</button>
+    </div>
+  `).join("");
 
   const plans = [
     { id: "readers_pass", name: "Readers Pass", monthly: "$5.99", yearly: "$49.99", benefits: ["No banner ad","50 free coins monthly","5% off on coin purchases"] },
@@ -128,11 +132,15 @@ async function loadBooks() {
   ];
   const membershipEl = $("membership-plans");
   if (membershipEl) membershipEl.innerHTML = plans.map((p, i) => `
-    <div class=\"plan ${i === 1 ? "featured" : ""}\"><div class=\"eyebrow\">${i === 1 ? "Popular choice" : "Reader membership"}</div>
-    <h2>${p.name}</h2><div class=\"price\">${p.monthly}<small class=\"muted\"> / month</small></div>
-    <p class=\"muted\">${p.yearly} when billed yearly</p><ul>${p.benefits.map(x => `<li>${x}</li>`).join("")}</ul>
-    <button class=\"btn primary buy-product\" data-type=\"membership\" data-id=\"${p.id}\" style=\"width:100%\">Choose plan</button></div>`
-  ).join("");
+    <div class=\"plan ${i === 1 ? "featured" : ""}\">
+      <div class=\"eyebrow\">${i === 1 ? "Popular choice" : "Reader membership"}</div>
+      <h2>${p.name}</h2>
+      <div class=\"price\">${p.monthly}<small class=\"muted\"> / month</small></div>
+      <p class=\"muted\">${p.yearly} when billed yearly</p>
+      <ul>${p.benefits.map(x => `<li>${x}</li>`).join("")}</ul>
+      <button class=\"btn primary buy-product\" data-type=\"membership\" data-id=\"${p.id}\" style=\"width:100%\">Choose plan</button>
+    </div>
+  `).join("");
 }
 
 function updateAccountUI() {
@@ -267,13 +275,311 @@ async function loadNotifications() {
   }
 
   list.innerHTML = data.map(n => `
-    <article class=\"chapter-row\">
-      <div class=\"chapter-label\">
+    <article class="chapter-row">
+      <div class="chapter-label">
         <strong>${escapeHTML(n.title || "Notification")}</strong>
-        <p class=\"muted\">${escapeHTML(n.message || n.body || "")}</p>
-        <small class=\"muted\">${new Date(n.created_at).toLocaleString()}</small>
+        <p class="muted">${escapeHTML(n.message || n.body || "")}</p>
+        <small class="muted">${new Date(n.created_at).toLocaleString()}</small>
       </div>
-      <span class=\"tag\">${escapeHTML(n.type || "info")}</span>
+      <span class="tag">${escapeHTML(n.type || "info")}</span>
     </article>
   `).join("");
+}async function openBook(id) {
+  currentBook = books.find(b => String(b.id) === String(id));
+  if (!currentBook) return;
+
+  $("detail-title").textContent = currentBook.title || "Untitled story";
+  $("detail-author").textContent = currentBook.author || currentBook.author_name || "";
+  $("detail-genre").textContent = currentBook.genre || "Fiction";
+  $("detail-description").textContent = currentBook.synopsis || currentBook.description || "Discover this story on Fictional World Library.";
+  $("detail-status").textContent = currentBook.status || "";
+
+  const cover = currentBook.cover_url || currentBook.cover_image;
+  $("detail-cover").innerHTML = cover
+    ? `<img src="${escapeHTML(cover)}" alt="" style="width:100%;height:100%;object-fit:cover">`
+    : `<div class="cover-fallback">${escapeHTML(currentBook.title || "Story")}</div>`;
+
+  $("save-book").textContent = libraryIds.has(String(id)) ? "✓ In my library" : "＋ Add to library";
+  $("chapter-list").innerHTML = `<p class="muted">Loading chapters...</p>`;
+  showPage("book");
+
+  const { data, error } = await supabase.from("chapters").select("*").eq("book_id", String(id)).order("chapter_number", { ascending: true });
+  if (error) {
+    console.error("Chapters:", error);
+    $("chapter-list").innerHTML = `<p class="muted">Chapters could not be loaded. Please try again.</p>`;
+    return;
+  }
+
+  chapters = (data || []).filter(c => String(c.pub_status || "").trim().toLowerCase() === "published");
+  renderChapterList();
 }
+
+function renderChapterList() {
+  $("chapter-list").innerHTML = chapters.length ? chapters.map((c, i) => {
+    const locked = c.locked === true && !unlockedChapterIds.has(String(c.id));
+    return `<div class="chapter-row"><span class="chapter-label">${locked ? "🔒" : "📖"} ${escapeHTML(c.title || `Chapter ${i + 1}`)}</span>
+    <span class="chapter-price ${locked ? "locked" : "free"}">${locked ? "10 coins" : "FREE"}</span>
+    <button class="btn ${locked ? "" : "primary"} open-chapter" data-index="${i}">${locked ? "Unlock" : "Read"}</button></div>`;
+  }).join("") : `<div class="empty">No published chapters are available yet.</div>`;
+}
+
+async function openChapter(index) {
+  if (!reader) {
+    notify("Please log in to read chapters.");
+    showPage("account");
+    return;
+  }
+
+  const chapter = chapters[index];
+  if (!chapter) return;
+  const chapterId = String(chapter.id);
+  const isLocked = chapter.locked === true && !unlockedChapterIds.has(chapterId);
+
+  if (isLocked) {
+    if (!confirm("Unlock this chapter for 10 coins?")) return;
+    const { data: unlockData, error: unlockError } = await supabase.rpc("unlock_chapter", { p_chapter_id: chapterId });
+    if (unlockError) {
+      console.error("Unlock error:", unlockError);
+      notify(unlockError.message || "Unable to unlock chapter.");
+      return;
+    }
+    if (unlockData?.success !== true) {
+      notify("The chapter could not be unlocked.");
+      return;
+    }
+    unlockedChapterIds.add(chapterId);
+    await loadProfile();
+    renderChapterList();
+  }
+
+  const { data, error } = await supabase.rpc("get_chapter_content", { p_chapter_id: chapterId });
+  if (error) {
+    console.error("Chapter content error:", error);
+    notify(error.message || "The chapter could not be opened.");
+    return;
+  }
+  const content = typeof data === "string" ? data : data?.content || "";
+  if (!content) {
+    notify("Chapter content is unavailable.");
+    return;
+  }
+  displayChapter(index, chapter, content);
+}
+
+function displayChapter(index, chapter, content) {
+  currentChapterIndex = index;
+  $("reader-book-title").textContent = currentBook?.title || "";
+  $("reader-chapter-title").textContent = chapter.title || `Chapter ${index + 1}`;
+  $("reader-content").textContent = content;
+  $("previous-chapter").disabled = index <= 0;
+  $("next-chapter").disabled = index >= chapters.length - 1;
+  showPage("reader");
+}
+
+async function buyProduct(type, id) {
+  if (!reader) {
+    notify("Please log in before making a purchase.");
+    showPage("account");
+    return;
+  }
+  notify("Connecting to secure checkout...");
+  const { data, error } = await supabase.functions.invoke("initialize-payment", {
+    body: { product_type: type, product_id: id, billing_cycle: "monthly" }
+  });
+  if (error || !data?.authorization_url) {
+    notify("Checkout could not be started. Please try again later.");
+    console.error(error || data);
+    return;
+  }
+  window.location.href = data.authorization_url;
+}
+
+document.addEventListener("click", async e => {
+  const pageButton = e.target.closest("[data-page]");
+  if (pageButton) {
+    e.preventDefault();
+    showPage(pageButton.dataset.page);
+  }
+
+  const genreButton = e.target.closest("[data-genre]");
+  if (genreButton) {
+    selectedGenre = genreButton.dataset.genre;
+    renderBooks();
+    showPage("browse");
+  }
+
+  const card = e.target.closest("[data-open-book]");
+  if (card) await openBook(card.dataset.openBook);
+
+  const chapterButton = e.target.closest(".open-chapter");
+  if (chapterButton) await openChapter(Number(chapterButton.dataset.index));
+
+  const purchase = e.target.closest(".buy-product");
+  if (purchase) await buyProduct(purchase.dataset.type, purchase.dataset.id);
+
+  const libraryFilter = e.target.closest("[data-library-filter]");
+  if (libraryFilter) {
+    const status = libraryFilter.dataset.libraryFilter;
+    renderBookList("library-books", books.filter(b =>
+      libraryIds.has(String(b.id)) &&
+      (status === "all" || String(b.status || "").toLowerCase() === status)
+    ));
+  }
+});
+
+$("search-btn")?.addEventListener("click", renderBooks);
+$("search-input")?.addEventListener("input", renderBooks);
+
+$("theme-toggle")?.addEventListener("click", () => {
+  document.body.classList.toggle("light");
+  localStorage.setItem("fw-theme", document.body.classList.contains("light") ? "light" : "dark");
+});
+
+$("settings-theme")?.addEventListener("click", () => $("theme-toggle")?.click());
+if (localStorage.getItem("fw-theme") === "light") document.body.classList.add("light");
+
+$("switch-auth")?.addEventListener("click", () => {
+  isRegister = !isRegister;
+  $("account-heading").textContent = isRegister ? "Create your account" : "Welcome back";
+  $("account-description").textContent = isRegister ? "Join Fictional World Library." : "Log in to continue your reading journey.";
+  $("name-field").hidden = !isRegister;
+  $("auth-name").required = isRegister;
+  $("auth-submit").textContent = isRegister ? "Create account" : "Log in";
+  $("switch-auth").textContent = isRegister ? "Already have an account? Log in" : "Create an account";
+});
+
+$("auth-form")?.addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("auth-email").value.trim();
+  const password = $("auth-password").value;
+  $("auth-message").textContent = "Please wait...";
+  let result;
+
+  if (isRegister) {
+    result = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: $("auth-name").value.trim() } }
+    });
+  } else {
+    result = await supabase.auth.signInWithPassword({ email, password });
+  }
+
+  if (result.error) {
+    $("auth-message").textContent = result.error.message;
+    return;
+  }
+  if (isRegister && !result.data.session) {
+    $("auth-message").textContent = "Check your email to confirm your account.";
+    return;
+  }
+
+  reader = result.data.user || result.data.session?.user || null;
+  $("auth-message").textContent = "You're signed in.";
+  updateAccountUI();
+  await loadProfile();
+  await loadLibrary();
+  await loadTransactions();
+  await loadNotifications();
+  showPage("profile");
+});
+
+$("forgot-password")?.addEventListener("click", () => showPage("reset"));
+
+$("reset-form")?.addEventListener("submit", async e => {
+  e.preventDefault();
+  const { error } = await supabase.auth.resetPasswordForEmail($("reset-email").value.trim());
+  notify(error ? error.message : "If the email is registered, a reset link will be sent.");
+});
+
+$("logout-btn")?.addEventListener("click", async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    notify(error.message || "Could not sign out.");
+    return;
+  }
+  reader = null;
+  libraryIds.clear();
+  unlockedChapterIds.clear();
+  updateAccountUI();
+  $("coin-count").textContent = "0";
+  $("wallet-coins").textContent = "0";
+  $("profile-coins").textContent = "0";
+  $("profile-saved").textContent = "0";
+  $("transactions").innerHTML = `<p class="muted">Log in to view transactions.</p>`;
+  notify("You have logged out.");
+  showPage("home");
+});
+
+$("save-profile")?.addEventListener("click", async () => {
+  if (!reader) {
+    notify("Please log in first.");
+    showPage("account");
+    return;
+  }
+  const name = $("profile-display-name").value.trim();
+  const { error } = await supabase.auth.updateUser({ data: { display_name: name } });
+  if (error) notify(error.message);
+  else {
+    $("profile-name").textContent = name || "Reader";
+    notify("Profile updated.");
+  }
+});
+
+$("save-book")?.addEventListener("click", async () => {
+  if (!reader || !currentBook) {
+    notify("Please log in to save stories.");
+    showPage("account");
+    return;
+  }
+  const id = String(currentBook.id);
+  if (libraryIds.has(id)) {
+    notify("This story is already in your library.");
+    return;
+  }
+  const { error } = await supabase.from("library").insert({ user_id: reader.id, book_id: id });
+  if (error) notify(error.message);
+  else {
+    libraryIds.add(id);
+    $("save-book").textContent = "✓ In my library";
+    await loadLibrary();
+    notify("Added to your library.");
+  }
+});
+
+$("start-reading")?.addEventListener("click", () => {
+  if (chapters.length) openChapter(0);
+  else notify("No chapters are available yet.");
+});
+
+$("back-to-book")?.addEventListener("click", () => showPage("book"));
+$("previous-chapter")?.addEventListener("click", () => {
+  if (currentChapterIndex > 0) openChapter(currentChapterIndex - 1);
+});
+$("next-chapter")?.addEventListener("click", () => {
+  if (currentChapterIndex < chapters.length - 1) openChapter(currentChapterIndex + 1);
+});
+
+supabase.auth.onAuthStateChange(async (_event, session) => {
+  reader = session?.user || null;
+  updateAccountUI();
+
+  if (reader) {
+    await loadProfile();
+    await loadLibrary();
+    await loadTransactions();
+    await loadNotifications();
+
+    if ($("page-account") && $("page-account").classList.contains("active")) {
+      showPage("profile");
+    }
+  } else {
+    libraryIds.clear();
+  }
+});
+
+renderGenres();
+renderPackages();
+loadBooks();
+getSession();
+  </script>
