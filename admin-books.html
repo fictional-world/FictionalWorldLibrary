@@ -1,495 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Books | Fictional World Library</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Books | Fictional World Library</title>
   <style>
-    * { box-sizing: border-box; }
+    :root {
+      --bg:#100b1c;
+      --surface:#1b122b;
+      --surface-2:#26183a;
+      --text:#f7f2ff;
+      --muted:#b8accb;
+      --accent:#a879ff;
+      --accent-2:#7b4ce0;
+      --border:#38264e;
+      --danger:#ff7272;
+      --success:#72d8a0;
+      --radius:16px;
+    }
 
+    * { box-sizing:border-box; }
     body {
-      margin: 0;
-      padding: 20px;
-      background: #f5f5f7;
-      color: #222;
-      font-family: Arial, sans-serif;
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      line-height:1.6;
     }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
+    a { color:var(--accent); text-decoration:none; }
+    button,input,select,textarea {
+      font:inherit;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
+    .admin-shell {
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 80px;
     }
 
-    h1 { font-size: 25px; }
-    h2 { font-size: 19px; }
+    .admin-header {
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px 20px;
+      margin-bottom:18px;
+    }
+
+    .admin-layout {
+      display:grid;
+      grid-template-columns:220px minmax(0,1fr);
+      gap:18px;
+    }
+
+    .sidebar {
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      align-self:start;
+    }
+
+    .sidebar a {
+      display:block;
+      padding:10px 12px;
+      border-radius:10px;
+      margin-bottom:6px;
+      color:var(--text);
+      text-decoration:none;
+    }
+
+    .sidebar a:hover {
+      background:var(--surface-2);
+    }
+
+    .content {
+      display:grid;
+      gap:18px;
+    }
 
     .panel {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px #0000000a;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px;
     }
 
-    label {
-      display: block;
-      font-weight: bold;
-      margin: 14px 0 6px;
+    .panel h2 {
+      margin:0 0 14px;
+      font-size:22px;
     }
 
-    input, textarea, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 7px;
-      font-size: 16px;
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+
+    .form-group {
+      display:grid;
+      gap:6px;
+      margin-bottom:14px;
+    }
+
+    .form-group label {
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    input, select, textarea {
+      width:100%;
+      min-height:44px;
+      background:var(--bg);
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:10px 12px;
     }
 
     textarea {
-      min-height: 120px;
-      resize: vertical;
+      min-height:120px;
+      resize:vertical;
     }
 
-    button, .link-button {
-      display: inline-block;
-      padding: 11px 15px;
-      border: 0;
-      border-radius: 7px;
-      background: #27213d;
-      color: white;
-      font-size: 15px;
-      text-decoration: none;
-      cursor: pointer;
-      margin-top: 12px;
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:10px 16px;
+      border-radius:10px;
+      border:1px solid var(--accent-2);
+      background:var(--accent-2);
+      color:#fff;
+      cursor:pointer;
+      font-weight:600;
     }
 
-    button:disabled {
-      opacity: .6;
-      cursor: wait;
+    .btn.secondary {
+      background:transparent;
+      color:var(--text);
+      border-color:var(--border);
     }
 
-    .secondary { background: #666; }
-    .danger { background: #a32626; }
-
-    .book {
-      border: 1px solid #e2e2e2;
-      border-radius: 8px;
-      padding: 14px;
-      margin-top: 12px;
+    .table-wrap {
+      width:100%;
+      overflow-x:auto;
     }
 
-    .book p {
-      overflow-wrap: anywhere;
-      color: #555;
+    table {
+      width:100%;
+      border-collapse:collapse;
+      min-width:600px;
     }
 
-    .message {
-      padding: 12px;
-      border-radius: 7px;
-      margin-bottom: 15px;
-      overflow-wrap: anywhere;
+    th, td {
+      padding:12px 10px;
+      border-bottom:1px solid var(--border);
+      text-align:left;
     }
 
-    .error { background: #ffe8e8; color: #8b1111; }
-    .success { background: #e7f8eb; color: #176b2c; }
-    .muted { color: #666; font-size: 14px; }
+    .muted {
+      color:var(--muted);
+    }
 
-    #app { display: none; }
+    @media (max-width:760px) {
+      .admin-layout {
+        grid-template-columns:1fr;
+      }
+    }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <div id="checking">Checking administrator access...</div>
+  <div class="admin-shell">
+    <div class="admin-header">
+      <h1>Admin Books</h1>
+      <p class="muted">Manage books and chapters for the Fictional World Library.</p>
+    </div>
 
-    <main id="app">
-      <header>
-        <div>
-          <h1>Manage Books</h1>
-          <p class="muted">Fictional World Library administration</p>
+    <div class="admin-layout">
+      <aside class="sidebar">
+        <a href="admin.html">Dashboard</a>
+        <a href="admin-books.html">Books</a>
+        <a href="admin-readers.html">Readers</a>
+        <a href="admin-reviews.html">Reviews</a>
+        <a href="admin-publishers.html">Publishers</a>
+      </aside>
+
+      <main class="content">
+        <div class="panel">
+          <h2>Add New Book</h2>
+          <form id="bookForm">
+            <div class="grid">
+              <div class="form-group">
+                <label for="title">Title</label>
+                <input id="title" required />
+              </div>
+
+              <div class="form-group">
+                <label for="genre">Genre</label>
+                <select id="genre">
+                  <option value="Werewolf">Werewolf</option>
+                  <option value="Mafia">Mafia</option>
+                  <option value="Erotica">Erotica</option>
+                  <option value="LGBTQ">LGBTQ</option>
+                  <option value="Billionaire Drama">Billionaire Drama</option>
+                  <option value="Vampire">Vampire</option>
+                  <option value="Paranormal">Paranormal</option>
+                  <option value="Christian Romance">Christian Romance</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="title">Author Name</label>
+                <input id="author_name" />
+              </div>
+
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status">
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="grid-column:1/-1;">
+                <label for="cover_url">Cover Image URL</label>
+                <input id="cover_url" placeholder="https://example.com/cover.jpg" />
+              </div>
+
+              <div class="form-group" style="grid-column:1/-1;">
+                <label for="synopsis">Synopsis / Description</label>
+                <textarea id="synopsis"></textarea>
+              </div>
+            </div>
+
+            <button class="btn" type="submit">Save Book</button>
+          </form>
         </div>
 
-        <div>
-          <a class="link-button" href="admin.html">Dashboard</a>
-          <button id="logoutButton" class="secondary">Log out</button>
+        <div class="panel">
+          <h2>Published Books</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Genre</th>
+                  <th>Status</th>
+                  <th>Author</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="bookTableBody"></tbody>
+            </table>
+          </div>
         </div>
-      </header>
-
-      <div id="message" aria-live="polite"></div>
-
-      <section class="panel">
-        <h2 id="formHeading">Add a Book</h2>
-
-        <form id="bookForm">
-          <input type="hidden" id="bookId">
-
-          <label for="title">Book Title *</label>
-          <input id="title" required maxlength="200">
-
-          <label for="author">Author Name *</label>
-          <input id="author" required maxlength="200">
-
-          <label for="publisher">Publisher</label>
-          <input id="publisher" maxlength="200">
-
-          <label for="cover">Cover Image URL</label>
-          <input id="cover" type="url" placeholder="https://...">
-
-          <label for="genre">Genre *</label>
-          <select id="genre" required>
-            <option value="">Choose a genre</option>
-            <option>Werewolf</option>
-            <option>Mafia</option>
-            <option>Erotica</option>
-            <option>LGBTQ</option>
-            <option>Billionaire Drama</option>
-            <option>Vampire</option>
-            <option>Paranormal</option>
-            <option>Christian Romance</option>
-          </select>
-
-          <label for="length">Story Length *</label>
-          <select id="length" required>
-            <option value="">Choose length</option>
-            <option>Short</option>
-            <option>Long</option>
-          </select>
-
-          <label for="status">Publication Status *</label>
-          <select id="status" required>
-            <option value="">Choose status</option>
-            <option>Draft</option>
-            <option>Ongoing</option>
-            <option>Completed</option>
-          </select>
-
-          <label for="synopsis">Synopsis *</label>
-          <textarea id="synopsis" required></textarea>
-
-          <label for="tags">Tags (separate with commas)</label>
-          <input id="tags" placeholder="Alpha, romance, betrayal">
-
-          <label>
-            <input id="featured" type="checkbox" style="width:auto">
-            Feature this book
-          </label>
-
-          <button id="saveButton" type="submit">Save Book</button>
-          <button id="cancelButton" type="button" class="secondary">
-            Clear Form
-          </button>
-        </form>
-      </section>
-
-      <section class="panel">
-        <h2>Published and Saved Books</h2>
-        <button id="refreshButton" class="secondary">Refresh Books</button>
-        <div id="bookList">Loading books...</div>
-      </section>
-    </main>
+      </main>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  <script>
-    (() => {
-      "use strict";
+    const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      const SUPABASE_URL =
-        "https://mhvphjcreqhfnulflgiy.supabase.co";
+    const bookTableBody = document.getElementById("bookTableBody");
 
-      const SUPABASE_KEY =
-        "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
-
-      const ADMIN_ID =
-        "a57c6170-7026-43b4-91af-ee7459776109";
-
-      const client = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY,
-        {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: false,
-            storage: window.sessionStorage
-          }
-        }
-      );
-
-      const $ = id => document.getElementById(id);
-
-      let currentBooks = [];
-      let busy = false;
-
-      function showMessage(text, type = "error") {
-        $("message").replaceChildren();
-
-        if (!text) return;
-
-        const box = document.createElement("div");
-        box.className = "message " + type;
-        box.textContent = text;
-        $("message").appendChild(box);
-      }
-
-      async function checkAdmin() {
-        try {
-          const { data, error } = await client.auth.getSession();
-
-          if (error || !data.session) {
-            window.location.replace("admin-login.html");
-            return false;
-          }
-
-          if (data.session.user.id !== ADMIN_ID) {
-            await client.auth.signOut();
-            window.location.replace("admin-login.html");
-            return false;
-          }
-
-          const { data: admin, error: adminError } = await client
-            .from("admin_users")
-            .select("user_id")
-            .eq("user_id", ADMIN_ID)
-            .maybeSingle();
-
-          if (adminError || !admin) {
-            await client.auth.signOut();
-            window.location.replace("admin-login.html");
-            return false;
-          }
-
-          $("checking").style.display = "none";
-          $("app").style.display = "block";
-          return true;
-
-        } catch (error) {
-          $("checking").textContent =
-            "Unable to verify administrator access. Please return to the login page.";
-
-          const link = document.createElement("a");
-          link.href = "admin-login.html";
-          link.textContent = " Return to admin login";
-          $("checking").appendChild(link);
-          return false;
-        }
-      }
-
-      function resetForm() {
-        $("bookForm").reset();
-        $("bookId").value = "";
-        $("formHeading").textContent = "Add a Book";
-        $("saveButton").textContent = "Save Book";
-        showMessage("");
-      }
-
-      function setBusy(value) {
-        busy = value;
-        $("saveButton").disabled = value;
-        $("refreshButton").disabled = value;
-      }
-
-      async function loadBooks() {
-        $("bookList").textContent = "Loading books...";
-
-        const { data, error } = await client
+    async function loadBooks() {
+      try {
+        const { data, error } = await supabase
           .from("books")
           .select("*")
           .order("created_at", { ascending: false });
 
-        if (error) {
-          $("bookList").textContent =
-            "Could not load books: " + error.message;
-          return;
-        }
+        if (error) throw error;
 
-        currentBooks = data || [];
-        renderBooks();
+        const rows = (data || []).map(book => `
+          <tr>
+            <td>${book.title || "Untitled"}</td>
+            <td>${book.genre || "General"}</td>
+            <td>${book.status || "Published"}</td>
+            <td>${book.author_name || "Unknown"}</td>
+            <td>
+              <button class="btn secondary" type="button" data-book-id="${book.id}">Preview</button>
+            </td>
+          </tr>
+        `).join("");
+
+        bookTableBody.innerHTML = rows || `
+          <tr>
+            <td colspan="5" class="muted">No books yet.</td>
+          </tr>
+        `;
+      } catch (error) {
+        console.error("Load books error:", error);
+        bookTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="muted">No books available right now.</td>
+          </tr>
+        `;
+      }
+    }
+
+    document.getElementById("bookForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const title = document.getElementById("title").value.trim();
+      const genre = document.getElementById("genre").value;
+      const author_name = document.getElementById("author_name").value.trim();
+      const status = document.getElementById("status").value;
+      const cover_url = document.getElementById("cover_url").value.trim();
+      const synopsis = document.getElementById("synopsis").value.trim();
+
+      if (!title) {
+        alert("Please enter a title.");
+        return;
       }
 
-      function renderBooks() {
-        const list = $("bookList");
-        list.replaceChildren();
+      try {
+        const { data, error } = await supabase
+          .from("books")
+          .insert([
+            {
+              title,
+              genre,
+              author_name,
+              status,
+              cover_url,
+              synopsis,
+              created_at: new Date().toISOString()
+            }
+          ])
+          .select();
 
-        if (!currentBooks.length) {
-          list.textContent = "No books found yet.";
-          return;
-        }
+        if (error) throw error;
 
-        currentBooks.forEach(book => {
-          const card = document.createElement("article");
-          card.className = "book";
-
-          const title = document.createElement("h3");
-          title.textContent = book.title || "Untitled book";
-          card.appendChild(title);
-
-          const details = document.createElement("p");
-          details.textContent =
-            "Author: " + (book.author_name || "Not specified") +
-            " | Genre: " + (book.genre || "Not specified") +
-            " | Length: " + (book.length || "Not specified") +
-            " | Status: " + (book.status || "Not specified");
-          card.appendChild(details);
-
-          const edit = document.createElement("button");
-          edit.textContent = "Edit";
-          edit.addEventListener("click", () => editBook(book));
-          card.appendChild(edit);
-
-          const chapters = document.createElement("a");
-          chapters.href = "admin-chapters.html";
-          chapters.className = "link-button";
-          chapters.textContent = "Manage Chapters";
-          card.appendChild(chapters);
-
-          const remove = document.createElement("button");
-          remove.textContent = "Delete Book";
-          remove.className = "danger";
-          remove.addEventListener("click", () => deleteBook(book));
-          card.appendChild(remove);
-
-          list.appendChild(card);
-        });
+        document.getElementById("bookForm").reset();
+        await loadBooks();
+        alert("Book saved successfully.");
+      } catch (error) {
+        console.error("Book save error:", error);
+        alert("Book save failed. " + (error?.message || "Unknown error"));
       }
+    });
 
-      function editBook(book) {
-        $("bookId").value = book.id;
-        $("title").value = book.title || "";
-        $("author").value = book.author_name || "";
-        $("publisher").value = book.publisher || "";
-        $("cover").value = book.cover_url || "";
-        $("genre").value = book.genre || "";
-        $("length").value = book.length || "";
-        $("status").value = book.status || "";
-        $("synopsis").value = book.synopsis || "";
-        $("tags").value = book.tags || "";
-        $("featured").checked = Boolean(book.featured);
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-book-id]");
+      if (!target) return;
 
-        $("formHeading").textContent = "Edit Book";
-        $("saveButton").textContent = "Update Book";
+      const bookId = target.getAttribute("data-book-id");
+      alert("Selected book ID: " + bookId);
+    });
 
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-
-      $("bookForm").addEventListener("submit", async event => {
-        event.preventDefault();
-
-        if (busy) return;
-
-        setBusy(true);
-        showMessage("");
-
-        try {
-          const book = {
-            title: $("title").value.trim(),
-            author_name: $("author").value.trim(),
-            publisher: $("publisher").value.trim() || null,
-            cover_url: $("cover").value.trim() || null,
-            genre: $("genre").value,
-            length: $("length").value,
-            status: $("status").value,
-            synopsis: $("synopsis").value.trim(),
-            tags: $("tags").value.trim() || null,
-            featured: $("featured").checked
-          };
-
-          const id = $("bookId").value;
-
-          let result;
-
-          if (id) {
-            result = await client
-              .from("books")
-              .update(book)
-              .eq("id", id)
-              .select()
-              .single();
-          } else {
-            result = await client
-              .from("books")
-              .insert(book)
-              .select()
-              .single();
-          }
-
-          if (result.error) {
-            showMessage("Book could not be saved: " + result.error.message);
-            return;
-          }
-
-          resetForm();
-          showMessage(
-            id ? "Book updated successfully." : "Book saved successfully.",
-            "success"
-          );
-
-          await loadBooks();
-
-        } catch (error) {
-          showMessage("An unexpected error occurred: " + error.message);
-        } finally {
-          setBusy(false);
-        }
-      });
-
-      async function deleteBook(book) {
-        if (busy) return;
-
-        const confirmed = window.confirm(
-          'Delete "' + book.title +
-          '"? This cannot be undone. Related chapters may need separate cleanup.'
-        );
-
-        if (!confirmed) return;
-
-        setBusy(true);
-        showMessage("");
-
-        try {
-          const { error } = await client
-            .from("books")
-            .delete()
-            .eq("id", book.id);
-
-          if (error) {
-            showMessage("Book could not be deleted: " + error.message);
-            return;
-          }
-
-          showMessage("Book deleted.", "success");
-          await loadBooks();
-
-        } finally {
-          setBusy(false);
-        }
-      }
-
-      $("cancelButton").addEventListener("click", resetForm);
-
-      $("refreshButton").addEventListener("click", loadBooks);
-
-      $("logoutButton").addEventListener("click", async () => {
-        $("logoutButton").disabled = true;
-        await client.auth.signOut();
-        window.location.replace("admin-login.html");
-      });
-
-      checkAdmin().then(allowed => {
-        if (allowed) loadBooks();
-      });
-    })();
+    loadBooks();
   </script>
 </body>
-</html>
+  </html>
