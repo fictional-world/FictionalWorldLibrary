@@ -1,4 +1,414 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fictional World Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#10101b; --surface:#191927; --card:#202033; --text:#f7f4ff; --muted:#aaa7bd;
+  --accent:#c7a3ff; --gold:#f4cf86; --line:#34334a; --danger:#ff8e9d; --success:#7ee0b0;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+body.light{--bg:#f8f5fc;--surface:#fff;--card:#f0eaf8;--text:#21182c;--muted:#71677d;--accent:#8050bd;--gold:#9b6c16;--line:#ded5e8}
+a{text-decoration:none;color:inherit}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);z-index:20}
+.top-inner{max-width:1250px;margin:auto;padding:13px 20px;display:flex;align-items:center;gap:22px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{width:42px;height:42px;border-radius:12px}
+.brand strong{display:block;font-family:'Playfair Display',serif;font-size:16px;letter-spacing:1px}
+.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px}
+.navlinks{display:flex;gap:18px;flex:1}
+.navlinks button{background:none;border:0;color:var(--text);padding:8px 4px;font-weight:600}
+.navlinks button.active,.navlinks button:hover{color:var(--accent)}
+.top-actions{display:flex;align-items:center;gap:10px}
+.btn{padding:10px 15px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:600}
+.btn.primary{background:var(--accent);color:#1f1429;border-color:var(--accent)}
+.btn.gold{background:var(--gold);color:#1d170e;border-color:var(--gold)}
+.icon-btn{background:none;border:0;color:var(--text);padding:8px}
+main{max-width:1250px;margin:auto;padding:25px 20px 90px}
+.page{display:none}
+.page.active{display:block}
+.hero{min-height:360px;border:1px solid var(--line);background:linear-gradient(120deg,rgba(13,12,22,.95),rgba(38,26,54,.8)),linear-gradient(135deg,#44305e,#17172d);border-radius:22px;padding:40px;display:flex;align-items:center}
+.hero-copy{max-width:650px}
+.eyebrow{color:var(--gold);text-transform:uppercase;letter-spacing:3px;font-size:11px;font-weight:700}
+h1,h2,h3{font-family:'Playfair Display',serif;margin:0}
+.hero h1{font-size:clamp(35px,5vw,58px);line-height:1.08;margin:16px 0}
+.hero p{color:#d8d2df;line-height:1.8;max-width:520px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.section{margin-top:32px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.section-head h2{font-size:25px}
+.muted{color:var(--muted)}
+.genre-list{display:flex;gap:9px;overflow-x:auto;padding:3px 0 10px}
+.genre{white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:9px 15px;border-radius:30px}
+.genre.active,.genre:hover{background:var(--accent);color:#1f1429;border-color:var(--accent)}
+.book-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+.book-card{cursor:pointer}
+.cover{height:240px;border-radius:12px;overflow:hidden;position:relative;border:1px solid var(--line);background:linear-gradient(145deg,#44304f,#211d32)}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover-fallback{height:100%;display:flex;align-items:center;justify-content:center;padding:18px;font-family:'Playfair Display',serif;font-size:21px;background:linear-gradient(145deg,#44304f,#211d32)}
+.book-card h3{font-family:'DM Sans',sans-serif;font-size:15px;margin:10px 0 4px}
+.book-card p{margin:0 0 5px;color:var(--muted);font-size:12px}
+.tag{display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+.searchbar{display:flex;gap:10px;margin:20px 0}
+.searchbar input,.field input,.field textarea,.field select{width:100%;padding:13px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--text)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:22px;margin:18px 0}
+.form{max-width:500px;margin:30px auto}
+.field{margin:15px 0}
+.field label{display:block;font-size:13px;margin-bottom:7px}
+.grid-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.grid-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.plan.featured{border-color:var(--accent)}
+.price{font-size:30px;font-weight:700;margin:12px 0}
+.plan ul{padding-left:18px;line-height:2;color:var(--muted)}
+.profile-head{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.avatar{width:68px;height:68px;border-radius:50%;background:var(--card);display:grid;place-items:center;overflow:hidden;font-size:28px}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.stat{background:var(--card);padding:18px;border-radius:12px}
+.stat strong{display:block;font-size:24px;margin-top:8px}
+.reader-text{font-family:'Playfair Display',serif;font-size:19px;white-space:pre-wrap;line-height:2}
+.chapter-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.chapter-label{flex:1;min-width:120px}
+.chapter-price{font-size:12px;font-weight:700;white-space:nowrap}
+.chapter-price.free{color:var(--success)}
+.chapter-price.locked{color:var(--gold)}
+.bottom-nav{display:none}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:12px 16px;border-radius:10px;display:none;z-index:30;max-width:90%;text-align:center}
+.empty{text-align:center;padding:35px 15px;color:var(--muted)}
+@media (max-width: 950px){.navlinks{display:none}.book-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.cover{height:220px}}
+@media (max-width: 650px){.top-inner{padding:10px 13px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-two,.grid-three{grid-template-columns:1fr}.hero{padding:24px}.bottom-nav{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);justify-content:space-between;padding:8px 12px;z-index:25}.bottom-nav button{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px}.bottom-nav button.active{color:var(--accent)}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="top-inner">
+    <a class="brand" href="#" data-page="home">
+      <img src="https://i.postimg.cc/W3BCGxmQ/logo.png" alt="Fictional World logo">
+      <span><strong>FICTIONAL WORLD</strong><small>LIBRARY</small></span>
+    </a>
+    <nav class="navlinks">
+      <button class="active" data-page="home">Home</button>
+      <button data-page="browse">Discover</button>
+      <button data-page="library">Library</button>
+      <button data-page="writer">Be Our Author</button>
+    </nav>
+    <div class="top-actions">
+      <button class="btn desktop-only" data-page="wallet">🪙 <span id="coin-count">0</span></button>
+      <button class="icon-btn" id="theme-toggle" aria-label="Theme toggle">☼</button>
+      <button class="btn primary" id="login-nav" data-page="account">My Account</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Your next obsession starts here</div>
+        <h1>Some stories stay with you long after the last page.</h1>
+        <p>Step into unforgettable romances, dangerous secrets, powerful alphas and worlds you won't want to leave.</p>
+        <div class="hero-actions">
+          <button class="btn primary" data-page="browse">Explore stories →</button>
+          <button class="btn" data-page="library">My library</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Find your world</h2>
+        <span class="muted">Choose a genre</span>
+      </div>
+      <div class="genre-list" id="home-genres"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Stories to fall into</h2>
+        <button class="btn" data-page="browse">View all</button>
+      </div>
+      <div class="book-grid" id="featured-books"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Ongoing stories</h2>
+        <span class="muted">New chapters await</span>
+      </div>
+      <div class="book-grid" id="ongoing-books"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Completed reads</h2>
+        <span class="muted">Read at your pace</span>
+      </div>
+      <div class="book-grid" id="completed-books"></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-browse">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Discover</div>
+        <h1>Find your next story</h1>
+      </div>
+    </div>
+    <div class="searchbar">
+      <input id="search-input" placeholder="Search titles, authors or genres...">
+      <button class="btn primary" id="search-btn">Search</button>
+    </div>
+    <div class="genre-list" id="browse-genres"></div>
+    <div class="section-head">
+      <h2 id="browse-heading">All stories</h2>
+      <span class="muted" id="book-total"></span>
+    </div>
+    <div class="book-grid" id="all-books"></div>
+  </section>
+
+  <section class="page" id="page-library">
+    <div class="eyebrow">Your personal shelf</div>
+    <h1>My Library</h1>
+    <div class="genre-list">
+      <button class="genre active" data-library-filter="all">All saved</button>
+      <button class="genre" data-library-filter="ongoing">Ongoing</button>
+      <button class="genre" data-library-filter="completed">Completed</button>
+    </div>
+    <div class="book-grid" id="library-books"></div>
+    <div class="notice panel" id="library-note">Log in to keep your reading library connected to your account.</div>
+  </section>
+
+  <section class="page" id="page-notifications">
+    <div class="eyebrow">Stay in the loop</div>
+    <h1>Notifications</h1>
+    <div id="notification-list" class="panel">
+      <p class="muted">Log in to view your notifications.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-account">
+    <div class="form panel">
+      <div class="eyebrow">Welcome to your world</div>
+      <h1 id="account-heading">Welcome back</h1>
+      <p class="muted" id="account-description">Log in to continue your reading journey.</p>
+      <form id="auth-form">
+        <div class="field" id="name-field" hidden>
+          <label for="auth-name">Your name</label>
+          <input id="auth-name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="auth-email">Email address</label>
+          <input id="auth-email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="auth-password">Password</label>
+          <input id="auth-password" type="password" minlength="6" autocomplete="current-password" required>
+        </div>
+        <button class="btn primary" id="auth-submit" type="submit" style="width:100%">Log in</button>
+      </form>
+      <p><button class="icon-btn" id="switch-auth">Create an account</button></p>
+      <p><button class="icon-btn" id="forgot-password">Forgot password?</button></p>
+      <p class="muted" id="auth-message"></p>
+    </div>
+  </section>
+
+  <section class="page" id="page-reset">
+    <div class="form panel">
+      <h1>Reset password</h1>
+      <form id="reset-form">
+        <div class="field">
+          <label>Email address</label>
+          <input id="reset-email" type="email" required>
+        </div>
+        <button class="btn primary" type="submit" style="width:100%">Send reset link</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="page" id="page-profile">
+    <div class="eyebrow">Your account</div>
+    <h1>My Profile</h1>
+    <div class="panel">
+      <div class="profile-head">
+        <div class="avatar" id="profile-avatar">♡</div>
+        <div>
+          <h2 id="profile-name">Reader</h2>
+          <p class="muted" id="profile-email">Sign in to view your profile</p>
+        </div>
+      </div>
+      <p><strong>Reader ID:</strong> <span id="profile-reader-id">—</span></p>
+      <p><strong>Gender:</strong> <span id="profile-gender">Not provided</span></p>
+      <p><strong>Membership:</strong> <span id="profile-tier">Free</span></p>
+      <div class="field">
+        <label for="profile-display-name">Display name</label>
+        <input id="profile-display-name" placeholder="Your display name">
+      </div>
+      <button class="btn primary" id="save-profile">Save profile</button>
+      <button class="btn" id="logout-btn">Log out</button>
+    </div>
+    <div class="grid-three">
+      <div class="stat">Coin balance<strong id="profile-coins">0</strong></div>
+      <div class="stat">Saved books<strong id="profile-saved">0</strong></div>
+      <div class="stat">Membership<strong id="profile-tier-stat">Free</strong></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-book">
+    <button class="btn" data-page="browse">← Back to stories</button>
+    <div class="panel grid-two" style="margin-top:20px">
+      <div class="cover" style="height:360px" id="detail-cover"></div>
+      <div>
+        <div class="eyebrow" id="detail-genre">Fiction</div>
+        <h1 id="detail-title">Story title</h1>
+        <p class="muted" id="detail-author"></p>
+        <p id="detail-description"></p>
+        <p class="muted" id="detail-status"></p>
+        <div class="hero-actions">
+          <button class="btn primary" id="start-reading">Start reading</button>
+          <button class="btn" id="save-book">＋ Add to library</button>
+        </div>
+      </div>
+    </div>
+    <div class="section-head">
+      <h2>Chapters</h2>
+    </div>
+    <div class="panel" id="chapter-list"></div>
+  </section>
+
+  <section class="page" id="page-reader">
+    <button class="btn" id="back-to-book">← Back to story</button>
+    <div class="panel">
+      <div class="muted" id="reader-book-title"></div>
+      <h1 id="reader-chapter-title">Chapter</h1>
+      <div class="reader-text" id="reader-content">Select a chapter to begin reading.</div>
+      <div class="hero-actions">
+        <button class="btn" id="previous-chapter">← Previous</button>
+        <button class="btn primary" id="next-chapter">Next chapter →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-wallet">
+    <div class="eyebrow">Your reading balance</div>
+    <h1>Wallet</h1>
+    <div class="panel">
+      <p class="muted">Available coins</p>
+      <div class="price"><span id="wallet-coins">0</span> 🪙</div>
+      <p class="muted">Coins are used to unlock paid chapters.</p>
+    </div>
+    <div class="section-head"><h2>Choose a coin package</h2></div>
+    <div class="grid-two" id="coin-packages"></div>
+    <div class="section-head"><h2>Transaction history</h2></div>
+    <div class="panel" id="transactions"><p class="muted">Log in to view transactions.</p></div>
+  </section>
+
+  <section class="page" id="page-subscriptions">
+    <div class="eyebrow">Read more. Enjoy more.</div>
+    <h1>Reader Memberships</h1>
+    <p class="muted">Choose a plan that suits your reading habit.</p>
+    <div class="grid-two" id="membership-plans"></div>
+  </section>
+
+  <section class="page" id="page-more">
+    <div class="eyebrow">Everything in one place</div>
+    <h1>More</h1>
+    <div class="grid-two">
+      <button class="panel" data-page="wallet"><h2>🪙 Wallet</h2><p class="muted">Coins and transactions</p></button>
+      <button class="panel" data-page="subscriptions"><h2>✦ Memberships</h2><p class="muted">Explore reader plans</p></button>
+      <button class="panel" data-page="support"><h2>♡ Customer service</h2><p class="muted">Get help with your account</p></button>
+      <button class="panel" data-page="settings"><h2>⚙ Settings</h2><p class="muted">Manage your preferences</p></button>
+      <button class="panel" data-page="writer"><h2>✍ Be our author</h2><p class="muted">Publish your story</p></button>
+    </div>
+  </section>
+
+  <section class="page" id="page-support">
+    <div class="eyebrow">We're here to help</div>
+    <h1>Customer Service</h1>
+    <div class="panel">
+      <p>For account, reading, or general help, contact our support team at <strong>fictionhomeofficial@gmail.com</strong></p>
+      <p class="muted">For reader support, email us and we’ll help you as quickly as possible.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-writer">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Your story deserves a world</div>
+        <h1>Be Our Author</h1>
+        <p>Bring your imagination to readers who love compelling fiction.</p>
+        <div class="hero-actions">
+          <button class="btn primary" data-page="support">Contact us</button>
+        </div>
+      </div>
+    </div>
+    <div class="grid-two section">
+      <div class="panel">
+        <h2>Short stories</h2>
+        <p>12–25 chapters, with 600–1,000 words per chapter.</p>
+        <p class="muted">At least 5 completed chapters to apply.</p>
+      </div>
+      <div class="panel">
+        <h2>Long stories</h2>
+        <p>25+ chapters and a deeper story arc.</p>
+        <p class="muted">A strong synopsis and clear author profile are recommended.</p>
+      </div>
+    </div>
+    <p class="panel">Applications are reviewed in approximately 3–7 working days. If you are interested, send your name, story type, genre, and a short author bio to fictionhomeofficial@gmail.com.</p>
+  </section>
+
+  <section class="page" id="page-settings">
+    <div class="eyebrow">Make it yours</div>
+    <h1>Settings</h1>
+    <div class="panel">
+      <h2>Appearance</h2>
+      <p class="muted">Choose a theme for your reading experience.</p>
+      <button class="btn" id="settings-theme">Toggle dark / light</button>
+    </div>
+    <div class="panel">
+      <h2>Quick links</h2>
+      <div class="grid-two">
+        <button class="btn" data-page="about">About Us</button>
+        <button class="btn" data-page="terms">Terms & Conditions</button>
+        <button class="btn" data-page="privacy">Privacy Policy</button>
+        <button class="btn" data-page="support">Customer Service</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-about">
+    <h1>About Fictional World Library</h1>
+    <div class="panel">
+      <p>Fictional World Library is a place for readers who want to discover immersive stories, compelling characters, and unforgettable worlds.</p>
+      <p class="muted">Contact us for sponsorships, partnerships, or ad placement at fictionhomeofficial@gmail.com.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-terms">
+    <h1>Terms & Conditions</h1>
+    <div class="panel">
+      <p>Use of Fictional World Library is subject to the platform's applicable terms, content rules, payment policies, and account rules.</p>
+      <p class="muted">By creating an account, you agree to use the platform lawfully and responsibly.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-privacy">
+    <h1>Privacy Policy</h1>
+    <div class="panel">
+      <p>Fictional World Library uses account information to provide reader features, protect accounts, and support transaction records.</p>
+      <p class="muted">We do not sell or misuse your reader information. For privacy or account questions, email fictionhomeofficial@gmail.com.</p>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status" aria-l
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
@@ -286,7 +696,8 @@ async function loadNotifications() {
     </article>
   `).join("");
 }
-      async function openBook(id) {
+
+async function openBook(id) {
   currentBook = books.find(b => String(b.id) === String(id));
   if (!currentBook) return;
 
@@ -584,4 +995,6 @@ renderGenres();
 renderPackages();
 loadBooks();
 getSession();
-  </script>
+</script>
+</body>
+  </html>
