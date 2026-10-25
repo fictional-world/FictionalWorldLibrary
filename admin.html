@@ -1,516 +1,1131 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fictional World Library — Admin</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#211333">
+<meta name="description" content="Find a story that fits your taste. 😉">
+<title>Fictional World Library</title>
+<link rel="icon" type="image/png" href="https://i.postimg.cc/wxW3xYLv/fictionalworld-icon.png">
 <style>
-:root{--ink:#24133f;--purple:#4b2678;--pale:#f5f1fa;--line:#e7e0ef;--muted:#766b85}
-*{box-sizing:border-box}
-body{margin:0;font:14px Arial,sans-serif;background:#f8f7fa;color:#241b31}
-button,input,select,textarea{font:inherit}
-button{border:0;border-radius:8px;padding:10px 13px;background:var(--purple);color:#fff;cursor:pointer}
-button.secondary{background:#eee7f5;color:var(--ink)}
-button.danger{background:#a52b48}
-.layout{display:grid;grid-template-columns:225px 1fr;min-height:100vh}
-.side{background:#211333;color:#fff;padding:22px 14px}
-.brand{font-size:18px;font-weight:700;margin:0 8px 5px}
-.sub{font-size:12px;color:#c9bdd9;margin:0 8px 24px}
-.nav{display:grid;gap:5px}
-.nav button{background:transparent;text-align:left;color:#e9e0f2}
-.nav button.active,.nav button:hover{background:#4b2678}
-.main{padding:24px;min-width:0}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
-.top h1{margin:0;font-size:25px}
-.muted{color:var(--muted)}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:18px}
-.card,.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:16px}
-.card small{color:var(--muted)}
-.num{font-size:25px;font-weight:700;margin-top:8px;color:var(--purple)}
-.panel{margin-bottom:16px}
-.panel h2{font-size:17px;margin:0 0 14px}
-.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.tools input,.tools select,input,select,textarea{border:1px solid #d9d0e3;border-radius:8px;padding:10px;background:white;max-width:100%}
-.tools input{flex:1;min-width:150px}
-.tablewrap{overflow:auto}
-table{border-collapse:collapse;width:100%;min-width:600px}
-th,td{padding:10px;text-align:left;border-bottom:1px solid #eee8f3;vertical-align:top}
-th{font-size:12px;color:var(--muted);background:#faf8fc}
-td{max-width:300px;overflow-wrap:anywhere}
-.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
-.formgrid label{display:grid;gap:5px;color:var(--muted);font-size:12px}
-.formgrid textarea{min-height:85px}
-.hidden{display:none!important}
-.notice{padding:12px;background:var(--pale);border-radius:8px;margin-bottom:12px}
-.rowbuttons{display:flex;gap:6px;flex-wrap:wrap}
-.status{padding:4px 7px;border-radius:99px;background:#f0e9f8}
-.error{color:#a52b48}
-.success{color:#26734d}
-@media(max-width:720px){
-.layout{grid-template-columns:1fr}
-.side{padding:14px}
-.nav{grid-template-columns:repeat(2,minmax(0,1fr))}
-.main{padding:14px}
-.top{align-items:flex-start;flex-direction:column}
+:root {
+  --bg: #f8f6fb;
+  --surface: #ffffff;
+  --text: #251637;
+  --muted: #786d84;
+  --primary: #6639a1;
+  --primary-dark: #42216c;
+  --accent: #e5b75b;
+  --line: #e9e1f0;
+  --danger: #b4233b;
+  --success: #16784a;
+  --shadow: 0 5px 20px rgba(44, 22, 70, .07);
+}
+* { box-sizing: border-box; }
+html {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+body.dark {
+  --bg: #17111f;
+  --surface: #241a30;
+  --text: #f6efff;
+  --muted: #c0b2cf;
+  --line: #403149;
+  --shadow: 0 5px 20px rgba(0,0,0,.2);
+}
+button, input, select, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button {
+  cursor: pointer;
+  border: 0;
+}
+button:disabled { opacity: .55; cursor: not-allowed; }
+a { color: var(--primary); }
+img { max-width: 100%; }
+.hidden { display: none !important; }
+.muted { color: var(--muted); }
+.container {
+  width: min(100% - 32px, 1120px);
+  margin-inline: auto;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner {
+  width: min(100% - 24px, 1200px);
+  min-height: 68px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.brand img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.brand-name { font-size: 15px; }
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+.nav-btn, .plain-btn {
+  padding: 9px 11px;
+  background: transparent;
+  color: var(--text);
+  border-radius: 9px;
+}
+.nav-btn:hover, .plain-btn:hover { background: var(--bg); }
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  min-height: 42px;
+  padding: 10px 15px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+}
+.btn:hover { background: var(--primary-dark); }
+.btn.secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.btn.gold { background: #9a6811; color: #fff; }
+.btn.danger { background: var(--danger); }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.coin-pill {
+  white-space: nowrap;
+  padding: 8px 11px;
+  background: #fff4d8;
+  color: #63420b;
+  border-radius: 99px;
+  font-weight: 800;
+  font-size: 14px;
+}
+main { min-height: 65vh; padding: 22px 0 100px; }
+.page { display: none; }
+.page.active { display: block; }
+.hero {
+  padding: clamp(24px, 5vw, 48px);
+  border-radius: 20px;
+  background: linear-gradient(125deg, #35204f, #7044a0);
+  color: white;
+  overflow: hidden;
+}
+.hero h1 {
+  max-width: 700px;
+  margin: 0 0 10px;
+  font-size: clamp(26px, 4.5vw, 44px);
+  line-height: 1.15;
+}
+.hero p { max-width: 640px; margin: 0 0 20px; color: #f1e9fc; }
+.hero .btn.secondary { background: #fff; color: #42216c; }
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 26px 0 14px;
+}
+.section-head h2 { margin: 0; font-size: 21px; }
+.panel {
+  padding: clamp(15px, 3vw, 24px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+.panel h2, .panel h3 { margin-top: 0; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.genre {
+  padding: 13px 10px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-weight: 700;
+  text-align: center;
+}
+.book-card {
+  min-width: 0;
+  padding: 11px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.book-cover {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  display: block;
+  border-radius: 9px;
+  background: var(--bg);
+}
+.book-card h3 { margin: 10px 0 4px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+.book-card p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+.book-card .btn { width: 100%; margin-top: 8px; padding: 8px; font-size: 13px; }
+.search-row { display: flex; gap: 9px; }
+.search-row input { min-width: 0; flex: 1; }
+input, select, textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+textarea { min-height: 120px; resize: vertical; }
+label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; }
+.form-field { margin-bottom: 14px; }
+.form-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.tab.active { background: var(--primary); color: white; }
+.notice {
+  padding: 12px 14px;
+  margin: 12px 0;
+  border-radius: 9px;
+  background: var(--bg);
+  overflow-wrap: anywhere;
+}
+.notice.error { color: var(--danger); }
+.notice.success { color: var(--success); }
+.stat {
+  padding: 17px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+.stat strong { display: block; font-size: 23px; overflow-wrap: anywhere; }
+.stat span { color: var(--muted); font-size: 13px; }
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.list-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.list-item:last-child { border-bottom: 0; }
+.package-price { font-size: 25px; font-weight: 800; margin: 8px 0; }
+.badge {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 99px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-size: 12px;
+}
+.mobile-nav {
+  display: none;
+  position: fixed;
+  z-index: 60;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 4px max(8px, env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.mobile-nav button {
+  background: transparent;
+  color: var(--muted);
+  padding: 5px 1px;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.mobile-nav button span { display: block; font-size: 18px; }
+.mobile-nav button.active { color: var(--primary); font-weight: 800; }
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: 22px 0 90px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.site-footer a { margin-right: 13px; }
+.reader-id {
+  padding: 12px;
+  border: 1px dashed var(--primary);
+  border-radius: 10px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 900px) {
+  .desktop-nav { display: none; }
+  .topbar-inner { flex-wrap: wrap; padding: 9px 0; }
+  .header-actions { margin-left: auto; }
+  .mobile-nav { display: grid; }
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  body { font-size: 15px; }
+  .container { width: calc(100% - 24px); }
+  .topbar-inner { width: calc(100% - 20px); gap: 8px; }
+  .brand img { width: 34px; height: 34px; flex-basis: 34px; }
+  .brand-name { font-size: 13px; }
+  .header-actions { gap: 5px; }
+  .header-actions .btn { min-height: 36px; padding: 7px 9px; font-size: 12px; }
+  .coin-pill { padding: 7px 8px; font-size: 12px; }
+  main { padding-top: 14px; }
+  .grid, .grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .grid.two { grid-template-columns: 1fr; }
+  .hero { border-radius: 14px; padding: 23px 18px; }
+  .hero h1 { font-size: 28px; }
+  .section-head h2 { font-size: 19px; }
+  .panel { padding: 15px; }
+  .mobile-nav button { font-size: 10px; }
+  .search-row { flex-wrap: wrap; }
+  .search-row .btn { width: 100%; }
 }
 </style>
 </head>
-
 <body>
-<div class="layout">
-<aside class="side">
-<p class="brand">fictional world</p>
-<p class="sub">library admin</p>
-<nav class="nav" id="nav"></nav>
-<button class="secondary" id="signout" style="margin-top:18px;width:100%">sign out</button>
-</aside>
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="brand" data-page="home" aria-label="Fictional World Library home">
+      <img src="https://i.postimg.cc/wxW3xYLv/fictionalworld-icon.png" alt="Fictional World Library logo">
+      <span class="brand-name">Fictional World<br>Library</span>
+    </button>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <button class="nav-btn" data-page="home">Home</button>
+      <button class="nav-btn" data-page="browse">Discover</button>
+      <button class="nav-btn" data-page="library">Library</button>
+      <button class="nav-btn" data-page="memberships">Memberships</button>
+      <button class="nav-btn" data-page="wallet">Wallet</button>
+    </nav>
+    <div class="header-actions">
+      <span class="coin-pill" id="coin-count">🪙 —</span>
+      <button class="btn" id="login-nav" data-page="account">Log in</button>
+    </div>
+  </div>
+</header>
 
-<main class="main">
-<div class="top">
-<div>
-<h1 id="heading">dashboard</h1>
-<div class="muted">manage fictional world library</div>
+<main>
+<div class="container">
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <h1>Find a story that fits your taste. 😉</h1>
+    <p>Explore romance, werewolf, mafia, billionaire drama, vampire stories and more. Your next favourite story is waiting.</p>
+    <div class="form-actions">
+      <button class="btn secondary" data-page="browse">Discover stories</button>
+      <button class="btn" data-page="account">Create account</button>
+    </div>
+  </div>
+  <div class="section-head"><h2>Explore genres</h2></div>
+  <div class="grid" id="genres"></div>
+  <div class="section-head"><h2>Featured stories</h2><button class="plain-btn" data-page="browse">View all</button></div>
+  <div class="grid" id="featured-books"><p class="muted">Loading stories…</p></div>
+  <div class="section-head"><h2>Ongoing stories</h2></div>
+  <div class="grid" id="ongoing-books"><p class="muted">Loading stories…</p></div>
+  <div class="section-head"><h2>Completed stories</h2></div>
+  <div class="grid" id="completed-books"><p class="muted">Loading stories…</p></div>
+</section>
+
+<section class="page" id="page-browse">
+  <div class="section-head"><h2>Discover stories</h2></div>
+  <div class="panel">
+    <div class="search-row">
+      <input id="book-search" type="search" placeholder="Search by title, author, or genre" aria-label="Search stories">
+      <button class="btn" id="search-books">Search</button>
+    </div>
+    <div class="form-field" style="margin-top:14px">
+      <label for="genre-filter">Genre</label>
+      <select id="genre-filter"><option value="">All genres</option></select>
+    </div>
+  </div>
+  <div class="section-head"><h2>All stories</h2></div>
+  <div class="grid" id="all-books"></div>
+</section>
+
+<section class="page" id="page-book">
+  <div id="book-detail"></div>
+</section>
+
+<section class="page" id="page-reader">
+  <div id="reader-content"></div>
+</section>
+
+<section class="page" id="page-account">
+  <div class="panel" style="max-width:520px;margin:0 auto">
+    <h2 id="account-heading">Welcome back</h2>
+    <p class="muted" id="account-description">Log in or create your reader account.</p>
+    <div class="tabs">
+      <button class="tab active" id="tab-login" type="button">Log in</button>
+      <button class="tab" id="tab-signup" type="button">Sign up</button>
+    </div>
+    <form id="login-form">
+      <div class="form-field"><label for="login-email">Email</label><input id="login-email" type="email" autocomplete="email" required></div>
+      <div class="form-field"><label for="login-password">Password</label><input id="login-password" type="password" autocomplete="current-password" required></div>
+      <div class="form-actions"><button class="btn" type="submit">Log in</button><button class="btn secondary" type="button" id="forgot-password">Forgot password?</button></div>
+    </form>
+    <form id="signup-form" class="hidden">
+      <div class="form-field"><label for="signup-name">Your name</label><input id="signup-name" autocomplete="name" required maxlength="100"></div>
+      <div class="form-field"><label for="signup-email">Email</label><input id="signup-email" type="email" autocomplete="email" required></div>
+      <div class="form-field"><label for="signup-password">Password (at least 6 characters)</label><input id="signup-password" type="password" minlength="6" autocomplete="new-password" required></div>
+      <div class="form-actions"><button class="btn" type="submit">Create account</button></div>
+    </form>
+    <div id="account-message" class="notice hidden" role="status" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="page" id="page-profile">
+  <div class="section-head"><h2>My profile</h2></div>
+  <div class="panel" id="profile-content"><p class="muted">Loading profile…</p></div>
+</section>
+
+<section class="page" id="page-library">
+  <div class="section-head"><h2>My library</h2></div>
+  <div class="panel">
+    <div class="tabs">
+      <button class="tab active" data-library-tab="viewed">Viewed</button>
+      <button class="tab" data-library-tab="ongoing">Ongoing</button>
+      <button class="tab" data-library-tab="completed">Completed</button>
+    </div>
+    <div id="library-content"><p class="muted">Log in to view your library.</p></div>
+  </div>
+</section>
+
+<section class="page" id="page-wallet">
+  <div class="section-head"><h2>My wallet</h2></div>
+  <div class="grid three" style="margin-bottom:16px">
+    <div class="stat"><span>Coin balance</span><strong id="wallet-coins">—</strong></div>
+    <div class="stat"><span>Reader ID</span><strong id="wallet-reader-id">—</strong></div>
+    <div class="stat"><span>Membership</span><strong id="wallet-membership">Free</strong></div>
+  </div>
+  <div class="panel">
+    <h3>Buy coins</h3>
+    <p class="muted">Choose a coin package. The secure payment service must confirm the final amount before you pay.</p>
+    <div class="grid two" id="coin-packages"></div>
+    <div id="wallet-message" class="notice hidden" role="status" aria-live="polite"></div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>Transaction history</h3>
+    <div id="transaction-list"><p class="muted">Log in to view your transactions.</p></div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>Unlocked chapters</h3>
+    <div id="unlock-list"><p class="muted">Log in to view your unlocked chapters.</p></div>
+  </div>
+</section>
+
+<section class="page" id="page-memberships">
+  <div class="section-head"><h2>Reader memberships</h2></div>
+  <p class="muted">Choose a plan that suits your reading. Membership is confirmed only after payment verification.</p>
+  <div class="grid three" id="membership-plans"></div>
+  <div id="membership-message" class="notice hidden" role="status" aria-live="polite"></div>
+</section>
+
+<section class="page" id="page-notifications">
+  <div class="section-head"><h2>Notifications</h2></div>
+  <div class="panel" id="notifications-content"><p class="muted">Log in to view notifications.</p></div>
+</section>
+
+<section class="page" id="page-settings">
+  <div class="section-head"><h2>Settings</h2></div>
+  <div class="panel">
+    <h3>Appearance</h3>
+    <button class="btn secondary" id="theme-toggle">Switch light/dark theme</button>
+    <div class="list-item"><a href="about.html">About Us</a></div>
+    <div class="list-item"><a href="terms.html">Terms and Conditions</a></div>
+    <div class="list-item"><a href="privacy.html">Privacy Policy</a></div>
+    <div class="list-item"><a href="be-our-author.html">Be Our Author</a></div>
+    <div class="list-item"><button class="btn secondary" data-page="account">Log in / Sign up</button></div>
+    <div class="list-item"><button class="btn danger" id="logout-button">Log out</button></div>
+  </div>
+</section>
+
+<section class="page" id="page-customer-service">
+  <div class="section-head"><h2>Customer service</h2></div>
+  <div class="panel">
+    <p>Need help with your account, coins, membership or reading? Contact our support team.</p>
+    <p><a href="mailto:fictionalworldlibary@gmail.com">fictionalworldlibary@gmail.com</a></p>
+    <a class="btn secondary" href="be-our-author.html">Be Our Author</a>
+  </div>
+</section>
+
 </div>
-<div id="who" class="muted"></div>
-</div>
-<div id="message" class="notice hidden"></div>
-<section id="content"></section>
 </main>
+
+<nav class="mobile-nav" aria-label="Reader navigation">
+  <button data-page="home" class="active"><span>⌂</span>Home</button>
+  <button data-page="browse"><span>⌕</span>Discover</button>
+  <button data-page="library"><span>▤</span>Library</button>
+  <button data-page="notifications"><span>♧</span>Alerts</button>
+  <button data-page="more"><span>⋯</span>More</button>
+</nav>
+
+<footer class="site-footer">
+  <div class="container">
+    <p><strong>Fictional World Library</strong></p>
+    <p>Find a story that fits your taste. 😉</p>
+    <a href="about.html">About</a>
+    <a href="terms.html">Terms</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="be-our-author.html">Be Our Author</a>
+    <p>© <span id="current-year"></span> Fictional World Library.</p>
+  </div>
+</footer>
+<div id="more-menu" class="panel hidden" style="position:fixed;right:12px;bottom:75px;z-index:80;width:min(250px,calc(100% - 24px));box-shadow:var(--shadow)">
+  <button class="plain-btn" data-page="wallet">Wallet & coins</button>
+  <button class="plain-btn" data-page="memberships">Memberships</button>
+  <button class="plain-btn" data-page="profile">My profile</button>
+  <button class="plain-btn" data-page="settings">Settings</button>
+  <button class="plain-btn" data-page="customer-service">Customer service</button>
 </div>
-
+<div id="toast" class="notice hidden" style="position:fixed;z-index:100;bottom:90px;left:50%;transform:translateX(-50%);width:min(420px,calc(100% - 24px));box-shadow:var(--shadow)" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="superbase.js"></script>
+<script src="reader-auth.js"></script>
+<script src="reader-books.js"></script>
+<script src="reader-features.js"></script>
 <script>
-const SUPABASE_URL='https://mhvphjcreqhfnulflgiy.supabase.co';
-const SUPABASE_KEY='sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC';
-const ADMIN_ID='a57c6170-7026-43b4-91af-ee7459776109';
+"use strict";
+(() => {
+const $ = id => document.getElementById(id);
+const genres = ["Werewolf","Mafia","Erotica","LGBTQ","Billionaire Drama","Vampire","Paranormal","Christian Romance"];
+const COIN_PACKAGES = [
+  {coins:100, price:2.99},
+  {coins:300, price:7.99},
+  {coins:600, price:14.99},
+  {coins:1200, price:27.99}
+];
+const PLANS = [
+  {id:"readers-pass",name:"Readers Pass",monthly:5.99,yearly:49.99,coins:50,discount:5,unlocks:0},
+  {id:"vip-reader",name:"VIP Reader",monthly:9.99,yearly:89.99,coins:150,discount:9,unlocks:0},
+  {id:"exclusive-reader",name:"Exclusive Reader",monthly:19.99,yearly:179.99,coins:300,discount:15,unlocks:2}
+];
+let currentUser = null;
+let readerProfile = null;
+let books = [];
+let selectedLibraryTab = "viewed";
+let activeBook = null;
+let activeChapter = null;
+let busyPayment = false;
 
-/* Use the same session storage as admin-login.html. */
-const db=window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY,
-  {
-    auth:{
-      persistSession:true,
-      autoRefreshToken:true,
-      detectSessionInUrl:false,
-      storage:window.sessionStorage
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[ch]);
+}
+function notice(id, text, type="") {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = "notice" + (type ? " " + type : "");
+  el.classList.remove("hidden");
+}
+function toast(text) {
+  $("toast").textContent = text;
+  $("toast").classList.remove("hidden");
+  clearTimeout(window.__fwlToastTimer);
+  window.__fwlToastTimer = setTimeout(() => $("toast").classList.add("hidden"), 3500);
+}
+function go(page) {
+  if (page === "more") {
+    $("more-menu").classList.toggle("hidden");
+    return;
+  }
+  $("more-menu").classList.add("hidden");
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  const target = $("page-" + page);
+  if (!target) return;
+  target.classList.add("active");
+  document.querySelectorAll("[data-page]").forEach(el => {
+    el.classList.toggle("active", el.dataset.page === page);
+  });
+  if (page === "profile") loadProfile();
+  if (page === "wallet") loadWallet();
+  if (page === "memberships") loadMemberships();
+  if (page === "library") loadLibrary();
+  if (page === "notifications") loadNotifications();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-page]");
+  if (button) {
+    event.preventDefault();
+    go(button.dataset.page);
+  }
+});
+function switchAccountTab(tab) {
+  const signup = tab === "signup";
+  $("login-form").classList.toggle("hidden", signup);
+  $("signup-form").classList.toggle("hidden", !signup);
+  $("tab-login").classList.toggle("active", !signup);
+  $("tab-signup").classList.toggle("active", signup);
+  $("account-heading").textContent = signup ? "Create your reader account" : "Welcome back";
+  $("account-description").textContent = signup
+    ? "Join Fictional World Library to save stories and manage your reading."
+    : "Log in to continue reading.";
+  $("account-message").classList.add("hidden");
+}
+$("tab-login").addEventListener("click", () => switchAccountTab("login"));
+$("tab-signup").addEventListener("click", () => switchAccountTab("signup"));
+
+function getSupabase() {
+  if (window.supabaseClient) return window.supabaseClient;
+  if (window.supabase && window.SUPABASE_URL && window.SUPABASE_PUBLISHABLE_KEY) {
+    window.supabaseClient = window.supabase.createClient(
+      window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY
+    );
+    return window.supabaseClient;
+  }
+  throw new Error("The account service could not load. Refresh the page and try again.");
+}
+async function ensureReaderProfile(user, name="") {
+  const db = getSupabase();
+  const {data:existing,error:lookupError} = await db
+    .from("users").select("*").eq("auth_user_id", user.id).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (existing) {
+    const updates = {};
+    if (!existing.email && user.email) updates.email = user.email;
+    if (!existing.name && name) updates.name = name;
+    if (Object.keys(updates).length) {
+      const {data,error} = await db.from("users").update(updates)
+        .eq("auth_user_id", user.id).select("*").maybeSingle();
+      if (error) throw error;
+      return data || {...existing,...updates};
+    }
+    return existing;
+  }
+  const {data,error} = await db.from("users").insert({
+    auth_user_id:user.id,
+    email:user.email || "",
+    name:name || user.user_metadata?.name || "Reader"
+  }).select("*").single();
+  if (error) {
+    // If a database trigger created the profile concurrently, retrieve it.
+    const retry = await db.from("users").select("*")
+      .eq("auth_user_id", user.id).maybeSingle();
+    if (retry.data) return retry.data;
+    throw error;
+  }
+  return data;
+}
+function readerId(profile) {
+  if (!profile) return "Pending";
+  return profile.reader_id || profile.id || profile.user_id || "Pending";
+}
+async function setSignedIn(user) {
+  currentUser = user || null;
+  readerProfile = null;
+  if (currentUser) {
+    try {
+      readerProfile = await ensureReaderProfile(currentUser);
+    } catch (error) {
+      console.error("Reader profile lookup:", error);
+      toast("You're logged in, but your reader profile could not load. Check users-table permissions.");
     }
   }
-);
-
-const sections=[
-'dashboard','books','chapters','authors','readers',
-'payments','transactions','subscriptions',
-'notifications','visitors & analytics','settings'
-];
-
-let currentUser=null;
-let active='dashboard';
-let booksCache=[];
-let redirecting=false;
-
-const $=id=>document.getElementById(id);
-
-function msg(s,bad=false){
-$('message').textContent=s;
-$('message').classList.remove('hidden');
-$('message').classList.toggle('error',bad);
-$('message').classList.toggle('success',!bad);
+  $("login-nav").textContent = currentUser ? "My profile" : "Log in";
+  $("login-nav").dataset.page = currentUser ? "profile" : "account";
+  $("coin-count").textContent = "🪙 " + (readerProfile?.coins ?? readerProfile?.coin_balance ?? "—");
 }
-
-function esc(v){
-return String(v??'').replace(/[&<>"']/g,c=>({
-'&':'&amp;','<':'&lt;','>':'&gt;',
-'"':'&quot;',"'":'&#39;'
-}[c]));
-}
-
-function nav(){
-$('nav').innerHTML=sections.map(s=>{
-return `<button class="${s===active?'active':''}" data-page="${esc(s)}">${esc(s)}</button>`;
-}).join('');
-
-$('nav').querySelectorAll('button').forEach(b=>{
-b.onclick=()=>show(b.dataset.page);
+$("login-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const email = $("login-email").value.trim();
+  const password = $("login-password").value;
+  const submit = $("login-form").querySelector('[type="submit"]');
+  submit.disabled = true;
+  try {
+    const db = getSupabase();
+    const {data,error} = await db.auth.signInWithPassword({email,password});
+    if (error) throw error;
+    await setSignedIn(data.user);
+    notice("account-message","You are logged in.","success");
+    go("profile");
+  } catch (error) {
+    notice("account-message",error.message || "Login failed.","error");
+  } finally {
+    submit.disabled = false;
+  }
 });
-}
-
-function table(rows){
-if(!rows.length)
-return '<p class="muted">No records found, or access is restricted by your existing RLS policies.</p>';
-
-let keys=[...new Set(rows.flatMap(r=>Object.keys(r)))].slice(0,8);
-
-return `<div class="tablewrap">
-<table>
-<thead><tr>${keys.map(k=>`<th>${esc(k.replaceAll('_',' '))}</th>`).join('')}</tr></thead>
-<tbody>${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(typeof r[k]==='object'?JSON.stringify(r[k]):r[k])}</td>`).join('')}</tr>`).join('')}</tbody>
-</table>
-</div>`;
-}
-
-async function get(tableName,limit=100){
-let r=await db.from(tableName).select('*').order('created_at',{ascending:false}).limit(limit);
-if(r.error)r=await db.from(tableName).select('*').limit(limit);
-if(r.error)throw r.error;
-return r.data||[];
-}
-
-async function metric(name){
-try{return (await get(name,1000)).length}
-catch{return '—'}
-}
-
-async function show(page){
-page=page.toLowerCase();
-page=page==='visitors & analytics'?'Visitors & Analytics':page.charAt(0).toUpperCase()+page.slice(1);
-active=page.toLowerCase();
-nav();
-$('heading').textContent=page.toLowerCase();
-$('content').innerHTML='<div class="panel">loading…</div>';
-
-try{
-if(page==='Dashboard')return await dashboard();
-if(page==='Books')return await bookPage();
-if(page==='Chapters')return await chapterPage();
-if(page==='Authors')return await authorPage();
-if(page==='Settings')return settingsPage();
-
-if(page==='Payments'){
-$('content').innerHTML='<div class="panel"><h2>payments</h2><p class="muted">No separate payments table is connected here. Payment records may be available in transactions if your payment workflow stores them there.</p></div>';
-return;
-}
-
-let mapping={
-'Readers':'users',
-'Transactions':'transactions',
-'Subscriptions':'subscription',
-'Notifications':'notification',
-'Visitors & Analytics':'visits'
-};
-
-const data=await get(mapping[page]);
-
-$('content').innerHTML=`<div class="panel">
-<h2>${esc(page)}</h2>
-<div class="tools">
-<input id="filter" placeholder="search records">
-<button class="secondary" id="refresh">refresh</button>
-</div>
-<div id="records">${table(data)}</div>
-</div>`;
-
-$('refresh').onclick=()=>show(page);
-
-$('filter').oninput=e=>{
-let q=e.target.value.toLowerCase();
-$('records').innerHTML=table(data.filter(r=>JSON.stringify(r).toLowerCase().includes(q)));
-};
-
-}catch(e){
-$('content').innerHTML=`<div class="panel">
-<h2>${esc(page)}</h2>
-<p class="error">Could not load this section: ${esc(e.message||e)}</p>
-<p class="muted">This may mean an existing RLS policy does not allow this query, or the table name differs.</p>
-<button id="retrySection">Try again</button>
-</div>`;
-const retry=$('retrySection');
-if(retry)retry.onclick=()=>show(page);
-}
-}
-
-async function dashboard(){
-let names=['users','books','chapters','transactions','visits','subscription'];
-let counts=await Promise.all(names.map(metric));
-
-$('content').innerHTML=`<div class="cards">
-${names.map((n,i)=>`<div class="card"><small>${esc(n.replaceAll('_',' '))}</small><div class="num">${counts[i]}</div></div>`).join('')}
-</div>
-<div class="panel">
-<h2>Quick actions</h2>
-<div class="tools">
-<button onclick="show('Books')">Manage books</button>
-<button onclick="show('Chapters')">Manage chapters</button>
-<button onclick="show('Authors')">Manage authors</button>
-<button onclick="show('Readers')">View readers</button>
-<button onclick="show('Payments')">View payments</button>
-</div>
-</div>
-<div class="panel"><h2>Recent books</h2>${table(await get('books',10))}</div>`;
-}
-
-async function bookPage(){
-booksCache=await get('books',500);
-
-$('content').innerHTML=`<div class="panel">
-<h2>add / edit book</h2>
-<form id="bookform">
-<input type="hidden" name="id">
-<div class="formgrid">
-<label>title<input name="title" required></label>
-<label>author name<input name="author_name" required></label>
-<label>cover url<input name="cover_url"></label>
-<label>genre<input name="genre"></label>
-<label>length<select name="length"><option>Short</option><option>Long</option></select></label>
-<label>status<select name="status"><option>Ongoing</option><option>Completed</option></select></label>
-<label>tags<input name="tags" placeholder="Comma-separated"></label>
-<label>synopsis<textarea name="synopsis"></textarea></label>
-</div>
-<div class="tools" style="margin-top:12px">
-<button type="submit">save book</button>
-<button type="reset" class="secondary" id="clearbook">clear</button>
-</div>
-</form>
-</div>
-<div class="panel">
-<h2>books</h2>
-<div class="tools">
-<input id="booksearch" placeholder="search title or author">
-<button class="secondary" id="refreshBooks">refresh</button>
-</div>
-<div id="bookrows"></div>
-</div>`;
-
-renderBooks(booksCache);
-
-$('booksearch').oninput=e=>{
-renderBooks(booksCache.filter(b=>JSON.stringify(b).toLowerCase().includes(e.target.value.toLowerCase())));
-};
-
-$('bookform').onsubmit=saveBook;
-
-$('refreshBooks').onclick=()=>show('Books');
-
-$('clearbook').onclick=()=>{
-setTimeout(()=>$('bookform').elements.id.value='',0);
-};
-}
-
-function renderBooks(rows){
-$('bookrows').innerHTML=rows.map(b=>`
-<div class="notice">
-<b>${esc(b.title)}</b> — ${esc(b.author_name)}
-<span class="status">${esc(b.status)}</span>
-<div class="rowbuttons" style="margin-top:8px">
-<button class="secondary" data-edit="${esc(b.id)}">Edit</button>
-<button class="danger" data-delete="${esc(b.id)}">Delete</button>
-</div>
-</div>`).join('')||'<p class="muted">No books found.</p>';
-
-$('bookrows').querySelectorAll('[data-edit]').forEach(btn=>{
-btn.onclick=()=>{
-let b=booksCache.find(x=>String(x.id)===btn.dataset.edit);
-if(!b)return;
-let f=$('bookform');
-
-['id','title','author_name','cover_url','genre','length','status','synopsis'].forEach(k=>{
-if(f.elements[k])f.elements[k].value=b[k]??'';
+$("signup-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const name = $("signup-name").value.trim();
+  const email = $("signup-email").value.trim();
+  const password = $("signup-password").value;
+  const submit = $("signup-form").querySelector('[type="submit"]');
+  if (password.length < 6) {
+    notice("account-message","Your password must be at least 6 characters.","error");
+    return;
+  }
+  submit.disabled = true;
+  try {
+    const db = getSupabase();
+    const {data,error} = await db.auth.signUp({
+      email,password,
+      options:{data:{name,is_reader:true}}
+    });
+    if (error) throw error;
+    if (data.user && data.session) {
+      await setSignedIn(data.user);
+      notice("account-message","Your account was created successfully.","success");
+      go("profile");
+    } else if (data.user) {
+      notice("account-message","Registration submitted. Check your email if confirmation is required. Your profile will be linked after you log in.","success");
+    } else {
+      notice("account-message","Registration submitted. Follow the instructions sent to your email.","success");
+    }
+  } catch (error) {
+    notice("account-message",error.message || "Registration failed.","error");
+  } finally {
+    submit.disabled = false;
+  }
 });
-
-f.elements.tags.value=Array.isArray(b.tags)?b.tags.join(', '):(b.tags||'');
-f.scrollIntoView({behavior:'smooth'});
-};
+$("forgot-password").addEventListener("click", async () => {
+  const email = $("login-email").value.trim();
+  if (!email) {
+    notice("account-message","Enter your email address first.","error");
+    return;
+  }
+  try {
+    const {error} = await getSupabase().auth.resetPasswordForEmail(email,{
+      redirectTo:location.origin + "/index.html"
+    });
+    if (error) throw error;
+    notice("account-message","If that account exists, password-reset instructions have been sent.","success");
+  } catch (error) {
+    notice("account-message",error.message || "Could not request a password reset.","error");
+  }
 });
-
-$('bookrows').querySelectorAll('[data-delete]').forEach(btn=>{
-btn.onclick=async()=>{
-if(!confirm('Delete this book?'))return;
-let {error}=await db.from('books').delete().eq('id',btn.dataset.delete);
-if(error)return msg(error.message,true);
-msg('Book deleted');
-show('Books');
-};
+$("logout-button").addEventListener("click", async () => {
+  try {
+    const {error} = await getSupabase().auth.signOut();
+    if (error) throw error;
+    await setSignedIn(null);
+    toast("You have logged out.");
+    go("home");
+  } catch (error) { toast(error.message || "Logout failed."); }
 });
+<script>
+async function loadProfile() {
+  const el = document.getElementById("profile-content");
+  if (!currentUser) {
+    el.innerHTML = '<p>Log in to view your reader profile.</p><button class="btn" data-page="account">Log in / Sign up</button>';
+    return;
+  }
+  try {
+    if (!readerProfile) readerProfile = await ensureReaderProfile(currentUser);
+    const p = readerProfile;
+    el.innerHTML = `
+      <div class="row">
+        <div>
+          <h3>${escapeHtml(p.name || currentUser.user_metadata?.name || "Reader")}</h3>
+          <p class="muted">${escapeHtml(currentUser.email || p.email || "")}</p>
+        </div>
+        <span class="badge">Reader account</span>
+      </div>
+      <p class="muted">Your Reader ID</p>
+      <div class="reader-id" id="reader-id-value">${escapeHtml(readerId(p))}</div>
+      <div class="form-actions" style="margin-top:12px">
+        <button class="btn secondary" id="copy-reader-id">Copy Reader ID</button>
+        <button class="btn" data-page="wallet">Open wallet</button>
+      </div>
+      <div class="grid two" style="margin-top:18px">
+        <div class="stat"><span>Coins</span><strong>${escapeHtml(p.coins ?? p.coin_balance ?? "—")}</strong></div>
+        <div class="stat"><span>Membership</span><strong>${escapeHtml(p.membership_name || "Free")}</strong></div>
+      </div>
+      <p class="muted" style="margin-top:15px">Your account is linked to your secure sign-in. Never share your password.</p>`;
+    document.getElementById("copy-reader-id").onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(String(readerId(p)));
+        toast("Reader ID copied.");
+      } catch { toast("Your Reader ID is " + readerId(p)); }
+    };
+  } catch (error) {
+    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load your profile.")}</p>`;
+  }
 }
-
-async function saveBook(e){
-e.preventDefault();
-let f=e.target;
-let v=Object.fromEntries(new FormData(f));
-let id=v.id;
-delete v.id;
-
-v.tags=v.tags?v.tags.split(',').map(x=>x.trim()).filter(Boolean):[];
-
-if(!v.cover_url)delete v.cover_url;
-if(!v.synopsis)delete v.synopsis;
-
-let result=id
-?await db.from('books').update(v).eq('id',id)
-:await db.from('books').insert(v);
-
-if(result.error)return msg(result.error.message,true);
-
-msg('Book saved');
-show('Books');
+function renderBookCard(book) {
+  const cover = book.cover_url || book.cover_image || "";
+  return `<article class="book-card">
+    ${cover ? `<img class="book-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(book.title)} cover" loading="lazy">` : '<div class="book-cover" aria-label="No cover image"></div>'}
+    <h3>${escapeHtml(book.title || "Untitled")}</h3>
+    <p>By ${escapeHtml(book.author_name || "Unknown author")}</p>
+    <p>${escapeHtml(book.genre || "Fiction")} · ${escapeHtml(book.status || "Published")}</p>
+    <button class="btn" data-open-book="${escapeHtml(book.id)}">Read story</button>
+  </article>`;
 }
-
-async function chapterPage(){
-let rows=await get('chapters',500);
-let availableBooks=booksCache.length?booksCache:await get('books',500);
-
-$('content').innerHTML=`<div class="panel">
-<h2>add chapter</h2>
-<form id="chapterform">
-<div class="formgrid">
-<label>book<select name="book_id" required>${availableBooks.map(b=>`<option value="${esc(b.id)}">${esc(b.title)}</option>`).join('')}</select></label>
-<label>chapter number<input name="chapter_number" type="number" min="1" required></label>
-<label>title<input name="title" required></label>
-<label>access<select name="locked"><option value="false">Free</option><option value="true">Locked / paid</option></select></label>
-<label>publish status<select name="pub_status"><option>published</option><option>draft</option></select></label>
-<label>content<textarea name="content" required></textarea></label>
-</div>
-<div class="tools" style="margin-top:12px"><button>save chapter</button></div>
-</form>
-</div>
-<div class="panel"><h2>chapters</h2>${table(rows)}</div>`;
-
-$('chapterform').onsubmit=async e=>{
-e.preventDefault();
-let v=Object.fromEntries(new FormData(e.target));
-v.locked=v.locked==='true';
-v.chapter_number=Number(v.chapter_number);
-
-let {error}=await db.from('chapters').insert(v);
-if(error)return msg(error.message,true);
-
-msg('Chapter saved');
-show('Chapters');
-};
+async function loadBooks() {
+  const containers = ["featured-books","ongoing-books","completed-books","all-books"];
+  try {
+    const {data,error} = await getSupabase().from("books").select("*")
+      .in("status",["Ongoing","Completed","Published","published"])
+      .order("created_at",{ascending:false}).limit(300);
+    if (error) throw error;
+    books = data || [];
+    const featured = books.filter(b => b.featured === true);
+    const ongoing = books.filter(b => String(b.status).toLowerCase() === "ongoing");
+    const completed = books.filter(b => String(b.status).toLowerCase() === "completed");
+    document.getElementById("featured-books").innerHTML = featured.length
+      ? featured.map(renderBookCard).join("") : '<p class="muted">No featured stories yet.</p>';
+    document.getElementById("ongoing-books").innerHTML = ongoing.length
+      ? ongoing.map(renderBookCard).join("") : '<p class="muted">No ongoing stories yet.</p>';
+    document.getElementById("completed-books").innerHTML = completed.length
+      ? completed.map(renderBookCard).join("") : '<p class="muted">No completed stories yet.</p>';
+    document.getElementById("all-books").innerHTML = books.length
+      ? books.map(renderBookCard).join("") : '<p class="muted">No published stories are available yet.</p>';
+    document.getElementById("genres").innerHTML = genres.map(g =>
+      `<button class="genre" data-genre="${escapeHtml(g)}">${escapeHtml(g)}</button>`).join("");
+    document.getElementById("genre-filter").innerHTML =
+      '<option value="">All genres</option>' + genres.map(g=>`<option>${escapeHtml(g)}</option>`).join("");
+  } catch (error) {
+    console.error("Books query failed:",error);
+    containers.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<p class="notice error">Stories could not be loaded. Check public read access to the books table.</p>';
+    });
+  }
 }
-
-async function authorPage(){
-let rows=await get('books',500);
-let authors={};
-
-rows.forEach(b=>{
-let n=(b.author_name||'').trim();
-if(n)(authors[n]??=[]).push(b);
+document.addEventListener("click", event => {
+  const bookBtn = event.target.closest("[data-open-book]");
+  if (bookBtn) openBook(bookBtn.dataset.openBook);
+  const genreBtn = event.target.closest("[data-genre]");
+  if (genreBtn) {
+    document.getElementById("genre-filter").value = genreBtn.dataset.genre;
+    filterBooks();
+    go("browse");
+  }
 });
-
-$('content').innerHTML=`<div class="panel">
-<h2>author management</h2>
-<p class="muted">Authors are listed from the author names currently attached to books. Editing a name updates the books carrying that name.</p>
-<form id="authorform">
-<div class="formgrid">
-<label>Current author name<select name="old">${Object.keys(authors).map(n=>`<option>${esc(n)}</option>`).join('')}</select></label>
-<label>author name<input name="next" required></label>
-</div>
-<div class="tools" style="margin-top:12px"><button>Update author name</button></div>
-</form>
-</div>
-<div class="panel">
-<h2>authors and their books</h2>
-${Object.entries(authors).map(([n,bs])=>`<div class="notice"><b>${esc(n)}</b> · ${bs.length} book(s)<ul>${bs.map(b=>`<li>${esc(b.title)}</li>`).join('')}</ul></div>`).join('')||'<p>No authors found in books yet.</p>'}
-</div>`;
-
-$('authorform').onsubmit=async e=>{
-e.preventDefault();
-let f=e.target;
-let old=f.elements.old.value;
-let next=f.elements.next.value.trim();
-if(!old||!next)return;
-
-let {error}=await db.from('books').update({author_name:next}).eq('author_name',old);
-if(error)return msg(error.message,true);
-
-msg('Author name updated across books');
-show('Authors');
-};
+function filterBooks() {
+  const q = document.getElementById("book-search").value.trim().toLowerCase();
+  const genre = document.getElementById("genre-filter").value;
+  const results = books.filter(b => {
+    const text = [b.title,b.author_name,b.genre,b.synopsis].join(" ").toLowerCase();
+    return (!q || text.includes(q)) && (!genre || b.genre === genre);
+  });
+  document.getElementById("all-books").innerHTML = results.length
+    ? results.map(renderBookCard).join("") : '<p class="muted">No stories match your search.</p>';
 }
-
-function settingsPage(){
-$('content').innerHTML=`<div class="panel">
-<h2>admin security</h2>
-<p>Signed in as ${esc(currentUser?.email||'')}</p>
-<p class="muted">This page uses Supabase authentication and checks your account against the existing admin_users table. Keep RLS enabled and never place a service-role key in this file.</p>
-<button id="settingsout">sign out</button>
-</div>`;
-
-$('settingsout').onclick=signOut;
-}
-
-async function signOut(){
-await db.auth.signOut();
-location.href='admin-login.html';
-}
-
-async function init(){
-nav();
-$('signout').onclick=signOut;
-
-if(!window.supabase){
-$('content').innerHTML='<div class="panel"><p class="error">The Supabase login service could not load. Check your connection and reload.</p></div>';
-return;
-}
-
-try{
-const {data,error}=await db.auth.getSession();
-
-if(error)throw error;
-
-if(!data.session){
-location.replace('admin-login.html');
-return;
-}
-
-currentUser=data.session.user;
-$('who').textContent=currentUser.email||'';
-
-/* Verify both the signed-in account and its admin table record. */
-if(currentUser.id!==ADMIN_ID){
-$('content').innerHTML='<div class="panel"><h2>Admin access denied</h2><p>This account is not the designated administrator.</p><button id="returnlogin">Return to login</button></div>';
-$('returnlogin').onclick=signOut;
-return;
-}
-
-const check=await db
-.from('admin_users')
-.select('user_id')
-.eq('user_id',currentUser.id)
-.maybeSingle();
-
-if(check.error){
-$('content').innerHTML=`<div class="panel">
-<h2>Could not verify admin access</h2>
-<p class="error">${esc(check.error.message)}</p>
-<p>Please check the existing admin_users table policy. No database changes have been made by this page.</p>
-</div>`;
-return;
-}
-
-if(!check.data){
-$('content').innerHTML=`<div class="panel">
-<h2>Admin access denied</h2>
-<p>Your signed-in account was not found in admin_users.</p>
-<button id="returnlogin">Return to login</button>
-</div>`;
-$('returnlogin').onclick=signOut;
-return;
-}
-
-await show('Dashboard');
-
-}catch(e){
-$('content').innerHTML=`<div class="panel">
-<h2>Admin could not load</h2>
-<p class="error">${esc(e.message||e)}</p>
-<button id="retryInit">Try again</button>
-</div>`;
-$('retryInit').onclick=init;
-}
-}
-
-/* Avoid redirecting for token refresh or other normal auth events. */
-db.auth.onAuthStateChange((event,session)=>{
-if(event==='SIGNED_OUT'&&!redirecting){
-redirecting=true;
-location.replace('admin-login.html');
-}
+document.getElementById("search-books").addEventListener("click",filterBooks);
+document.getElementById("book-search").addEventListener("keydown",event=>{
+  if(event.key==="Enter"){event.preventDefault();filterBooks();}
 });
+document.getElementById("genre-filter").addEventListener("change",filterBooks);
 
-init();
+async function openBook(bookId) {
+  activeBook = books.find(b => String(b.id) === String(bookId));
+  if (!activeBook) return;
+  const detail = document.getElementById("book-detail");
+  detail.innerHTML = `<div class="panel"><h2>${escapeHtml(activeBook.title)}</h2><p>By ${escapeHtml(activeBook.author_name || "Unknown author")}</p><p>${escapeHtml(activeBook.synopsis || "No synopsis provided.")}</p><div id="chapter-list">Loading chapters…</div></div>`;
+  go("book");
+  try {
+    const {data,error} = await getSupabase().from("chapters").select("id,book_id,chapter_number,title,locked,pub_status")
+      .eq("book_id",activeBook.id).order("chapter_number",{ascending:true});
+    if (error) throw error;
+    const chapters = (data || []).filter(c => String(c.pub_status || "").toLowerCase() === "published");
+    document.getElementById("chapter-list").innerHTML = chapters.length ? chapters.map(ch => `
+      <div class="list-item row">
+        <div><strong>Chapter ${escapeHtml(ch.chapter_number)}: ${escapeHtml(ch.title || "")}</strong><br><span class="muted">${ch.locked ? "Locked · 10 coins" : "Free"}</span></div>
+        <button class="btn" data-read-chapter="${escapeHtml(ch.id)}" data-locked="${ch.locked ? "true":"false"}">Read</button>
+      </div>`).join("") : '<p class="muted">No published chapters yet.</p>';
+    document.querySelectorAll("[data-read-chapter]").forEach(btn => btn.addEventListener("click",()=>openChapter(btn.dataset.readChapter,btn.dataset.locked==="true")));
+  } catch (error) {
+    document.getElementById("chapter-list").innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load chapters.")}</p>`;
+  }
+}
+async function openChapter(chapterId,locked) {
+  if (!currentUser) {
+    toast("Log in to read this chapter.");
+    go("account");
+    return;
+  }
+  if (locked) {
+    toast("Locked chapters require a verified unlock. Open your wallet to check your coins.");
+    go("wallet");
+    return;
+  }
+  try {
+    const {data,error} = await getSupabase().from("chapters").select("*").eq("id",chapterId).maybeSingle();
+    if (error) throw error;
+    if (!data || String(data.pub_status||"").toLowerCase()!=="published") throw new Error("This chapter is not published.");
+    activeChapter = data;
+    document.getElementById("reader-content").innerHTML = `
+      <article class="panel">
+        <button class="btn secondary" id="back-to-book">← Back to book</button>
+        <h2>${escapeHtml(activeBook?.title || "Story")}</h2>
+        <h3>Chapter ${escapeHtml(data.chapter_number)}: ${escapeHtml(data.title || "")}</h3>
+        <div style="white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9">${escapeHtml(data.content || data.body || "Chapter content is unavailable.")}</div>
+      </article>`;
+    document.getElementById("back-to-book").onclick=()=>go("book");
+    go("reader");
+  } catch (error) { toast(error.message || "Unable to open chapter."); }
+}
+<script>
+async function requireReader() {
+  if (!currentUser) {
+    toast("Please log in first.");
+    go("account");
+    return false;
+  }
+  return true;
+}
+function renderCoinPackages() {
+  document.getElementById("coin-packages").innerHTML = COIN_PACKAGES.map(p => `
+    <div class="panel">
+      <span class="badge">${p.coins.toLocaleString()} coins</span>
+      <div class="package-price">$${p.price.toFixed(2)}</div>
+      <p class="muted">Coin package</p>
+      <button class="btn" data-buy-coins="${p.coins}">Continue to payment</button>
+    </div>`).join("");
+}
+function renderPlans() {
+  document.getElementById("membership-plans").innerHTML = PLANS.map(p => `
+    <div class="panel">
+      <span class="badge">${escapeHtml(p.name)}</span>
+      <h3>${escapeHtml(p.name)}</h3>
+      <div class="package-price">$${p.monthly.toFixed(2)}<small style="font-size:13px"> / month</small></div>
+      <p>${p.coins} free coins monthly</p>
+      <p>${p.discount}% off eligible coin purchases</p>
+      <p>${p.unlocks} free chapter unlocks</p>
+      <p>No homepage banner ads</p>
+      <p class="muted">Yearly: $${p.yearly.toFixed(2)}</p>
+      <div class="form-actions">
+        <button class="btn" data-buy-plan="${p.id}" data-cycle="monthly">Monthly</button>
+        <button class="btn secondary" data-buy-plan="${p.id}" data-cycle="yearly">Yearly</button>
+      </div>
+    </div>`).join("");
+}
+document.addEventListener("click", async event => {
+  const coinButton = event.target.closest("[data-buy-coins]");
+  const planButton = event.target.closest("[data-buy-plan]");
+  if (!coinButton && !planButton) return;
+  if (!(await requireReader())) return;
+  if (busyPayment) return;
+  const isPlan = Boolean(planButton);
+  const product = isPlan ? planButton.dataset.buyPlan : "coins";
+  const coins = isPlan ? null : Number(coinButton.dataset.buyCoins);
+  const cycle = isPlan ? planButton.dataset.cycle : null;
+  await startPayment({product,coins,cycle,button:isPlan?planButton:coinButton});
+});
+async function startPayment({product,coins,cycle,button}) {
+  busyPayment = true;
+  button.disabled = true;
+  const id = product === "coins" ? coins + " coins" : product.replaceAll("-"," ") + " (" + cycle + ")";
+  notice("wallet-message","Preparing secure checkout for " + id + "…");
+  notice("membership-message","Preparing secure checkout for " + id + "…");
+  try {
+    const db = getSupabase();
+    // The server must validate product, price, FX conversion and membership discount.
+    const {data,error} = await db.functions.invoke("initialize-payment",{
+      body:{
+        product_type:product === "coins" ? "coins" : "subscription",
+        product_id:product,
+        coins,
+        billing_cycle:cycle
+      }
+    });
+    if (error) throw error;
+    const url = data?.authorization_url || data?.payment_url || data?.url;
+    if (!url || typeof url !== "string" || !/^https:\/\/(checkout\.)?paystack\.com\//i.test(url)) {
+      throw new Error(data?.error || "The payment service did not return a valid Paystack checkout link.");
+    }
+    window.location.href = url;
+  } catch (error) {
+    console.error("Payment initialization failed:",error);
+    notice("wallet-message",error.message || "Payment could not be started. Try again later.","error");
+    notice("membership-message",error.message || "Payment could not be started. Try again later.","error");
+  } finally {
+    busyPayment = false;
+    button.disabled = false;
+  }
+}
+async function loadWallet() {
+  renderCoinPackages();
+  if (!currentUser) {
+    document.getElementById("wallet-coins").textContent = "—";
+    document.getElementById("wallet-reader-id").textContent = "—";
+    document.getElementById("wallet-membership").textContent = "Free";
+    document.getElementById("transaction-list").innerHTML = '<p>Log in to view your transactions.</p>';
+    document.getElementById("unlock-list").innerHTML = '<p>Log in to view unlocked chapters.</p>';
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    document.getElementById("wallet-coins").textContent = readerProfile.coins ?? readerProfile.coin_balance ?? "—";
+    document.getElementById("wallet-reader-id").textContent = readerId(readerProfile);
+    document.getElementById("wallet-membership").textContent = readerProfile.membership_name || "Free";
+    document.getElementById("coin-count").textContent = "🪙 " + (readerProfile.coins ?? readerProfile.coin_balance ?? "—");
+    const db = getSupabase();
+    const {data:transactions,error:txError} = await db.from("transactions").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(30);
+    document.getElementById("transaction-list").innerHTML = txError
+      ? '<p class="muted">Transaction history is unavailable under current database permissions or field names.</p>'
+      : (transactions||[]).length ? transactions.map(t=>`<div class="list-item"><strong>${escapeHtml(t.description || t.type || "Transaction")}</strong><div class="muted">${escapeHtml(t.status || "Recorded")} · ${escapeHtml(t.created_at || "")}</div></div>`).join("")
+      : '<p class="muted">No transactions yet.</p>';
+    const {data:unlocks,error:unlockError} = await db.from("unlocks").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(30);
+    document.getElementById("unlock-list").innerHTML = unlockError
+      ? '<p class="muted">Unlocked chapters are unavailable under current database permissions or field names.</p>'
+      : (unlocks||[]).length ? unlocks.map(u=>`<div class="list-item">Chapter ${escapeHtml(u.chapter_id || "")} <span class="badge">${escapeHtml(u.status || "Unlocked")}</span></div>`).join("")
+      : '<p class="muted">No unlocked chapters yet.</p>';
+  } catch (error) {
+    notice("wallet-message",error.message || "Wallet could not load.","error");
+  }
+}
+async function loadMemberships() {
+  renderPlans();
+  if (!currentUser) {
+    notice("membership-message","Log in to purchase a membership.");
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    const {data,error} = await getSupabase().from("subscription").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(1);
+    if (error) throw error;
+    const active = (data||[]).find(s => String(s.status||"").toLowerCase()==="active");
+    if (active) notice("membership-message","Your membership status: " + (active.plan_name || active.plan_id || "Active") + ".","success");
+  } catch (error) {
+    console.warn("Membership lookup:",error);
+  }
+}
+async function loadLibrary() {
+  const el = document.getElementById("library-content");
+  if (!currentUser) {
+    el.innerHTML = '<p>Log in to access your library.</p><button class="btn" data-page="account">Log in</button>';
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    const {data,error} = await getSupabase().from("library").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(100);
+    if (error) throw error;
+    const rows = (data||[]).filter(row => {
+      const status = String(row.status || row.reading_status || "viewed").toLowerCase();
+      if (selectedLibraryTab==="viewed") return true;
+      return status.includes(selectedLibraryTab);
+    });
+    el.innerHTML = rows.length ? rows.map(row=>{
+      const book = books.find(b=>String(b.id)===String(row.book_id));
+      return `<div class="list-item"><strong>${escapeHtml(book?.title || row.book_title || ("Book #"+row.book_id))}</strong><div class="muted">${escapeHtml(row.status || row.reading_status || "Viewed")}</div></div>`;
+    }).join("") : '<p class="muted">Your library is empty. Open a story to start reading.</p>';
+  } catch (error) {
+    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load your library.")}</p>`;
+  }
+}
+document.querySelectorAll("[data-library-tab]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    selectedLibraryTab=button.dataset.libraryTab;
+    document.querySelectorAll("[data-library-tab]").forEach(b=>b.classList.toggle("active",b===button));
+    loadLibrary();
+  });
+});
+async function loadNotifications() {
+  const el = document.getElementById("notifications-content");
+  if (!currentUser) {
+    el.innerHTML = '<p>Log in to view notifications.</p><button class="btn" data-page="account">Log in</button>';
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    const {data,error} = await getSupabase().from("notification").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(50);
+    if (error) throw error;
+    el.innerHTML = (data||[]).length ? data.map(n=>`<div class="list-item"><strong>${escapeHtml(n.title || "Notification")}</strong><p>${escapeHtml(n.message || "")}</p><span class="badge">${n.is_read ? "Read" : "Unread"}</span></div>`).join("") : '<p class="muted">No notifications yet.</p>';
+  } catch (error) {
+    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load notifications.")}</p>`;
+  }
+}
+<script>
+document.getElementById("theme-toggle").addEventListener("click",()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("fwl-theme",document.body.classList.contains("dark")?"dark":"light");
+});
+if (localStorage.getItem("fwl-theme")==="dark") document.body.classList.add("dark");
+document.getElementById("current-year").textContent = new Date().getFullYear();
+
+async function initializeReaderSite() {
+  try {
+    const db = getSupabase();
+    const {data,error} = await db.auth.getSession();
+    if (error) throw error;
+    if (data.session?.user) await setSignedIn(data.session.user);
+  } catch (error) {
+    console.error("Reader session initialization:",error);
+  }
+  await loadBooks();
+  renderCoinPackages();
+  renderPlans();
+}
+getSupabase().auth.onAuthStateChange(async (event,session)=>{
+  if (event==="SIGNED_IN" && session?.user) {
+    await setSignedIn(session.user);
+  } else if (event==="SIGNED_OUT") {
+    currentUser = null;
+    readerProfile = null;
+    document.getElementById("login-nav").textContent = "Log in";
+    document.getElementById("login-nav").dataset.page = "account";
+    document.getElementById("coin-count").textContent = "🪙 —";
+  }
+});
+initializeReaderSite();
+})();
 </script>
 </body>
-  </html>
+</html>
