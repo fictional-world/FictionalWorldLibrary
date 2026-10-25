@@ -108,7 +108,8 @@ async function loadBooks() {
   }
   books = data || [];
   renderBooks();
-}function renderPackages() {
+}
+      function renderPackages() {
   const packages = [
     { id: "coins_100", coins: 100, price: "$2.99" },
     { id: "coins_300", coins: 300, price: "$7.99" },
@@ -284,7 +285,8 @@ async function loadNotifications() {
       <span class="tag">${escapeHTML(n.type || "info")}</span>
     </article>
   `).join("");
-}async function openBook(id) {
+}
+      async function openBook(id) {
   currentBook = books.find(b => String(b.id) === String(id));
   if (!currentBook) return;
 
