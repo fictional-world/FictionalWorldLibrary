@@ -1,1357 +1,2055 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#100b1d" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#24143d">
+  <meta name="description" content="Find your next favourite story at Fictional World Library. Explore romance, werewolf, mafia, billionaire drama, vampire and more.">
+  <meta property="og:title" content="Fictional World Library">
+  <meta property="og:description" content="Find a story that fits your taste. 😉">
+  <meta property="og:type" content="website">
   <title>Fictional World Library</title>
+  <link rel="icon" href="/logo.png">
   <style>
     :root {
-      --bg:#0d0d17;
-      --surface:#171827;
-      --surface-2:#1f2135;
-      --card:#202338;
-      --text:#f3f1ff;
-      --muted:#b9b1c9;
-      --accent:#c9a7ff;
-      --accent-2:#8457df;
-      --gold:#f3d38d;
-      --line:#31365a;
-      --danger:#ff8ea0;
-      --success:#8de7b8;
-      --shadow:rgba(0,0,0,.24);
+      --bg: #f8f6fc;
+      --surface: #ffffff;
+      --surface-2: #f0eaf8;
+      --text: #21172d;
+      --muted: #766c82;
+      --primary: #7042a0;
+      --primary-dark: #4b2675;
+      --accent: #e5b85c;
+      --border: #e7dfef;
+      --danger: #c34257;
+      --success: #27845d;
+      --shadow: 0 8px 28px rgba(45, 23, 68, .08);
+      --radius: 18px;
     }
 
-    body.light {
-      --bg:#f7f4fc;
-      --surface:#ffffff;
-      --surface-2:#f0ebfa;
-      --card:#f9f4ff;
-      --text:#1d1528;
-      --muted:#6b6179;
-      --accent:#7b4ad7;
-      --accent-2:#6234b9;
-      --gold:#946d1a;
-      --line:#ddd2ef;
-      --danger:#d9465d;
-      --success:#1db76e;
-      --shadow:rgba(36,24,48,.15);
+    body.dark {
+      --bg: #15111d;
+      --surface: #211a2c;
+      --surface-2: #30243e;
+      --text: #f7f0ff;
+      --muted: #b8a9c8;
+      --primary: #b58be5;
+      --primary-dark: #8c5bc1;
+      --accent: #e5b85c;
+      --border: #40334f;
+      --shadow: 0 8px 28px rgba(0, 0, 0, .2);
     }
 
-    * { box-sizing:border-box; }
-    html { scroll-behavior:smooth; }
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:Arial, Helvetica, sans-serif;
-      line-height:1.6;
-      font-size:16px;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      transition: background .2s, color .2s;
     }
-    a { color:inherit; text-decoration:none; }
-    button,input,textarea,select { font:inherit; }
-    button { cursor:pointer; }
-    img { max-width:100%; display:block; }
-    h1,h2,h3 {
-      font-family:Georgia,"Times New Roman",serif;
-      line-height:1.2;
-      margin:0;
-    }
-    .muted { color:var(--muted); }
+
+    button, input, textarea, select { font: inherit; }
+
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    button { cursor: pointer; }
+
+    a { color: var(--primary); }
+
+    img { max-width: 100%; }
 
     .topbar {
-      position:sticky;
-      top:0;
-      z-index:20;
-      background:var(--surface);
-      border-bottom:1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
     }
-    .top-inner {
-      max-width:1200px;
-      margin:0 auto;
-      padding:12px 18px;
-      display:flex;
-      align-items:center;
-      gap:18px;
-    }
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
-    .brand-mark {
-      width:42px;
-      height:42px;
-      border-radius:12px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      display:grid;
-      place-items:center;
-      color:#fff;
-      font-weight:700;
-      box-shadow:0 10px 18px rgba(132,87,223,.35);
-    }
-    .brand-mark svg { display:block;width:22px;height:22px; }
-    .brand-text {
-      display:flex;
-      flex-direction:column;
-      line-height:1;
-    }
-    .brand-text strong { font-size:14px; letter-spacing:1px; }
-    .brand-text small { color:var(--muted); letter-spacing:2px; font-size:10px; }
-    .navlinks {
-      display:flex;
-      gap:18px;
-      flex:1;
-      flex-wrap:wrap;
-    }
-    .navlinks button {
-      background:none;
-      border:none;
-      color:var(--muted);
-      font-weight:600;
-      padding:8px 0;
-    }
-    .navlinks button.active, .navlinks button:hover { color:var(--text); }
-    .top-actions {
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .btn {
-      min-height:42px;
-      padding:10px 16px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:var(--card);
-      color:var(--text);
-      font-weight:600;
-    }
-    .btn.primary {
-      background:var(--accent);
-      border-color:var(--accent);
-      color:#1d1326;
-    }
-    .btn.gold {
-      background:var(--gold);
-      border-color:var(--gold);
-      color:#1d170a;
-    }
-    .btn:disabled { opacity:.55; cursor:not-allowed; }
 
-    main {
-      max-width:1200px;
-      margin:0 auto;
-      padding:24px 18px 90px;
+    .topbar-inner {
+      max-width: 1200px;
+      min-height: 72px;
+      margin: auto;
+      padding: 12px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
     }
-    .page { display:none; }
-    .page.active { display:block; }
+
+    .brand {
+      border: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      background: transparent;
+      font-weight: 800;
+      font-size: 17px;
+      text-align: left;
+      min-width: max-content;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, #7042a0, #a77bd0);
+      font-size: 22px;
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+    }
+
+    .nav-btn, .icon-btn {
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .nav-btn:hover, .icon-btn:hover { background: var(--surface-2); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .coin-pill {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 12px;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 16px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform .15s, opacity .15s;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      color: #fff;
+      background: var(--primary-dark);
+    }
+
+    body.dark .btn-primary { background: #8050ad; }
+
+    .btn-secondary {
+      color: var(--text);
+      background: var(--surface-2);
+      border-color: var(--border);
+    }
+
+    .btn-gold { background: var(--accent); color: #34210a; }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-block { width: 100%; }
+
+    .page {
+      display: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 22px 110px;
+      min-height: 70vh;
+    }
+
+    .page.active { display: block; }
 
     .hero {
-      min-height:330px;
-      display:flex;
-      align-items:center;
-      padding:40px;
-      border-radius:22px;
-      border:1px solid var(--line);
-      background:linear-gradient(135deg,rgba(12,12,18,.94),rgba(38,24,57,.9)),
-                 radial-gradient(circle at top left,#5a3e8d,#221d30);
-      box-shadow:0 15px 40px var(--shadow);
+      overflow: hidden;
+      position: relative;
+      border-radius: 26px;
+      padding: clamp(28px, 6vw, 68px);
+      color: white;
+      background:
+        radial-gradient(circle at 85% 15%, rgba(229,184,92,.35), transparent 30%),
+        linear-gradient(125deg, #29163e, #5a3280 58%, #8d61b3);
+      box-shadow: var(--shadow);
     }
-    .hero-copy { max-width:680px; }
-    .eyebrow {
-      color:var(--gold);
-      font-size:11px;
-      letter-spacing:2px;
-      text-transform:uppercase;
-      font-weight:700;
+
+    .hero h1 {
+      max-width: 720px;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.12;
+      margin: 0 0 16px;
     }
-    .hero h1 { font-size:clamp(34px,5vw,58px); margin-top:14px; margin-bottom:16px; }
-    .hero p { color:#e7e1f4; max-width:520px; }
+
+    .hero p {
+      max-width: 600px;
+      color: #eee2f8;
+      font-size: 17px;
+    }
+
     .hero-actions {
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
     }
-    .section { margin-top:34px; }
-    .section-head {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:16px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
+
+    .hero .btn-secondary {
+      background: rgba(255,255,255,.13);
+      color: white;
+      border-color: rgba(255,255,255,.3);
     }
-    .genre-list { display:flex; flex-wrap:wrap; gap:10px; padding:6px 0; }
-    .genre {
-      background:var(--surface);
-      border:1px solid var(--line);
-      color:var(--text);
-      padding:9px 16px;
-      border-radius:999px;
-      font-weight:600;
+
+    .section { margin-top: 34px; }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
     }
-    .genre.active {
-      background:var(--accent);
-      border-color:var(--accent);
-      color:#201526;
-    }
-    .book-grid {
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:18px;
-    }
-    .book-card {
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:16px;
-      overflow:hidden;
-      cursor:pointer;
-    }
-    .cover {
-      position:relative;
-      width:100%;
-      aspect-ratio:3/4;
-      background:linear-gradient(135deg,#3b2a52,#201b32);
-      overflow:hidden;
-      border-bottom:1px solid var(--line);
-    }
-    .cover img { width:100%; height:100%; object-fit:cover; }
-    .cover-fallback {
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      padding:18px;
-      text-align:center;
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:22px;
-      font-weight:700;
-      background:linear-gradient(135deg,#3b2a52,#201b32);
-    }
-    .book-card-content { padding:12px 12px 14px; }
-    .book-card h3 { font-family:Arial, Helvetica, sans-serif; font-size:15px; margin:0 0 7px; }
-    .book-card p { margin:0 0 8px; color:var(--muted); font-size:12px; }
-    .tag {
-      display:inline-block;
-      color:var(--gold);
-      font-size:10px;
-      letter-spacing:1px;
-      text-transform:uppercase;
-      font-weight:700;
-    }
+
+    .section-heading h2 { margin: 0; font-size: 23px; }
+
+    .muted { color: var(--muted); }
+
     .panel {
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:22px;
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
-    .searchbar {
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin:18px 0 22px;
+
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
     }
-    .searchbar input {
-      flex:1;
-      min-width:180px;
-      min-height:46px;
-      padding:10px 14px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:var(--surface);
-      color:var(--text);
+
+    .genre {
+      min-height: 88px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 15px;
+      font-weight: 700;
     }
-    .grid-two { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
-    .grid-three { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
-    .field { margin-bottom:15px; }
-    .field label { display:block; margin-bottom:6px; color:var(--muted); font-weight:600; }
-    .field input,.field textarea,.field select {
-      width:100%;
-      min-height:46px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:var(--surface);
-      color:var(--text);
-      padding:10px 12px;
+
+    .genre:hover {
+      border-color: var(--primary);
+      background: var(--surface-2);
     }
-    .field textarea { min-height:120px; resize:vertical; }
-    .form-shell { max-width:520px; margin:18px auto; }
-    .reader-text {
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:18px;
-      line-height:2;
-      white-space:pre-wrap;
+
+    .genre-icon { font-size: 27px; }
+
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
     }
-    .empty {
-      padding:36px 12px;
-      text-align:center;
-      color:var(--muted);
+
+    .book-card {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      min-width: 0;
     }
-    .toast {
-      position:fixed;
-      left:50%;
-      bottom:95px;
-      transform:translateX(-50%);
-      background:var(--text);
-      color:var(--bg);
-      padding:12px 16px;
-      border-radius:10px;
-      display:none;
-      z-index:40;
-      box-shadow:0 12px 24px var(--shadow);
-      max-width:90%;
-      text-align:center;
+
+    .book-cover {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      display: block;
+      background: var(--surface-2);
     }
+
+    .cover-placeholder {
+      aspect-ratio: 3 / 4;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      text-align: center;
+      color: white;
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(145deg, #51306f, #a77bd0);
+    }
+
+    .book-info { padding: 12px; }
+
+    .book-info h3 {
+      margin: 0 0 4px;
+      font-size: 15px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .book-info p {
+      margin: 3px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .book-info .btn { margin-top: 10px; padding: 8px; font-size: 13px; }
+
+    .status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 99px;
+      background: var(--surface-2);
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid-three {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .form-stack { display: grid; gap: 14px; }
+
+    .field { display: grid; gap: 6px; }
+
+    .field label { font-weight: 700; font-size: 14px; }
+
+    .field input, .field textarea, .field select,
+    .search-input {
+      width: 100%;
+      padding: 12px 13px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      outline: none;
+    }
+
+    .field input:focus, .field textarea:focus,
+    .field select:focus, .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(112,66,160,.12);
+    }
+
+    .field textarea { min-height: 120px; resize: vertical; }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-row .search-input { flex: 1; min-width: 0; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .tab-btn {
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 8px 14px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: white;
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    .empty-state {
+      padding: 30px 18px;
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      color: var(--muted);
+      background: var(--surface);
+    }
+
+    .notice {
+      padding: 13px 15px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .notice.error { background: #fde9ec; color: #8c2434; }
+
+    .notice.success { background: #e3f7ed; color: #155d3e; }
+
     .bottom-nav {
-      position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
-      z-index:25;
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      background:var(--surface);
-      border-top:1px solid var(--line);
-      padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
     }
+
     .bottom-nav button {
-      background:none;
-      border:none;
-      color:var(--muted);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:4px;
-      font-size:11px;
-      padding:4px 2px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 7px 2px;
+      font-size: 11px;
+      display: grid;
+      gap: 2px;
+      justify-items: center;
     }
-    .bottom-nav button.active { color:var(--accent); }
-    .footer {
-      max-width:1200px;
-      margin:0 auto;
-      padding:18px 18px 110px;
-      text-align:center;
-      color:var(--muted);
+
+    .bottom-nav button span:first-child { font-size: 20px; }
+
+    .bottom-nav button.active { color: var(--primary); font-weight: 800; }
+
+    .more-menu {
+      display: none;
+      position: fixed;
+      z-index: 80;
+      right: 12px;
+      bottom: 80px;
+      width: min(270px, calc(100vw - 24px));
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 16px;
     }
-    .footer nav { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:10px; }
-    @media (max-width:980px) { .book-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
-    @media (max-width:760px) {
-      .navlinks { display:none; }
-      .book-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .grid-two, .grid-three { grid-template-columns:1fr; }
-      .hero { padding:26px; }
+
+    .more-menu.open { display: grid; }
+
+    .more-menu button {
+      padding: 12px;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      border-radius: 9px;
     }
-    @media (max-width:560px) {
-      .top-inner { padding:10px 12px; }
-      main { padding:18px 12px 75px; }
-      .book-grid { grid-template-columns:1fr; }
-      .hero { padding:20px; }
+
+    .more-menu button:hover { background: var(--surface-2); }
+
+    .toast {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 50%;
+      bottom: 95px;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100vw - 30px);
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #24143d;
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show { display: block; }
+
+    .profile-head {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .avatar {
+      width: 78px;
+      height: 78px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--primary);
+      font-size: 30px;
+      font-weight: 800;
+      overflow: hidden;
+    }
+
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .stat {
+      padding: 16px;
+      background: var(--surface-2);
+      border-radius: 14px;
+    }
+
+    .stat strong { display: block; font-size: 23px; }
+
+    .chapter-row, .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chapter-row:last-child, .list-row:last-child { border-bottom: 0; }
+
+    .reader-content {
+      max-width: 760px;
+      margin: 20px auto;
+      font-size: 18px;
+      line-height: 2;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .reader-toolbar {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .site-footer {
+      padding: 28px 20px 100px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .site-footer a { margin: 0 8px; }
+
+    .price {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    .plan-card {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .plan-card ul { padding-left: 20px; margin: 0; }
+
+    .plan-card .btn { margin-top: auto; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .desktop-nav { display: none; }
+      .topbar-inner { padding: 10px 14px; }
+      .header-actions { margin-left: auto; }
+      .book-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .genre-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .bottom-nav { display: grid; }
+      .page { padding: 20px 14px 100px; }
+      .site-footer { padding-bottom: 110px; }
+    }
+
+    @media (max-width: 560px) {
+      .brand { font-size: 14px; }
+      .brand-mark { width: 36px; height: 36px; }
+      .header-actions { gap: 3px; }
+      .coin-pill { padding: 6px 8px; font-size: 12px; }
+      #login-nav { padding: 8px 10px; font-size: 12px; }
+      .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+      .grid-two, .grid-three { grid-template-columns: 1fr; }
+      .hero { padding: 28px 21px; border-radius: 20px; }
+      .hero p { font-size: 15px; }
+      .section-heading h2 { font-size: 20px; }
+      .panel { padding: 16px; }
+      .search-row { flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="top-inner">
-      <a href="#" class="brand" data-page="home">
-        <div class="brand-mark" aria-label="Fictional World Library logo">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M5 19V5.5C5 4.67 5.67 4 6.5 4H17.5C18.33 4 19 4.67 19 5.5V19L12 15.5L5 19Z" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 8.5H16M8 12H16" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="brand-text">
-          <strong>FICTIONAL WORLD</strong>
-          <small>LIBRARY</small>
-        </div>
-      </a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="brand" data-page="home" aria-label="Go to homepage">
+      <span class="brand-mark">📚</span>
+      <span>Fictional World<br>Library</span>
+    </button>
 
-      <nav class="navlinks">
-        <button class="active" data-page="home">Home</button>
-        <button data-page="browse">Discover</button>
-        <button data-page="library">Library</button>
-        <button data-page="writer">Be Our Author</button>
-      </nav>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <button class="nav-btn" data-page="home">Home</button>
+      <button class="nav-btn" data-page="browse">Discover</button>
+      <button class="nav-btn" data-page="library">My Library</button>
+      <button class="nav-btn" data-page="writer">Be Our Author</button>
+    </nav>
 
-      <div class="top-actions">
-        <button class="btn" data-page="wallet">🪙 <span id="coin-count">0</span></button>
-        <button class="btn" id="theme-toggle">☼ Theme</button>
-        <button class="btn primary" id="login-nav" data-page="account">My Account</button>
+    <div class="header-actions">
+      <button class="coin-pill" data-page="wallet" title="Open wallet">
+        🪙 <span id="coin-count">—</span>
+      </button>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">🌙</button>
+      <button class="btn btn-primary" id="login-nav" data-page="account">Log in</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <h1>Your next favourite story is waiting.</h1>
+      <p>Find a story that fits your taste. 😉</p>
+      <div class="hero-actions">
+        <button class="btn btn-gold" data-page="browse">Explore Stories</button>
+        <button class="btn btn-secondary" data-page="library">My Library</button>
       </div>
     </div>
-  </header>
-    <main>
-    <section class="page active" id="page-home">
-      <div class="hero">
-        <div class="hero-copy">
-          <div class="eyebrow">Your next obsession starts here</div>
-          <h1>Some stories stay with you long after the last page.</h1>
-          <p>Discover fiction that keeps you reading late into the night, from werewolves and mafia drama to billionaire romance and paranormal worlds.</p>
-          <div class="hero-actions">
-            <button class="btn primary" data-page="browse">Explore stories</button>
-            <button class="btn" data-page="library">My library</button>
-          </div>
-        </div>
-      </div>
 
-      <div class="section">
-        <div class="section-head">
-          <h2>Find your world</h2>
-          <span class="muted">Choose a genre</span>
-        </div>
-        <div class="genre-list" id="home-genres"></div>
+    <section class="section">
+      <div class="section-heading">
+        <h2>Explore by Genre</h2>
+        <button class="btn btn-secondary" data-page="browse">View all</button>
       </div>
+      <div class="genre-grid" id="home-genres"></div>
+    </section>
 
-      <div class="section">
-        <div class="section-head">
-          <h2>Stories to fall into</h2>
-          <button class="btn" data-page="browse">View all</button>
-        </div>
-        <div class="book-grid" id="featured-books"></div>
+    <section class="section">
+      <div class="section-heading">
+        <h2>Featured Stories</h2>
+        <button class="btn btn-secondary" data-page="browse">Discover more</button>
       </div>
-
-      <div class="section">
-        <div class="section-head">
-          <h2>Ongoing stories</h2>
-          <span class="muted">Fresh chapters keep the story moving</span>
-        </div>
-        <div class="book-grid" id="ongoing-books"></div>
-      </div>
-
-      <div class="section">
-        <div class="section-head">
-          <h2>Completed reads</h2>
-          <span class="muted">Stories worth revisiting</span>
-        </div>
-        <div class="book-grid" id="completed-books"></div>
+      <div class="book-grid" id="featured-books">
+        <div class="empty-state">Loading stories…</div>
       </div>
     </section>
 
-    <section class="page" id="page-browse">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">Discover</div>
-          <h1>Find your next story</h1>
-        </div>
+    <section class="section">
+      <div class="section-heading"><h2>Ongoing Stories</h2></div>
+      <div class="book-grid" id="ongoing-books">
+        <div class="empty-state">Loading stories…</div>
       </div>
-
-      <div class="searchbar">
-        <input id="search-input" type="text" placeholder="Search titles, authors or genres..." />
-        <button class="btn primary" id="search-btn">Search</button>
-      </div>
-
-      <div class="genre-list" id="browse-genres"></div>
-
-      <div class="section-head">
-        <h2 id="browse-heading">All stories</h2>
-        <span class="muted" id="book-total">0 stories</span>
-      </div>
-
-      <div class="book-grid" id="all-books"></div>
     </section>
 
-    <section class="page" id="page-library">
-      <div class="eyebrow">Your personal shelf</div>
-      <h1>My Library</h1>
-      <div class="genre-list" style="margin-top:14px;">
-        <button class="genre active" data-library-filter="all">All saved</button>
-        <button class="genre" data-library-filter="ongoing">Ongoing</button>
-        <button class="genre" data-library-filter="completed">Completed</button>
+    <section class="section">
+      <div class="section-heading"><h2>Completed Stories</h2></div>
+      <div class="book-grid" id="completed-books">
+        <div class="empty-state">Loading stories…</div>
       </div>
-      <div class="book-grid" id="library-books" style="margin-top:18px;"></div>
-      <div class="panel" id="library-note" style="margin-top:18px;">Log in to keep your reading library connected to your account.</div>
     </section>
 
-    <section class="page" id="page-notifications">
-      <div class="eyebrow">Stay in the loop</div>
+      <section class="page" id="page-browse">
+    <div class="section-heading">
+      <div>
+        <h1>Discover Stories</h1>
+        <p class="muted">Explore stories and find your next read.</p>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <input class="search-input" id="book-search" type="search"
+        placeholder="Search by title, author, or genre…">
+      <button class="btn btn-primary" id="search-button">Search</button>
+    </div>
+
+    <div class="genre-grid" id="browse-genres"></div>
+
+    <div class="tabs" id="browse-filters">
+      <button class="tab-btn active" data-filter="All">All Stories</button>
+      <button class="tab-btn" data-filter="Ongoing">Ongoing</button>
+      <button class="tab-btn" data-filter="Completed">Completed</button>
+    </div>
+
+    <div class="book-grid" id="browse-books">
+      <div class="empty-state">Loading stories…</div>
+    </div>
+  </section>
+
+  <section class="page" id="page-book">
+    <button class="btn btn-secondary" data-page="browse">← Back to stories</button>
+
+    <div class="section panel" id="book-detail">
+      <div class="empty-state">Select a story to view its details.</div>
+    </div>
+
+    <section class="section panel">
+      <div class="section-heading">
+        <h2>Chapters</h2>
+      </div>
+      <div id="book-chapters">
+        <div class="empty-state">Chapters will appear here.</div>
+      </div>
+    </section>
+  </section>
+
+  <section class="page" id="page-reader">
+    <div class="reader-toolbar">
+      <button class="btn btn-secondary" id="reader-back">← Book details</button>
+      <button class="btn btn-secondary" id="reader-library">＋ Add to library</button>
+    </div>
+
+    <div class="section panel">
+      <p class="muted" id="reader-book-title">Story</p>
+      <h1 id="reader-chapter-title">Chapter</h1>
+      <div class="reader-content" id="reader-content">
+        Select a published chapter to begin reading.
+      </div>
+      <div class="reader-toolbar">
+        <button class="btn btn-secondary" id="previous-chapter">← Previous</button>
+        <button class="btn btn-primary" id="next-chapter">Next →</button>
+      </div>
+      <p class="muted" id="reader-message"></p>
+    </div>
+  </section>
+
+  <section class="page" id="page-library">
+    <h1>My Library</h1>
+    <p class="muted">Keep track of stories you have viewed and read.</p>
+
+    <div class="tabs" id="library-tabs">
+      <button class="tab-btn active" data-library-status="Viewed">Viewed</button>
+      <button class="tab-btn" data-library-status="Ongoing">Ongoing Read</button>
+      <button class="tab-btn" data-library-status="Completed">Completed Read</button>
+    </div>
+
+    <div class="book-grid" id="library-books">
+      <div class="empty-state">Log in to view your library.</div>
+    </div>
+  </section>
+
+  <section class="page" id="page-notifications">
+    <div class="section-heading">
       <h1>Notifications</h1>
-      <div class="panel" id="notification-list" style="margin-top:18px;">
-        <p class="muted">Log in to view your notifications.</p>
-      </div>
-    </section>
+      <button class="btn btn-secondary" id="refresh-notifications">Refresh</button>
+    </div>
+    <div id="notifications-list">
+      <div class="empty-state">Log in to view your notifications.</div>
+    </div>
+  </section>
 
-    <section class="page" id="page-account">
-      <div class="panel form-shell">
-        <div class="eyebrow">Welcome to your world</div>
+  <section class="page" id="page-account">
+    <div class="grid-two">
+      <div class="panel">
         <h1 id="account-heading">Welcome back</h1>
         <p class="muted" id="account-description">Log in to continue your reading journey.</p>
 
-        <form id="auth-form" style="margin-top:20px;">
-          <div class="field" id="name-field" hidden>
-            <label for="auth-name">Your name</label>
-            <input id="auth-name" autocomplete="name" />
-          </div>
-
-          <div class="field">
-            <label for="auth-email">Email address</label>
-            <input id="auth-email" type="email" autocomplete="email" required />
-          </div>
-
-          <div class="field">
-            <label for="auth-password">Password</label>
-            <input id="auth-password" type="password" minlength="6" autocomplete="current-password" required />
-          </div>
-
-          <button class="btn primary" type="submit" style="width:100%;">Log in</button>
-        </form>
-
-        <p style="margin:12px 0 6px;"><button class="btn" id="switch-auth">Create an account</button></p>
-        <p style="margin:0;"><button class="btn" id="forgot-password">Forgot password?</button></p>
-        <p class="muted" id="auth-message" style="margin-top:12px;"></p>
-      </div>
-    </section>
-
-    <section class="page" id="page-reset">
-      <div class="panel form-shell">
-        <div class="eyebrow">Account help</div>
-        <h1>Reset password</h1>
-        <form id="reset-form" style="margin-top:16px;">
-          <div class="field">
-            <label for="reset-email">Email address</label>
-            <input id="reset-email" type="email" required />
-          </div>
-          <button class="btn primary" type="submit" style="width:100%;">Send reset link</button>
-        </form>
-      </div>
-    </section>
-
-    <section class="page" id="page-profile">
-      <div class="eyebrow">Your account</div>
-      <h1>My Profile</h1>
-
-      <div class="panel" style="margin-top:18px;">
-        <div class="profile-head">
-          <div class="avatar" id="profile-avatar">♡</div>
-          <div>
-            <h2 id="profile-name">Reader</h2>
-            <p class="muted" id="profile-email">Sign in to view your profile</p>
-          </div>
+        <div class="tabs">
+          <button class="tab-btn active" id="show-login">Log in</button>
+          <button class="tab-btn" id="show-signup">Create account</button>
         </div>
 
-        <p><strong>Reader ID:</strong> <span id="profile-reader-id">—</span></p>
+        <form class="form-stack" id="login-form">
+          <div class="field">
+            <label for="login-email">Email address</label>
+            <input id="login-email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password"
+              autocomplete="current-password" required>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit">Log in</button>
+          <button class="btn btn-secondary btn-block" type="button" id="forgot-password">
+            Forgot password?
+          </button>
+        </form>
 
-        <div class="field" style="margin-top:18px;">
-          <label for="profile-display-name">Display name</label>
-          <input id="profile-display-name" placeholder="Your display name" />
+        <form class="form-stack hidden" id="signup-form">
+          <div class="field">
+            <label for="signup-name">Full name</label>
+            <input id="signup-name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="signup-email">Email address</label>
+            <input id="signup-email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="signup-password">Password (at least 6 characters)</label>
+            <input id="signup-password" type="password"
+              autocomplete="new-password" minlength="6" required>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit">Create account</button>
+        </form>
+
+        <p class="muted">By creating an account, you agree to our
+          <a href="terms.html">Terms and Conditions</a> and
+          <a href="privacy.html">Privacy Policy</a>.
+        </p>
+        <div id="account-message" aria-live="polite"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Welcome to Fictional World Library</h2>
+        <p>Discover stories across different genres, keep your favourites
+          in your library, and continue reading whenever you return.</p>
+        <p class="muted">You can explore publicly available stories without
+          logging in. An account is required for account-specific features.</p>
+        <button class="btn btn-secondary" data-page="browse">Explore stories</button>
+      </div>
+    </div>
+  </section>
+
+      <section class="page" id="page-profile">
+    <h1>My Profile</h1>
+
+    <div class="panel">
+      <div class="profile-head">
+        <div class="avatar" id="profile-avatar">📚</div>
+        <div>
+          <h2 id="profile-name">Reader</h2>
+          <p class="muted" id="profile-email">Log in to view your profile.</p>
+          <p class="muted">Reader ID: <span id="profile-id">—</span></p>
         </div>
+      </div>
 
+      <form class="form-stack section" id="profile-form">
+        <div class="field">
+          <label for="profile-name-input">Display name</label>
+          <input id="profile-name-input" autocomplete="name">
+        </div>
         <div class="field">
           <label for="profile-gender">Gender</label>
           <select id="profile-gender">
-            <option value="">Select gender</option>
+            <option value="">Prefer not to say</option>
             <option value="Female">Female</option>
             <option value="Male">Male</option>
-            <option value="Non-binary">Non-binary</option>
-            <option value="Prefer not to say">Prefer not to say</option>
+            <option value="Other">Other</option>
           </select>
         </div>
+        <div class="field">
+          <label for="profile-picture">Profile picture URL</label>
+          <input id="profile-picture" type="url" placeholder="https://…">
+        </div>
+        <button class="btn btn-primary" type="submit">Save profile</button>
+      </form>
+      <div id="profile-message" aria-live="polite"></div>
+    </div>
+  </section>
 
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
-          <button class="btn primary" id="save-profile">Save profile</button>
-          <button class="btn" id="logout-btn">Log out</button>
+  <section class="page" id="page-wallet">
+    <h1>My Wallet</h1>
+    <p class="muted">Manage your coins, transactions, chapter unlocks, and membership.</p>
+
+    <div class="grid-three">
+      <div class="stat">
+        <span class="muted">Available coins</span>
+        <strong id="wallet-balance">—</strong>
+      </div>
+      <div class="stat">
+        <span class="muted">Chapter unlocks</span>
+        <strong id="wallet-unlocks">—</strong>
+      </div>
+      <div class="stat">
+        <span class="muted">Membership</span>
+        <strong id="wallet-membership">—</strong>
+      </div>
+    </div>
+
+    <section class="section panel">
+      <h2>Top Up Coins</h2>
+      <p>Choose a coin package. Chapter unlocks cost <strong>10 coins per chapter</strong>.</p>
+      <p class="muted">The final amount in NGN must be calculated and confirmed by the payment backend before you pay.</p>
+
+      <div class="grid-two" id="coin-packages">
+        <div class="plan-card">
+          <h3>Starter</h3><div class="price">$2.99</div>
+          <p>100 coins</p>
+          <button class="btn btn-primary" data-coins="100" data-usd="2.99">Choose package</button>
+        </div>
+        <div class="plan-card">
+          <h3>Popular</h3><div class="price">$7.99</div>
+          <p>300 coins</p>
+          <button class="btn btn-primary" data-coins="300" data-usd="7.99">Choose package</button>
+        </div>
+        <div class="plan-card">
+          <h3>Premium</h3><div class="price">$14.99</div>
+          <p>600 coins</p>
+          <button class="btn btn-primary" data-coins="600" data-usd="14.99">Choose package</button>
+        </div>
+        <div class="plan-card">
+          <h3>Ultimate</h3><div class="price">$27.99</div>
+          <p>1,200 coins</p>
+          <button class="btn btn-primary" data-coins="1200" data-usd="27.99">Choose package</button>
         </div>
       </div>
-
-      <div class="grid-three" style="margin-top:18px;">
-        <div class="stat">Coin balance<strong id="profile-coins">0</strong></div>
-        <div class="stat">Saved books<strong id="profile-saved">0</strong></div>
-        <div class="stat">Membership<strong id="profile-tier-stat">Free</strong></div>
-      </div>
+      <div id="wallet-message" aria-live="polite"></div>
     </section>
 
-    <section class="page" id="page-book">
-      <button class="btn" data-page="browse">← Back to stories</button>
-      <div class="panel" style="margin-top:18px;">
-        <div class="grid-two">
-          <div class="cover" id="detail-cover" style="height:360px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(135deg,#3a2a4b,#211b32);"></div>
-          <div>
-            <div class="eyebrow" id="detail-genre">Fiction</div>
-            <h1 id="detail-title">Story title</h1>
-            <p class="muted" id="detail-author"></p>
-            <p id="detail-description" style="margin-top:12px;"></p>
-            <p class="muted" id="detail-status" style="margin-top:12px;"></p>
-            <div class="hero-actions">
-              <button class="btn primary" id="start-reading">Start reading</button>
-              <button class="btn" id="save-book">＋ Add to library</button>
-            </div>
-          </div>
+    <section class="section">
+      <h2>Reader Memberships</h2>
+      <p class="muted">Membership prices are displayed in USD. Billing and eligibility must be confirmed by the backend.</p>
+
+      <div class="grid-three">
+        <div class="plan-card">
+          <h3>Readers Pass</h3>
+          <div class="price">$5.99 <small>/ month</small></div>
+          <p>Yearly: $49.99</p>
+          <ul>
+            <li>No homepage banner ads</li>
+            <li>50 free coins monthly</li>
+            <li>5% off eligible coin purchases</li>
+          </ul>
+          <button class="btn btn-primary subscribe-btn" data-tier="1">Choose Readers Pass</button>
+        </div>
+
+        <div class="plan-card">
+          <h3>VIP Reader</h3>
+          <div class="price">$9.99 <small>/ month</small></div>
+          <p>Yearly: $89.99</p>
+          <ul>
+            <li>No homepage banner ads</li>
+            <li>150 free coins monthly</li>
+            <li>9% off eligible coin purchases</li>
+          </ul>
+          <button class="btn btn-primary subscribe-btn" data-tier="2">Choose VIP Reader</button>
+        </div>
+
+        <div class="plan-card">
+          <h3>Exclusive Reader</h3>
+          <div class="price">$19.99 <small>/ month</small></div>
+          <p>Yearly: $179.99</p>
+          <ul>
+            <li>No homepage banner ads</li>
+            <li>300 free coins monthly</li>
+            <li>15% off eligible coin purchases</li>
+            <li>2 free chapter unlocks</li>
+          </ul>
+          <button class="btn btn-primary subscribe-btn" data-tier="3">Choose Exclusive Reader</button>
         </div>
       </div>
-
-      <div class="section-head" style="margin-top:20px;">
-        <h2>Chapters</h2>
-      </div>
-      <div class="panel" id="chapter-list"></div>
     </section>
 
-    <section class="page" id="page-reader">
-      <button class="btn" id="back-to-book">← Back to story</button>
-      <div class="panel" style="margin-top:18px;">
-        <div class="muted" id="reader-book-title"></div>
-        <h1 id="reader-chapter-title">Chapter</h1>
-        <div class="reader-text" id="reader-content" style="margin-top:14px;">Select a chapter to begin reading.</div>
-        <div class="hero-actions" style="margin-top:18px;">
-          <button class="btn" id="previous-chapter">← Previous</button>
-          <button class="btn primary" id="next-chapter">Next chapter →</button>
-        </div>
-      </div>
+    <section class="section panel">
+      <h2>Transaction History</h2>
+      <div id="transaction-history" class="empty-state">Log in to view transactions.</div>
     </section>
 
-    <section class="page" id="page-wallet">
-      <div class="eyebrow">Your reading balance</div>
-      <h1>Wallet</h1>
-      <div class="panel" style="margin-top:18px;">
-        <p class="muted">Available coins</p>
-        <div class="price" style="font-size:32px;font-weight:700;margin:12px 0;"><span id="wallet-coins">0</span> 🪙</div>
-        <p class="muted">Coins are used to unlock paid chapters and access premium reading features.</p>
-      </div>
-
-      <div class="section-head" style="margin-top:20px;">
-        <h2>Choose a coin package</h2>
-      </div>
-      <div class="grid-two" id="coin-packages"></div>
-
-      <div class="section-head" style="margin-top:20px;">
-        <h2>Transaction history</h2>
-      </div>
-      <div class="panel" id="transactions"><p class="muted">Log in to view transactions.</p></div>
-    </section>
-
-    <section class="page" id="page-more">
-      <div class="eyebrow">Everything in one place</div>
-      <h1>More</h1>
-      <div class="grid-two" style="margin-top:20px;">
-        <button class="panel" data-page="wallet" style="text-align:left;"><h2>🪙 Wallet</h2><p class="muted">Coins and transactions</p></button>
-        <button class="panel" data-page="subscriptions" style="text-align:left;"><h2>✦ Memberships</h2><p class="muted">Explore reader plans</p></button>
-        <button class="panel" data-page="support" style="text-align:left;"><h2>♡ Customer Service</h2><p class="muted">Get help with your account</p></button>
-        <button class="panel" data-page="settings" style="text-align:left;"><h2>⚙ Settings</h2><p class="muted">Manage your preferences</p></button>
-        <button class="panel" data-page="writer" style="text-align:left;"><h2>✍ Be Our Author</h2><p class="muted">Publish your story</p></button>
-        <button class="panel" data-page="about" style="text-align:left;"><h2>ℹ About Us</h2><p class="muted">Learn more about the platform</p></button>
+    <section class="section panel">
+      <h2>Chapter Unlock History</h2>
+      <div id="unlock-history" class="empty-state">
+        Unlock history will appear here when available.
       </div>
     </section>
+  </section>
 
-    <section class="page" id="page-support">
-      <div class="eyebrow">We are here to help</div>
-      <h1>Customer Service</h1>
-      <div class="panel" style="margin-top:18px;">
-        <p>Email us at <strong><a href="mailto:fictionalworldlibary@gmail.com">fictionalworldlibary@gmail.com</a></strong></p>
-        <p class="muted" style="margin-top:8px;">For account issues, reading access, payment questions, or general help, send an email and our team will respond as quickly as possible.</p>
-      </div>
-    </section>
+  <section class="page" id="page-support">
+    <h1>Customer Service</h1>
+    <p class="muted">Need help with your account, coins, reading, or membership?</p>
 
-    <section class="page" id="page-writer">
-      <div class="hero">
-        <div class="hero-copy">
-          <div class="eyebrow">Write · Create · Publish</div>
-          <h1>Your stories deserve a world of their own.</h1>
-          <p>Fictional World Library welcomes original authors with unforgettable stories and strong characters.</p>
-          <div class="hero-actions">
-            <button class="btn primary" data-page="support">Contact us</button>
-          </div>
-        </div>
-      </div>
-      <div class="grid-two section">
-        <div class="panel"><h2>Short stories</h2><p>12–25 chapters, 600–1000 words per chapter, and at least 5 completed chapters before application.</p></div>
-        <div class="panel"><h2>Long stories</h2><p>30–60 chapters, 600–1000 words per chapter, and at least 10 completed chapters before application.</p></div>
-      </div>
+    <div class="grid-two">
       <div class="panel">
-        <p>Have your story ready? Email <a href="mailto:fictionalworldlibary@gmail.com">fictionalworldlibary@gmail.com</a> with your name, story type, genre, and whether it is a short or long story.</p>
-      </div>
-    </section>
-
-    <section class="page" id="page-settings">
-      <div class="eyebrow">Make it yours</div>
-      <h1>Settings</h1>
-      <div class="panel" style="margin-top:18px;">
-        <h2>Appearance</h2>
-        <p class="muted">Choose a theme for your reading experience.</p>
-        <div style="margin-top:12px;">
-          <button class="btn" id="settings-theme">Toggle dark / light</button>
-        </div>
+        <h2>Reader Support</h2>
+        <p>Send us an email describing your question or problem. Include the email associated with your account where appropriate.</p>
+        <a class="btn btn-primary" href="mailto:fictionalworldlibary@gmail.com?subject=Fictional%20World%20Library%20Support">
+          Email Customer Service
+        </a>
       </div>
 
-      <div class="panel" style="margin-top:18px;">
-        <h2>Quick links</h2>
-        <div class="grid-two" style="margin-top:12px;">
-          <button class="btn" data-page="about">About Us</button>
-          <button class="btn" data-page="terms">Terms & Conditions</button>
-          <button class="btn" data-page="privacy">Privacy Policy</button>
-          <button class="btn" data-page="support">Customer Service</button>
-        </div>
+      <div class="panel">
+        <h2>Frequently Asked Questions</h2>
+        <details>
+          <summary>How many coins does a chapter cost?</summary>
+          <p>Unlocking a chapter costs 10 coins.</p>
+        </details>
+        <details>
+          <summary>How do I recover my password?</summary>
+          <p>Open the login page and select “Forgot password?”.</p>
+        </details>
+        <details>
+          <summary>How can I become an author?</summary>
+          <p>Review the author information and application guidelines.</p>
+          <a href="be-our-author.html">Read the author guidelines</a>
+        </details>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="page" id="page-about">
-      <div class="eyebrow">Welcome to Fictional World</div>
-      <h1>About Us</h1>
-      <div class="panel" style="margin-top:18px;">
-        <p>Fictional World Library is built for readers who love immersive stories and unforgettable characters.</p>
-        <p class="muted" style="margin-top:12px;">We aim to connect readers to stories they love and give writers a clear path to share original work with the world.</p>
+  <section class="page" id="page-settings">
+    <h1>Settings</h1>
+
+    <div class="panel">
+      <h2>Appearance</h2>
+      <p class="muted">Choose the appearance that feels comfortable for you.</p>
+      <button class="btn btn-secondary" id="settings-theme-toggle">Switch light/dark theme</button>
+    </div>
+
+    <div class="panel section">
+      <h2>Information and Policies</h2>
+      <div class="list-row"><a href="about.html">About Us</a><span>About our library</span></div>
+      <div class="list-row"><a href="terms.html">Terms and Conditions</a><span>Terms of use</span></div>
+      <div class="list-row"><a href="privacy.html">Privacy Policy</a><span>Your privacy</span></div>
+      <div class="list-row"><a href="be-our-author.html">Be Our Author</a><span>Writing guidelines</span></div>
+    </div>
+
+    <div class="panel section">
+      <h2>Account</h2>
+      <button class="btn btn-secondary" data-page="account">Log in / Create account</button>
+      <button class="btn btn-danger" id="logout-button">Log out</button>
+    </div>
+  </section>
+
+  <section class="page" id="page-writer">
+    <div class="hero">
+      <h1>Be Our Author</h1>
+      <p>Share your stories with readers who are looking for their next favourite read.</p>
+      <div class="hero-actions">
+        <a class="btn btn-gold" href="be-our-author.html">Read the full guidelines</a>
+        <a class="btn btn-secondary" href="mailto:fictionalworldlibary@gmail.com?subject=Author%20Application">
+          Contact the team
+        </a>
       </div>
-    </section>
+    </div>
 
-    <section class="page" id="page-terms">
-      <div class="eyebrow">Legal</div>
-      <h1>Terms & Conditions</h1>
-      <div class="panel" style="margin-top:18px;">
-        <p>By using Fictional World Library, you agree to use the platform responsibly and lawfully.</p>
-        <p class="muted" style="margin-top:12px;">Coins, subscriptions, story access, and author agreements are subject to platform rules and applicable law.</p>
+    <div class="grid-two section">
+      <div class="panel">
+        <h2>Short Stories</h2>
+        <ul>
+          <li>12–25 chapters</li>
+          <li>600–1,000 words per chapter</li>
+          <li>At least 5 completed chapters before applying</li>
+          <li>Review usually takes 3–7 business days</li>
+        </ul>
       </div>
-    </section>
 
-    <section class="page" id="page-privacy">
-      <div class="eyebrow">Privacy</div>
-      <h1>Privacy Policy</h1>
-      <div class="panel" style="margin-top:18px;">
-        <p>We handle account details, reader activity, transaction records, and subscription information to provide platform services.</p>
-        <p class="muted" style="margin-top:12px;">For privacy questions, contact <a href="mailto:fictionalworldlibary@gmail.com">fictionalworldlibary@gmail.com</a>.</p>
+      <div class="panel">
+        <h2>Long Stories</h2>
+        <ul>
+          <li>30–60 chapters</li>
+          <li>600–1,000 words per chapter</li>
+          <li>At least 10 completed chapters before applying</li>
+          <li>Review usually takes 3–7 business days</li>
+        </ul>
       </div>
-    </section>
+    </div>
 
-    <section class="page" id="page-subscriptions">
-      <div class="eyebrow">Read more. Enjoy more.</div>
-      <h1>Reader Memberships</h1>
-      <div class="grid-two" id="membership-plans" style="margin-top:18px;"></div>
-    </section>
+    <div class="panel section">
+      <h2>Interested in writing for us?</h2>
+      <p>Read the full author guidelines before applying. They explain submission requirements, contracts, payments, and completion expectations.</p>
+      <a class="btn btn-primary" href="mailto:fictionalworldlibary@gmail.com?subject=Author%20Application">
+        Email Your Interest
+      </a>
+    </div>
+  </section>
+    <div id="app-toast" class="toast" role="status" aria-live="polite"></div>
 
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="active" data-page="home">⌂<span>Home</span></button>
-    <button data-page="library">▤<span>Library</span></button>
-    <button data-page="more">•••<span>More</span></button>
-    <button data-page="notifications">✉<span>Alerts</span></button>
-    <button data-page="profile">◎<span>Profile</span></button>
-  </nav>
-
-  <div class="footer">
-    <div>Fictional World Library</div>
-    <nav>
-      <a href="#" data-page="about">About Us</a>
-      <a href="#" data-page="terms">Terms</a>
-      <a href="#" data-page="privacy">Privacy</a>
-      <a href="#" data-page="writer">Be Our Author</a>
-    </nav>
+  <div class="more-menu" id="more-menu">
+    <button data-page="wallet">🪙 Wallet</button>
+    <button data-page="support">💬 Customer Service</button>
+    <button data-page="settings">⚙️ Settings</button>
+    <button data-page="writer">✍️ Be Our Author</button>
   </div>
-    <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_CPulXF1pmXf_7RacRrv1ag_MHuGAxXC";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <button data-page="home"><span>⌂</span><span>Home</span></button>
+    <button data-page="library"><span>▤</span><span>Library</span></button>
+    <button data-page="notifications"><span>♧</span><span>Alerts</span></button>
+    <button data-page="profile"><span>☺</span><span>Profile</span></button>
+    <button id="more-menu-toggle"><span>•••</span><span>More</span></button>
+  </nav>
+</main>
 
-    const demoBooks = [
-      {
-        id: "demo-1",
-        title: "Moonlit Betrayal",
-        author_name: "A. N. Hart",
-        genre: "Werewolf",
-        status: "Ongoing",
-        synopsis: "A rejected alpha must save a rival pack while fighting a love interest who may be the true traitor.",
-        cover_url: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&q=80",
-        featured: true
-      },
-      {
-        id: "demo-2",
-        title: "Crown of Ashes",
-        author_name: "L. Morningstar",
-        genre: "Billionaire Drama",
-        status: "Completed",
-        synopsis: "A billionaire heiress discovers her father’s crime empire and must choose rebellion over bloodline.",
-        cover_url: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
-        featured: true
-      },
-      {
-        id: "demo-3",
-        title: "Midnight in Verona",
-        author_name: "S. D. Vale",
-        genre: "Mafia",
-        status: "Ongoing",
-        synopsis: "A quiet lawyer finds herself entangled with a feared mafioso who may be protecting her from the very family that raised her.",
-        cover_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80",
-        featured: false
-      }
+<footer class="site-footer">
+  <p><strong>Fictional World Library</strong></p>
+  <p>Find a story that fits your taste. 😉</p>
+  <p>
+    <a href="about.html">About</a>
+    <a href="terms.html">Terms</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="be-our-author.html">Be Our Author</a>
+  </p>
+  <p>© <span id="current-year"></span> Fictional World Library.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="superbase.js"></script>
+<script src="reader-auth.js"></script>
+<script src="reader-books.js"></script>
+<script src="reader-features.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+  const GENRES = [
+    ["Werewolf", "🐺"],
+    ["Mafia", "🖤"],
+    ["Erotica", "🌹"],
+    ["LGBTQ", "🌈"],
+    ["Billionaire Drama", "💎"],
+    ["Vampire", "🧛"],
+    ["Paranormal", "🌙"],
+    ["Christian Romance", "🕊️"]
+  ];
+
+  const state = {
+    books: [],
+    selectedBook: null,
+    chapters: [],
+    currentChapterIndex: -1,
+    currentChapter: null,
+    currentFilter: "All",
+    currentGenre: "All",
+    libraryStatus: "Viewed",
+    libraryEntries: [],
+    user: null,
+    profile: null,
+    chapterText: ""
+  };
+
+  function toast(message) {
+    const el = $("#app-toast");
+    if (!el) return;
+    el.textContent = message;
+    el.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => el.classList.remove("show"), 3500);
+  }
+
+  function setMessage(target, message, type = "") {
+    const el = typeof target === "string" ? $(target) : target;
+    if (!el) return;
+    el.textContent = message || "";
+    el.className = type ? `notice ${type}` : "";
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;",
+      '"': "&quot;", "'": "&#39;"
+    })[ch]);
+  }
+
+  function formatMoney(value, currency = "USD") {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "—";
+    return new Intl.NumberFormat(undefined, {
+      style: "currency", currency, maximumFractionDigits: 2
+    }).format(n);
+  }
+
+  function dateLabel(value) {
+    if (!value) return "—";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString();
+  }
+
+  function goToPage(name) {
+    const target = $(`#page-${name}`);
+    if (!target) {
+      toast("That page is not available.");
+      return;
+    }
+
+    $$(".page").forEach(page => page.classList.remove("active"));
+    target.classList.add("active");
+    $$(".bottom-nav [data-page]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.page === name);
+    });
+
+    $("#more-menu")?.classList.remove("open");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (name === "library") loadLibrary();
+    if (name === "profile") loadProfile();
+    if (name === "wallet") loadWallet();
+    if (name === "notifications") loadNotifications();
+    if (name === "account") updateAccountUI();
+  }
+
+  document.addEventListener("click", event => {
+    const pageButton = event.target.closest("[data-page]");
+    if (pageButton) {
+      event.preventDefault();
+      goToPage(pageButton.dataset.page);
+    }
+  });
+
+  $("#more-menu-toggle")?.addEventListener("click", () => {
+    $("#more-menu")?.classList.toggle("open");
+  });
+
+  document.addEventListener("click", event => {
+    if (!event.target.closest("#more-menu") &&
+        !event.target.closest("#more-menu-toggle")) {
+      $("#more-menu")?.classList.remove("open");
+    }
+  });
+
+  function renderGenres() {
+    const markup = GENRES.map(([name, icon]) => `
+      <button class="genre" type="button" data-genre="${escapeHTML(name)}">
+        <span class="genre-icon">${icon}</span>
+        <span>${escapeHTML(name)}</span>
+      </button>
+    `).join("");
+
+    if ($("#home-genres")) $("#home-genres").innerHTML = markup;
+    if ($("#browse-genres")) {
+      $("#browse-genres").innerHTML = `
+        <button class="genre" type="button" data-genre="All">
+          <span class="genre-icon">📚</span><span>All Genres</span>
+        </button>${markup}`;
+    }
+  }
+
+  document.addEventListener("click", event => {
+    const genreButton = event.target.closest("[data-genre]");
+    if (!genreButton) return;
+    state.currentGenre = genreButton.dataset.genre || "All";
+    $("#book-search").value = "";
+    goToPage("browse");
+    renderBrowseBooks();
+  });
+
+  function getBookTitle(book) {
+    return book?.title || "Untitled story";
+  }
+
+  function getBookAuthor(book) {
+    return book?.author_name || book?.author || "Unknown author";
+  }
+
+  function getBookGenre(book) {
+    return book?.genre || "Other";
+  }
+
+  function getBookStatus(book) {
+    const status = String(book?.status || "").toLowerCase();
+    return status === "completed" ? "Completed" : "Ongoing";
+  }
+
+  function getBookCover(book) {
+    return book?.cover_url || book?.cover_image || book?.image_url ||
+      book?.thumbnail_url || "";
+  }
+
+  function bookCard(book) {
+    const id = escapeHTML(book.id);
+    const title = escapeHTML(getBookTitle(book));
+    const author = escapeHTML(getBookAuthor(book));
+    const genre = escapeHTML(getBookGenre(book));
+    const status = getBookStatus(book);
+    const cover = getBookCover(book);
+
+    return `
+      <article class="book-card">
+        ${cover
+          ? `<img class="book-cover" src="${escapeHTML(cover)}"
+               alt="${title}" loading="lazy"
+               onerror="this.outerHTML='<div class=&quot;cover-placeholder&quot;>📖</div>'">`
+          : `<div class="cover-placeholder">📖<br>${title}</div>`}
+        <div class="book-info">
+          <span class="status">${escapeHTML(status)}</span>
+          <h3>${title}</h3>
+          <p>${author}</p>
+          <p>${genre}</p>
+          <button class="btn btn-primary btn-block"
+            data-open-book="${id}">Read story</button>
+        </div>
+      </article>`;
+  }
+
+  function renderBookList(target, books, emptyText = "No stories found.") {
+    const el = $(target);
+    if (!el) return;
+
+    el.innerHTML = books.length
+      ? books.map(bookCard).join("")
+      : `<div class="empty-state" style="grid-column:1/-1">${escapeHTML(emptyText)}</div>`;
+  }
+
+  async function loadBooks() {
+    const containers = [
+      "#featured-books", "#ongoing-books",
+      "#completed-books", "#browse-books"
     ];
 
-    const genres = ["All","Werewolf","Mafia","Erotica","LGBTQ","Billionaire Drama","Vampire","Paranormal","Christian Romance"];
-    let books = [];
-    let selectedGenre = "All";
-    let currentBook = null;
-    let chapters = [];
-    let currentChapterIndex = 0;
-    let reader = null;
-    let libraryIds = new Set();
-    const unlockedChapterIds = new Set();
-    const $ = id => document.getElementById(id);
+    containers.forEach(selector => {
+      if ($(selector)) $(selector).innerHTML = '<div class="empty-state">Loading stories…</div>';
+    });
 
-    function notify(message) {
-      const toast = $("toast");
-      if (!toast) return;
-      toast.textContent = message;
-      toast.style.display = "block";
-      clearTimeout(window.toastTimer);
-      window.toastTimer = setTimeout(() => toast.style.display = "none", 3500);
-    }
+    try {
+      if (typeof getPublishedBooks !== "function") {
+        throw new Error("The reader-books.js helper is not available.");
+      }
 
-    function escapeHTML(value = "") {
-      return String(value).replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      })[c]);
-    }
+      state.books = await getPublishedBooks();
 
-    function showPage(name) {
-      const page = $("page-" + name);
-      if (!page) return;
+      const featured = state.books.filter(book =>
+        book.featured === true || book.is_featured === true
+      );
 
-      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-      page.classList.add("active");
+      renderBookList("#featured-books", featured.slice(0, 5),
+        "No featured stories are available yet.");
 
-      document.querySelectorAll("[data-page]").forEach(b => {
-        b.classList.toggle("active", b.dataset.page === name);
-      });
+      renderBookList("#ongoing-books",
+        state.books.filter(book => getBookStatus(book) === "Ongoing").slice(0, 5),
+        "No ongoing stories are available yet.");
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderBookList("#completed-books",
+        state.books.filter(book => getBookStatus(book) === "Completed").slice(0, 5),
+        "No completed stories are available yet.");
 
-      if (name === "profile" && reader) loadProfile();
-      if (name === "wallet" && reader) loadTransactions();
-      if (name === "notifications") loadNotifications();
-    }
-
-    function renderGenres() {
-      ["home-genres","browse-genres"].forEach(id => {
-        const el = $(id);
-        if (!el) return;
-        el.innerHTML = genres.map(g => `
-          <button class="genre ${g === selectedGenre ? "active" : ""}" data-genre="${escapeHTML(g)}">${escapeHTML(g)}</button>
-        `).join("");
+      renderBrowseBooks();
+    } catch (error) {
+      console.error("Loading stories failed:", error);
+      containers.forEach(selector => {
+        if ($(selector)) {
+          $(selector).innerHTML =
+            '<div class="empty-state" style="grid-column:1/-1">Stories could not be loaded. Please try again later.</div>';
+        }
       });
     }
+  }
 
-    function bookCard(book) {
-      const id = escapeHTML(String(book.id));
-      const title = escapeHTML(book.title || "Untitled story");
-      const author = escapeHTML(book.author_name || book.author || "Fictional World");
-      const genre = escapeHTML(book.genre || "Fiction");
-      const cover = book.cover_url || "";
+  function renderBrowseBooks() {
+    const query = ($("#book-search")?.value || "").trim().toLowerCase();
+
+    const filtered = state.books.filter(book => {
+      const matchesQuery = !query || [
+        getBookTitle(book), getBookAuthor(book), getBookGenre(book)
+      ].some(value => String(value).toLowerCase().includes(query));
+
+      const matchesStatus = state.currentFilter === "All" ||
+        getBookStatus(book) === state.currentFilter;
+
+      const matchesGenre = state.currentGenre === "All" ||
+        getBookGenre(book).toLowerCase() === state.currentGenre.toLowerCase();
+
+      return matchesQuery && matchesStatus && matchesGenre;
+    });
+
+    renderBookList("#browse-books", filtered);
+  }
+
+  $("#search-button")?.addEventListener("click", renderBrowseBooks);
+
+  $("#book-search")?.addEventListener("input", renderBrowseBooks);
+
+  $("#browse-filters")?.addEventListener("click", event => {
+    const button = event.target.closest("[data-filter]");
+    if (!button) return;
+
+    state.currentFilter = button.dataset.filter;
+    $$("#browse-filters .tab-btn").forEach(tab =>
+      tab.classList.toggle("active", tab === button));
+    renderBrowseBooks();
+  });
+
+  async function openBook(bookId) {
+    const book = state.books.find(item => String(item.id) === String(bookId));
+
+    try {
+      state.selectedBook = book ||
+        (typeof getBookById === "function" ? await getBookById(bookId) : null);
+
+      if (!state.selectedBook) throw new Error("Story not found.");
+
+      state.chapters = [];
+      state.currentChapter = null;
+      state.currentChapterIndex = -1;
+
+      const selected = state.selectedBook;
+      const cover = getBookCover(selected);
+
+      $("#book-detail").innerHTML = `
+        <div class="grid-two">
+          <div>
+            ${cover
+              ? `<img src="${escapeHTML(cover)}" alt="${escapeHTML(getBookTitle(selected))}"
+                   style="width:100%;max-width:300px;border-radius:16px">`
+              : `<div class="cover-placeholder" style="max-width:300px">📖</div>`}
+          </div>
+          <div>
+            <span class="status">${escapeHTML(getBookStatus(selected))}</span>
+            <h1>${escapeHTML(getBookTitle(selected))}</h1>
+            <p>By ${escapeHTML(getBookAuthor(selected))}</p>
+            <p><strong>Genre:</strong> ${escapeHTML(getBookGenre(selected))}</p>
+            <p>${escapeHTML(selected.description || selected.synopsis || "Open a chapter to begin reading this story.")}</p>
+            <button class="btn btn-primary" id="start-reading">Start reading</button>
+            <button class="btn btn-secondary" id="add-library">Add to library</button>
+          </div>
+        </div>`;
+
+      $("#book-chapters").innerHTML = '<div class="empty-state">Loading chapters…</div>';
+      goToPage("book");
+
+      if (typeof getBookChapters !== "function") {
+        throw new Error("The chapter helper is unavailable.");
+      }
+
+      state.chapters = await getBookChapters(selected.id);
+      renderChapters();
+
+      if (state.user && typeof addBookToReaderLibrary === "function") {
+        try { await addBookToReaderLibrary(selected.id, "Viewed"); }
+        catch (error) { console.warn("Could not update library:", error); }
+      }
+    } catch (error) {
+      console.error("Could not open story:", error);
+      $("#book-chapters").innerHTML =
+        `<div class="empty-state">${escapeHTML(error.message || "Could not load chapters.")}</div>`;
+    }
+  }
+
+  document.addEventListener("click", event => {
+    const button = event.target.closest("[data-open-book]");
+    if (button) openBook(button.dataset.openBook);
+  });
+
+  function renderChapters() {
+    const el = $("#book-chapters");
+    if (!el) return;
+
+    if (!state.chapters.length) {
+      el.innerHTML = '<div class="empty-state">No published chapters are available yet.</div>';
+      return;
+    }
+
+    el.innerHTML = state.chapters.map((chapter, index) => {
+      const locked = chapter.locked === true;
       return `
-        <article class="book-card" data-open-book="${id}" tabindex="0" role="button">
-          <div class="cover">
-            ${cover ? `<img loading="lazy" src="${escapeHTML(cover)}" alt="${title}" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'cover-fallback\'>${escapeHTML(title)}</div>'">` : `<div class="cover-fallback">${escapeHTML(title)}</div>`}
+        <div class="chapter-row">
+          <div>
+            <strong>Chapter ${escapeHTML(chapter.chapter_number ?? index + 1)}</strong>
+            <div>${escapeHTML(chapter.title || `Chapter ${index + 1}`)}</div>
           </div>
-          <div class="book-card-content">
-            <h3>${title}</h3>
-            <p>${author}</p>
-            <span class="tag">${genre}</span>
-          </div>
-        </article>
-      `;
+          <button class="btn ${locked ? "btn-secondary" : "btn-primary"}"
+            data-chapter-index="${index}">
+            ${locked ? "🔒 Unlock" : "Read"}
+          </button>
+        </div>`;
+    }).join("");
+  }
+
+  $("#book-chapters")?.addEventListener("click", async event => {
+    const button = event.target.closest("[data-chapter-index]");
+    if (!button) return;
+    await openChapter(Number(button.dataset.chapterIndex));
+  });
+
+  $("#book-detail")?.addEventListener("click", async event => {
+    if (event.target.closest("#start-reading")) {
+      if (state.chapters.length) await openChapter(0);
+      else toast("There are no published chapters to read yet.");
     }
 
-    function renderBookList(target, list) {
-      const el = $(target);
-      if (!el) return;
-      el.innerHTML = list.length
-        ? list.map(bookCard).join("")
-        : `<div class="empty">No stories to display yet.</div>`;
+    if (event.target.closest("#add-library")) {
+      await addSelectedBookToLibrary("Viewed");
     }
+  });
 
-    function filteredBooks() {
-      const q = ($("search-input")?.value || "").trim().toLowerCase();
-      return books.filter(b => {
-        const genreMatch = selectedGenre === "All" || String(b.genre || "").toLowerCase() === selectedGenre.toLowerCase();
-        const searchMatch = !q || [b.title, b.author_name, b.author, b.genre].some(v => String(v || "").toLowerCase().includes(q));
-        return genreMatch && searchMatch;
-      });
-    }
+  async function openChapter(index) {
+    const chapter = state.chapters[index];
+    if (!chapter) return;
 
-    function renderBooks() {
-      const featured = books.filter(b => b.featured === true);
-      const featuredList = featured.length ? featured.slice(0, 5) : books.slice(0, 5);
-
-      renderBookList("featured-books", featuredList);
-      renderBookList("ongoing-books", books.filter(b => /ongoing/i.test(b.status || "")).slice(0, 5));
-      renderBookList("completed-books", books.filter(b => /completed/i.test(b.status || "")).slice(0, 5));
-
-      const list = filteredBooks();
-      renderBookList("all-books", list);
-
-      const total = $("book-total");
-      if (total) total.textContent = `${list.length} stories`;
-
-      const heading = $("browse-heading");
-      if (heading) heading.textContent = selectedGenre === "All" ? "All stories" : selectedGenre;
-
-      renderGenres();
-    }
-
-    async function loadBooks() {
-      const allBooks = $("all-books");
-      if (allBooks) allBooks.innerHTML = `<p class="muted">Loading stories...</p>`;
+    if (chapter.locked === true) {
+      const proceed = confirm("This chapter is locked. Would you like to try unlocking it for 10 coins?");
+      if (!proceed) return;
 
       try {
-        const { data, error } = await supabase.from("books").select("*").limit(100);
-
-        if (error) {
-          console.warn("Books query failed:", error.message);
-          books = demoBooks;
-          renderBooks();
-          notify("Live books unavailable. Showing sample stories.");
-          return;
+        if (typeof unlockChapter !== "function") {
+          throw new Error("Chapter unlocking is not available.");
         }
-
-        books = data && data.length ? data : demoBooks;
-        renderBooks();
+        const result = await unlockChapter(chapter.id);
+        toast(typeof result === "string" ? result : "Unlock request completed.");
+        chapter.locked = false;
+        renderChapters();
       } catch (error) {
-        console.warn("books load error", error);
-        books = demoBooks;
-        renderBooks();
+        toast(error.message || "Unable to unlock this chapter.");
+        return;
       }
     }
 
-    function buildReaderCode(readerId) {
-      return readerId ? `FWM${String(readerId).padStart(7, "0")}` : "FWM0000000";
+    state.currentChapterIndex = index;
+    state.currentChapter = chapter;
+
+    $("#reader-book-title").textContent = getBookTitle(state.selectedBook);
+    $("#reader-chapter-title").textContent =
+      `Chapter ${chapter.chapter_number ?? index + 1}: ${chapter.title || ""}`;
+    $("#reader-content").textContent = "Loading chapter…";
+    $("#reader-message").textContent = "";
+
+    goToPage("reader");
+
+    try {
+      if (typeof getChapterContent !== "function") {
+        throw new Error("The chapter content helper is unavailable.");
+      }
+
+      const data = await getChapterContent(chapter.id);
+      let content = "";
+
+      if (typeof data === "string") {
+        content = data;
+      } else if (Array.isArray(data)) {
+        content = data.map(row =>
+          row.content || row.chapter_content || row.body || ""
+        ).filter(Boolean).join("\n\n");
+      } else if (data && typeof data === "object") {
+        content = data.content || data.chapter_content || data.body || "";
+      }
+
+      if (!content) {
+        throw new Error("Chapter content was empty or returned in an unsupported format.");
+      }
+
+      state.chapterText = content;
+      $("#reader-content").textContent = content;
+    } catch (error) {
+      console.error("Loading chapter content failed:", error);
+      $("#reader-content").textContent =
+        "This chapter's content could not be loaded. Please try again later.";
+      $("#reader-message").textContent = error.message || "";
+    }
+  }
+
+  $("#reader-back")?.addEventListener("click", () => goToPage("book"));
+
+  $("#previous-chapter")?.addEventListener("click", async () => {
+    if (state.currentChapterIndex > 0) {
+      await openChapter(state.currentChapterIndex - 1);
+    } else {
+      toast("You are at the first chapter.");
+    }
+  });
+
+  $("#next-chapter")?.addEventListener("click", async () => {
+    if (state.currentChapterIndex < state.chapters.length - 1) {
+      await openChapter(state.currentChapterIndex + 1);
+    } else {
+      toast("You are at the latest available chapter.");
+    }
+  });
+
+  async function addSelectedBookToLibrary(status = "Viewed") {
+    if (!state.user) {
+      toast("Please log in to save stories to your library.");
+      goToPage("account");
+      return;
     }
 
-    async function getReaderProfile() {
-      try {
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (!state.selectedBook || typeof addBookToReaderLibrary !== "function") {
+      toast("Library service is unavailable.");
+      return;
+    }
 
-        if (userError || !user) return null;
+    try {
+      await addBookToReaderLibrary(state.selectedBook.id, status);
+      toast("Story added to your library.");
+    } catch (error) {
+      toast(error.message || "Could not update your library.");
+    }
+  }
 
-        const { data: profile, error } = await supabase
-          .from("readers")
-          .select("*")
-          .eq("auth_user_id", user.id)
-          .maybeSingle();
+  $("#reader-library")?.addEventListener("click", () => addSelectedBookToLibrary("Ongoing"));
 
-        if (error) {
-          console.warn("Reader lookup error:", error);
-          return null;
+  $("#library-tabs")?.addEventListener("click", event => {
+    const button = event.target.closest("[data-library-status]");
+    if (!button) return;
+
+    state.libraryStatus = button.dataset.libraryStatus;
+    $$("#library-tabs .tab-btn").forEach(tab =>
+      tab.classList.toggle("active", tab === button));
+    renderLibrary();
+  });
+
+  async function loadLibrary() {
+    if (!state.user) {
+      renderBookList("#library-books", [], "Log in to view your personal library.");
+      return;
+    }
+
+    if (typeof getReaderLibrary !== "function") {
+      renderBookList("#library-books", [], "The library service is unavailable.");
+      return;
+    }
+
+    try {
+      state.libraryEntries = await getReaderLibrary();
+      renderLibrary();
+    } catch (error) {
+      console.error("Library loading failed:", error);
+      renderBookList("#library-books", [], "Your library could not be loaded.");
+    }
+  }
+
+  function renderLibrary() {
+    const entries = state.libraryEntries.filter(entry =>
+      String(entry.status || "Viewed").toLowerCase() ===
+      state.libraryStatus.toLowerCase()
+    );
+    renderBookList("#library-books",
+      entries.map(entry => entry.book).filter(Boolean),
+      `No stories in the "${state.libraryStatus}" section yet.`);
+  }
+    function updateAccountUI() {
+    const button = $("#login-nav");
+    if (button) {
+      button.textContent = state.user ? "My Profile" : "Log in";
+      button.dataset.page = state.user ? "profile" : "account";
+    }
+
+    $("#coin-count").textContent =
+      state.profile?.coins == null ? "—" : String(state.profile.coins);
+  }
+
+  async function refreshAuth() {
+    try {
+      const { data, error } = await supabaseClient.auth.getUser();
+      if (error) throw error;
+
+      state.user = data?.user || null;
+      state.profile = null;
+
+      if (state.user && typeof getCurrentReader === "function") {
+        try {
+          const reader = await getCurrentReader();
+          state.profile = reader?.profile || null;
+        } catch (error) {
+          console.warn("Could not load reader profile:", error);
         }
-
-        return profile;
-      } catch (error) {
-        console.warn("Reader profile error:", error);
-        return null;
       }
+
+      updateAccountUI();
+      if (state.user) loadProfile();
+    } catch (error) {
+      console.error("Authentication check failed:", error);
+      state.user = null;
+      state.profile = null;
+      updateAccountUI();
+    }
+  }
+
+  $("#show-login")?.addEventListener("click", () => {
+    $("#login-form").classList.remove("hidden");
+    $("#signup-form").classList.add("hidden");
+    $("#show-login").classList.add("active");
+    $("#show-signup").classList.remove("active");
+    $("#account-heading").textContent = "Welcome back";
+    $("#account-description").textContent = "Log in to continue your reading journey.";
+  });
+
+  $("#show-signup")?.addEventListener("click", () => {
+    $("#signup-form").classList.remove("hidden");
+    $("#login-form").classList.add("hidden");
+    $("#show-signup").classList.add("active");
+    $("#show-login").classList.remove("active");
+    $("#account-heading").textContent = "Create your account";
+    $("#account-description").textContent = "Join Fictional World Library.";
+  });
+
+  $("#login-form")?.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const email = $("#login-email").value.trim();
+    const password = $("#login-password").value;
+
+    try {
+      if (typeof handleReaderLogin !== "function") {
+        throw new Error("Login service is unavailable.");
+      }
+
+      const result = await handleReaderLogin(email, password);
+      if (!result) return;
+
+      await refreshAuth();
+      setMessage("#account-message", "Login successful.", "success");
+      toast("Welcome back!");
+      goToPage("home");
+    } catch (error) {
+      setMessage("#account-message", error.message || "Login failed.", "error");
+    }
+  });
+
+  $("#signup-form")?.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const name = $("#signup-name").value.trim();
+    const email = $("#signup-email").value.trim();
+    const password = $("#signup-password").value;
+
+    try {
+      if (typeof handleReaderRegistration !== "function") {
+        throw new Error("Registration service is unavailable.");
+      }
+
+      const result = await handleReaderRegistration(email, password, name);
+      if (!result) return;
+
+      await refreshAuth();
+      setMessage("#account-message",
+        result.session
+          ? "Your account has been created."
+          : "Registration submitted. Check your email if email confirmation is required.",
+        "success");
+
+      if (result.session) goToPage("home");
+    } catch (error) {
+      setMessage("#account-message", error.message || "Registration failed.", "error");
+    }
+  });
+
+  $("#forgot-password")?.addEventListener("click", async () => {
+    const email = $("#login-email").value.trim();
+
+    try {
+      if (typeof sendReaderPasswordReset !== "function") {
+        throw new Error("Password reset is unavailable.");
+      }
+      await sendReaderPasswordReset(email);
+    } catch (error) {
+      setMessage("#account-message", error.message || "Could not send reset email.", "error");
+    }
+  });
+
+  $("#logout-button")?.addEventListener("click", async () => {
+    if (!state.user) {
+      toast("You are not logged in.");
+      return;
     }
 
-    async function loadProfile() {
-      const profile = await getReaderProfile();
-      if (!profile) {
-        reader = null;
-        return;
+    try {
+      if (typeof handleReaderLogout === "function") {
+        await handleReaderLogout();
+      } else {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+        state.user = null;
+        state.profile = null;
+        updateAccountUI();
+        goToPage("home");
       }
+    } catch (error) {
+      toast(error.message || "Logout failed.");
+    }
+  });
 
-      reader = profile;
-
-      const profileName = $("profile-name");
-      const emailField = $("profile-email");
-      const readerIdField = $("profile-reader-id");
-      const profileCoins = $("profile-coins");
-      const walletCoins = $("wallet-coins");
-      const profileSaved = $("profile-saved");
-      const avatar = $("profile-avatar");
-      const displayNameInput = $("profile-display-name");
-
-      if (profileName) profileName.textContent = profile.display_name || "Reader";
-      if (emailField) emailField.textContent = profile.email || "";
-      if (readerIdField) readerIdField.textContent = profile.reader_id || "FWM0000000";
-      if (profileCoins) profileCoins.textContent = String(profile.coin_balance || 0);
-      if (walletCoins) walletCoins.textContent = String(profile.coin_balance || 0);
-      if (profileSaved) profileSaved.textContent = String(profile.saved_count || 0);
-      if (avatar) avatar.textContent = "♡";
-      if (displayNameInput) displayNameInput.value = profile.display_name || "";
+  async function loadProfile() {
+    if (!state.user) {
+      $("#profile-name").textContent = "Reader";
+      $("#profile-email").textContent = "Log in to view your profile.";
+      $("#profile-id").textContent = "—";
+      return;
     }
 
-    async function loadTransactions() {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) return;
-
-      const { data, error: txError } = await supabase
-        .from("transactions")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      if (txError) {
-        console.warn("Transactions error:", txError);
-        return;
+    try {
+      if (typeof getCurrentReader === "function") {
+        const reader = await getCurrentReader();
+        state.profile = reader?.profile || null;
       }
 
-      const transactionsEl = $("transactions");
-      if (transactionsEl) {
-        transactionsEl.innerHTML = data && data.length
-          ? data.map(t => `
-              <div class="chapter-row">
-                <span>${t.payment_status || "Transaction"} · ${t.amount_ngn ?? 0} NGN</span>
-                <span>${t.coins_added ?? 0} coins</span>
-              </div>
-            `).join("")
-          : `<p class="muted">No transactions yet.</p>`;
+      const profile = state.profile || {};
+      $("#profile-name").textContent =
+        profile.name || state.user.user_metadata?.name || "Reader";
+      $("#profile-email").textContent = state.user.email || "—";
+      $("#profile-id").textContent = String(profile.id || state.user.id || "—");
+      $("#profile-name-input").value =
+        profile.name || state.user.user_metadata?.name || "";
+      $("#profile-gender").value = profile.gender || "";
+      $("#profile-picture").value = profile.profile_picture || profile.avatar_url || "";
+
+      const avatar = $("#profile-avatar");
+      const picture = profile.profile_picture || profile.avatar_url;
+
+      if (picture) {
+        avatar.innerHTML = `<img src="${escapeHTML(picture)}" alt="Profile picture">`;
+      } else {
+        avatar.textContent = (profile.name || "R").slice(0, 1).toUpperCase();
       }
+
+      updateAccountUI();
+    } catch (error) {
+      console.error("Profile loading failed:", error);
+      setMessage("#profile-message", "Your profile could not be loaded.", "error");
+    }
+  }
+
+  $("#profile-form")?.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!state.user) {
+      toast("Please log in first.");
+      goToPage("account");
+      return;
     }
 
-    async function loadNotifications() {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) return;
+    const name = $("#profile-name-input").value.trim();
+    const gender = $("#profile-gender").value;
+    const picture = $("#profile-picture").value.trim();
 
-      const { data, error: notificationError } = await supabase
-        .from("notification")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      if (notificationError) {
-        console.warn("Notifications error:", notificationError);
-        return;
-      }
-
-      const list = $("notification-list");
-      if (list) {
-        list.innerHTML = data && data.length
-          ? data.map(n => `
-              <article class="chapter-row">
-                <div class="chapter-label">
-                  <strong>${escapeHTML(n.title || "Notification")}</strong>
-                  <p class="muted">${escapeHTML(n.message || n.body || "")}</p>
-                  <small class="muted">${new Date(n.created_at).toLocaleString()}</small>
-                </div>
-                <span class="tag">${escapeHTML(n.type || "info")}</span>
-              </article>
-            `).join("")
-          : `<p class="muted">You're all caught up. No notifications yet.</p>`;
-      }
-    }
-
-    async function saveProfile() {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
-        notify("Please log in first.");
-        return;
-      }
-
-      const displayName = $("profile-display-name")?.value?.trim() || "";
-      const { error } = await supabase
-        .from("readers")
+    try {
+      const { error } = await supabaseClient
+        .from("users")
         .update({
-          display_name: displayName,
-          gender: $("profile-gender")?.value || ""
+          name,
+          gender,
+          profile_picture: picture || null
         })
-        .eq("auth_user_id", user.id);
+        .eq("auth_user_id", state.user.id);
 
-      if (error) {
-        console.warn("Profile update error:", error);
-        notify("Profile update failed.");
+      if (error) throw error;
+
+      await loadProfile();
+      setMessage("#profile-message", "Profile saved.", "success");
+    } catch (error) {
+      console.error("Profile update failed:", error);
+      setMessage("#profile-message",
+        error.message || "Profile could not be saved. Check your users table fields and permissions.",
+        "error");
+    }
+  });
+
+  async function loadNotifications() {
+    const el = $("#notifications-list");
+
+    if (!state.user) {
+      el.innerHTML = '<div class="empty-state">Log in to view notifications.</div>';
+      return;
+    }
+
+    try {
+      if (typeof getReaderNotifications !== "function") {
+        throw new Error("Notifications service is unavailable.");
+      }
+
+      const rows = await getReaderNotifications();
+
+      if (!rows.length) {
+        el.innerHTML = '<div class="empty-state">You have no notifications yet.</div>';
         return;
       }
 
-      notify("Profile updated.");
-    }
-
-    async function signIn() {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (user) {
-        showPage("profile");
-        return;
-      }
-      showPage("account");
-    }
-
-    function renderMembershipPlans() {
-      const plans = [
-        { id:"readers_pass", name:"Readers Pass", monthly:"$5.99", yearly:"$49.99", benefits:["No banner ad on homepage","75 free coins monthly","5% off on all coin purchases"] },
-        { id:"vip_reader", name:"VIP Reader", monthly:"$9.99", yearly:"$89.99", benefits:["No banner ad on homepage","175 free coins monthly","10% off on all coin purchases"] },
-        { id:"exclusive_reader", name:"Exclusive Reader", monthly:"$19.99", yearly:"$179.99", benefits:["No banner ad on homepage","325 free coins monthly","20% off on all coin purchases"] }
-      ];
-
-      const membershipEl = $("membership-plans");
-      if (membershipEl) {
-        membershipEl.innerHTML = plans.map((p, i) => `
-          <div class="plan ${i === 1 ? "featured" : ""}" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;">
-            <div class="eyebrow">${i === 1 ? "Popular choice" : "Reader membership"}</div>
-            <h2>${p.name}</h2>
-            <div class="price" style="font-size:32px;font-weight:700;margin:12px 0;">${p.monthly}<small class="muted" style="font-size:14px;"> / month</small></div>
-            <p class="muted">${p.yearly} when billed yearly</p>
-            <ul style="padding-left:20px;line-height:1.8;color:var(--muted);">
-              ${p.benefits.map(x => `<li>${x}</li>`).join("")}
-            </ul>
-            <button class="btn primary" style="width:100%;" data-type="membership" data-id="${p.id}">Choose plan</button>
+      el.innerHTML = rows.map(item => `
+        <div class="panel section">
+          <div class="list-row">
+            <div>
+              <strong>${escapeHTML(item.title || item.message || "Notification")}</strong>
+              <p class="muted">${escapeHTML(item.message || "")}</p>
+              <small class="muted">${dateLabel(item.created_at)}</small>
+            </div>
+            ${item.is_read ? '<span class="status">Read</span>' :
+              `<button class="btn btn-secondary" data-mark-read="${escapeHTML(item.id)}">Mark read</button>`}
           </div>
-        `).join("");
-      }
+        </div>`).join("");
+    } catch (error) {
+      console.error("Notifications failed:", error);
+      el.innerHTML = '<div class="empty-state">Notifications could not be loaded.</div>';
     }
-          async function initAuthForm() {
-      const form = $("auth-form");
-      const formReset = $("reset-form");
+  }
 
-      if (form) {
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
+  $("#notifications-list")?.addEventListener("click", async event => {
+    const button = event.target.closest("[data-mark-read]");
+    if (!button) return;
 
-          const email = $("auth-email")?.value.trim();
-          const password = $("auth-password")?.value.trim();
-          const name = $("auth-name")?.value.trim();
-
-          const isRegister = !$("name-field")?.hidden;
-
-          if (isRegister) {
-            const { data, error } = await supabase.auth.signUp({
-              email,
-              password,
-              options: { data: { name } }
-            });
-
-            if (error) {
-              notify(error.message || "Sign up failed.");
-              return;
-            }
-
-            const authUser = data.user;
-            const userIdCode = `FWM${String(Date.now()).slice(-7).padStart(7, "0")}`;
-
-            const { data: readerProfile, error: profileError } = await supabase
-              .from("readers")
-              .upsert([
-                {
-                  auth_user_id: authUser.id,
-                  reader_id: userIdCode,
-                  display_name: name || "Reader",
-                  email,
-                  created_at: new Date().toISOString()
-                }
-              ], { onConflict: "auth_user_id" })
-              .select()
-              .single();
-
-            if (profileError) {
-              console.warn("Profile creation error:", profileError);
-              notify("Account created, but profile could not be created.");
-            } else {
-              notify("Account created successfully.");
-            }
-          } else {
-            const { data, error } = await supabase.auth.signInWithPassword({
-              email,
-              password
-            });
-
-            if (error) {
-              notify(error.message || "Sign in failed.");
-              return;
-            }
-
-            notify("Signed in successfully.");
-          }
-
-          const profile = await getReaderProfile();
-          if (profile) {
-            reader = profile;
-            showPage("profile");
-          } else {
-            showPage("home");
-          }
-        });
+    try {
+      if (typeof markReaderNotificationAsRead !== "function") {
+        throw new Error("Mark-as-read service is unavailable.");
       }
 
-      if (formReset) {
-        formReset.addEventListener("submit", async (event) => {
-          event.preventDefault();
+      await markReaderNotificationAsRead(button.dataset.markRead);
+      await loadNotifications();
+    } catch (error) {
+      toast(error.message || "Could not mark notification as read.");
+    }
+  });
 
-          const resetEmail = $("reset-email")?.value.trim();
+  $("#refresh-notifications")?.addEventListener("click", loadNotifications);
 
-          const { error } = await supabase.auth.resetPasswordForEmail(resetEmail);
-
-          if (error) {
-            notify(error.message || "Reset password failed.");
-            return;
-          }
-
-          notify("Password reset link has been sent.");
-        });
-      }
+  async function loadWallet() {
+    if (!state.user) {
+      $("#wallet-balance").textContent = "—";
+      $("#wallet-unlocks").textContent = "—";
+      $("#wallet-membership").textContent = "Log in";
+      $("#transaction-history").innerHTML =
+        '<div class="empty-state">Log in to view your transactions.</div>';
+      $("#unlock-history").innerHTML =
+        '<div class="empty-state">Log in to view your unlock history.</div>';
+      return;
     }
 
-    document.addEventListener("click", (event) => {
-      const target = event.target.closest("[data-page]");
-      if (target) {
-        event.preventDefault();
-        showPage(target.dataset.page);
+    try {
+      await loadProfile();
+
+      const profile = state.profile || {};
+      const balance = profile.coins ?? profile.coin_balance ?? null;
+      $("#wallet-balance").textContent = balance == null ? "—" : String(balance);
+      $("#wallet-membership").textContent =
+        profile.subscription_tier || profile.membership || "Free";
+
+      updateAccountUI();
+
+      if (typeof getReaderTransactions === "function") {
+        const transactions = await getReaderTransactions();
+
+        $("#transaction-history").innerHTML = transactions.length
+          ? transactions.map(tx => `
+              <div class="list-row">
+                <div>
+                  <strong>${escapeHTML(tx.description || tx.type || "Transaction")}</strong>
+                  <p class="muted">${dateLabel(tx.created_at)}</p>
+                </div>
+                <div>
+                  ${tx.amount == null ? "" : escapeHTML(String(tx.amount))}
+                  ${tx.status ? `<p class="muted">${escapeHTML(tx.status)}</p>` : ""}
+                </div>
+              </div>`).join("")
+          : '<div class="empty-state">No transactions yet.</div>';
       }
 
-      const genreButton = event.target.closest("[data-genre]");
-      if (genreButton) {
-        selectedGenre = genreButton.dataset.genre;
-        renderBooks();
-      }
+      await loadUnlockHistory();
+    } catch (error) {
+      console.error("Wallet loading failed:", error);
+      setMessage("#wallet-message",
+        error.message || "Some wallet information could not be loaded.", "error");
+    }
+  }
 
-      const bookClick = event.target.closest("[data-open-book]");
-      if (bookClick) {
-        const current = books.find(book => String(book.id) === String(bookClick.dataset.openBook));
-        if (current) {
-          currentBook = current;
-          showPage("book");
-        }
-      }
+  async function loadUnlockHistory() {
+    const el = $("#unlock-history");
 
-      const themeToggle = event.target.closest("#theme-toggle");
-      if (themeToggle) {
-        document.body.classList.toggle("light");
-        localStorage.setItem("fwl-theme", document.body.classList.contains("light") ? "light" : "dark");
-      }
+    try {
+      const { data, error } = await supabaseClient
+        .from("unlocks")
+        .select("*")
+        .eq("user_id", state.user.id)
+        .order("created_at", { ascending: false });
 
-      const settingsTheme = event.target.closest("#settings-theme");
-      if (settingsTheme) {
-        document.body.classList.toggle("light");
-        localStorage.setItem("fwl-theme", document.body.classList.contains("light") ? "light" : "dark");
-      }
+      if (error) throw error;
 
-      const logoutButton = event.target.closest("#logout-btn");
-      if (logoutButton) {
-        supabase.auth.signOut();
-        reader = null;
-        notify("Logged out.");
-        showPage("home");
-      }
+      $("#wallet-unlocks").textContent = String(data?.length || 0);
+      el.innerHTML = data?.length
+        ? data.map(item => `
+            <div class="list-row">
+              <span>Chapter unlock</span>
+              <span class="muted">${dateLabel(item.created_at)}</span>
+            </div>`).join("")
+        : '<div class="empty-state">No chapter unlocks recorded yet.</div>';
+    } catch (error) {
+      console.warn("Unlock history could not be loaded:", error);
+      $("#wallet-unlocks").textContent = "—";
+      el.innerHTML = '<div class="empty-state">Unlock history is currently unavailable.</div>';
+    }
+  }
 
-      const saveProfileButton = event.target.closest("#save-profile");
-      if (saveProfileButton) {
-        saveProfile();
-      }
+  /*
+   * Payments:
+   * Do not call Paystack directly with an amount calculated in the browser.
+   * The existing initialize-payment Edge Function must validate the user,
+   * product, discount, FX conversion, and amount server-side.
+   *
+   * The exact request contract must match the deployed Edge Function.
+   * Until it is verified, these buttons do not invent a request payload.
+   */
+  $("#coin-packages")?.addEventListener("click", event => {
+    const button = event.target.closest("[data-coins]");
+    if (!button) return;
 
-      const switchAuthButton = event.target.closest("#switch-auth");
-      if (switchAuthButton) {
-        const nameField = $("name-field");
-        const submitButton = $("auth-form")?.querySelector("button[type='submit']");
-        const hiddenState = nameField?.hidden;
+    if (!state.user) {
+      toast("Please log in before purchasing coins.");
+      goToPage("account");
+      return;
+    }
 
-        if (hiddenState === false) {
-          nameField.hidden = true;
-        } else {
-          nameField.hidden = false;
-        }
+    setMessage("#wallet-message",
+      "Payment has not been started. The checkout request must match the deployed initialize-payment function.",
+      "error");
+  });
 
-        if (submitButton) {
-          submitButton.textContent = hiddenState === false ? "Log in" : "Create account";
-        }
-      }
-
-      const forgotPassword = event.target.closest("#forgot-password");
-      if (forgotPassword) {
-        showPage("reset");
-      }
-
-      const coverAction = event.target.closest("#start-reading");
-      if (coverAction && currentBook) {
-        if (!chapters.length) {
-          const first = currentBook.chapters || [];
-          if (first.length) {
-            chapters = first;
-          } else {
-            chapters = [{
-              chapter_number: 1,
-              title: "Chapter 1",
-              content: "This is a sample chapter. Readers can open it here."
-            }];
-          }
-        }
-        currentChapterIndex = 0;
-        showPage("reader");
-        renderReader();
-      }
-
-      const backToBook = event.target.closest("#back-to-book");
-      if (backToBook) {
-        showPage("book");
-      }
-
-      const previousChapter = event.target.closest("#previous-chapter");
-      if (previousChapter) {
-        if (currentChapterIndex > 0) {
-          currentChapterIndex--;
-          renderReader();
-        }
-      }
-
-      const nextChapter = event.target.closest("#next-chapter");
-      if (nextChapter) {
-        if (currentChapterIndex < chapters.length - 1) {
-          currentChapterIndex++;
-          renderReader();
-        } else {
-          notify("You are at the last chapter.");
-        }
-      }
-
-      const saveBookBtn = event.target.closest("#save-book");
-      if (saveBookBtn && currentBook) {
-        libraryIds.add(currentBook.id);
-        notify("Book added to library.");
-      }
-
-      const walletButton = event.target.closest("[data-page='wallet']");
-      if (walletButton) {
-        showPage("wallet");
-      }
-
-      const pageLink = event.target.closest("[data-page]");
-      if (pageLink && pageLink.dataset.page === "home") {
-        showPage("home");
-      }
-    });
-
-    function renderReader() {
-      const bookTitle = $("reader-book-title");
-      const chapterTitle = $("reader-chapter-title");
-      const content = $("reader-content");
-      const chapter = chapters[currentChapterIndex];
-
-      if (!chapter) {
-        if (content) content.textContent = "Select a chapter to begin reading.";
+  $$(".subscribe-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      if (!state.user) {
+        toast("Please log in before subscribing.");
+        goToPage("account");
         return;
       }
 
-      if (bookTitle) bookTitle.textContent = currentBook?.title || "Story";
-      if (chapterTitle) chapterTitle.textContent = chapter.title || `Chapter ${chapter.chapter_number || 1}`;
-      if (content) content.textContent = chapter.content || "No content available.";
-    }
-
-    function renderMembershipSection() {
-      const plans = [
-        { id:"readers_pass", name:"Readers Pass", monthly:"$5.99", yearly:"$49.99", benefits:["No banner ad on homepage","75 free coins monthly","5% off on all coin purchases"] },
-        { id:"vip_reader", name:"VIP Reader", monthly:"$9.99", yearly:"$89.99", benefits:["No banner ad on homepage","175 free coins monthly","10% off on all coin purchases"] },
-        { id:"exclusive_reader", name:"Exclusive Reader", monthly:"$19.99", yearly:"$179.99", benefits:["No banner ad on homepage","325 free coins monthly","20% off on all coin purchases"] }
-      ];
-
-      const membershipEl = $("membership-plans");
-      if (membershipEl) {
-        membershipEl.innerHTML = plans.map((p, i) => `
-          <div class="plan" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;">
-            <div class="eyebrow">${i === 1 ? "Popular choice" : "Reader membership"}</div>
-            <h2>${p.name}</h2>
-            <div class="price" style="font-size:32px;font-weight:700;margin:12px 0;">${p.monthly}<small class="muted" style="font-size:14px;"> / month</small></div>
-            <p class="muted">${p.yearly} when billed yearly</p>
-            <ul style="padding-left:20px;line-height:1.8;color:var(--muted);">
-              ${p.benefits.map(x => `<li>${x}</li>`).join("")}
-            </ul>
-            <button class="btn primary" style="width:100%;" data-type="membership" data-id="${p.id}">Choose plan</button>
-          </div>
-        `).join("");
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      renderMembershipSection();
-      renderGenres();
-      loadBooks();
-      loadProfile();
-      initAuthForm();
-      signIn();
+      setMessage("#wallet-message",
+        "Subscription checkout is not started because the deployed payment function's subscription request format must be verified.",
+        "error");
     });
-  </script>
+  });
+
+  function applyTheme(theme) {
+    document.body.classList.toggle("dark", theme === "dark");
+    $("#theme-toggle").textContent = theme === "dark" ? "☀️" : "🌙";
+    try { localStorage.setItem("fwl-theme", theme); } catch (_) {}
+  }
+
+  function toggleTheme() {
+    applyTheme(document.body.classList.contains("dark") ? "light" : "dark");
+  }
+
+  $("#theme-toggle")?.addEventListener("click", toggleTheme);
+  $("#settings-theme-toggle")?.addEventListener("click", toggleTheme);
+
+  $("#current-year").textContent = new Date().getFullYear();
+
+  async function initialiseApp() {
+    renderGenres();
+
+    let savedTheme = "light";
+    try { savedTheme = localStorage.getItem("fwl-theme") || "light"; } catch (_) {}
+    applyTheme(savedTheme);
+
+    await refreshAuth();
+    await loadBooks();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialiseApp);
+  } else {
+    initialiseApp();
+  }
+})();
+</script>
 </body>
 </html>
