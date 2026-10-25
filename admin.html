@@ -540,8 +540,373 @@ label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; }
 <script src="superbase.js"></script>
 <script src="reader-auth.js"></script>
 <script src="reader-books.js"></script>
-<script src="reader-features.js"></script>
-<script>
+<script src="reader-features.js"></script><script>
+async function loadProfile() {
+  const el = document.getElementById("profile-content");
+  if (!currentUser) {
+    el.innerHTML = '<p>Log in to view your reader profile.</p><button class="btn" data-page="account">Log in / Sign up</button>';
+    return;
+  }
+  try {
+    if (!readerProfile) readerProfile = await ensureReaderProfile(currentUser);
+    const p = readerProfile;
+    el.innerHTML = `
+      <div class="row">
+        <div>
+          <h3>${escapeHtml(p.name || currentUser.user_metadata?.name || "Reader")}</h3>
+          <p class="muted">${escapeHtml(currentUser.email || p.email || "")}</p>
+        </div>
+        <span class="badge">Reader account</span>
+      </div>
+      <p class="muted">Your Reader ID</p>
+      <div class="reader-id" id="reader-id-value">${escapeHtml(readerId(p))}</div>
+      <div class="form-actions" style="margin-top:12px">
+        <button class="btn secondary" id="copy-reader-id">Copy Reader ID</button>
+        <button class="btn" data-page="wallet">Open wallet</button>
+      </div>
+      <div class="grid two" style="margin-top:18px">
+        <div class="stat"><span>Coins</span><strong>${escapeHtml(p.coins ?? p.coin_balance ?? "—")}</strong></div>
+        <div class="stat"><span>Membership</span><strong>${escapeHtml(p.membership_name || "Free")}</strong></div>
+      </div>
+      <p class="muted" style="margin-top:15px">Your account is linked to your secure sign-in. Never share your password.</p>`;
+    document.getElementById("copy-reader-id").onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(String(readerId(p)));
+        toast("Reader ID copied.");
+      } catch { toast("Your Reader ID is " + readerId(p)); }
+    };
+  } catch (error) {
+    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load your profile.")}</p>`;
+  }
+}
+function renderBookCard(book) {
+  const cover = book.cover_url || book.cover_image || "";
+  return `<article class="book-card">
+    ${cover ? `<img class="book-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(book.title)} cover" loading="lazy">` : '<div class="book-cover" aria-label="No cover image"></div>'}
+    <h3>${escapeHtml(book.title || "Untitled")}</h3>
+    <p>By ${escapeHtml(book.author_name || "Unknown author")}</p>
+    <p>${escapeHtml(book.genre || "Fiction")} · ${escapeHtml(book.status || "Published")}</p>
+    <button class="btn" data-open-book="${escapeHtml(book.id)}">Read story</button>
+  </article>`;
+}
+async function loadBooks() {
+  const containers = ["featured-books","ongoing-books","completed-books","all-books"];
+  try {
+    const {data,error} = await getSupabase().from("books").select("*")
+      .in("status",["Ongoing","Completed","Published","published"])
+      .order("created_at",{ascending:false}).limit(300);
+    if (error) throw error;
+    books = data || [];
+    const featured = books.filter(b => b.featured === true);
+    const ongoing = books.filter(b => String(b.status).toLowerCase() === "ongoing");
+    const completed = books.filter(b => String(b.status).toLowerCase() === "completed");
+    document.getElementById("featured-books").innerHTML = featured.length
+      ? featured.map(renderBookCard).join("") : '<p class="muted">No featured stories yet.</p>';
+    document.getElementById("ongoing-books").innerHTML = ongoing.length
+      ? ongoing.map(renderBookCard).join("") : '<p class="muted">No ongoing stories yet.</p>';
+    document.getElementById("completed-books").innerHTML = completed.length
+      ? completed.map(renderBookCard).join("") : '<p class="muted">No completed stories yet.</p>';
+    document.getElementById("all-books").innerHTML = books.length
+      ? books.map(renderBookCard).join("") : '<p class="muted">No published stories are available yet.</p>';
+    document.getElementById("genres").innerHTML = genres.map(g =>
+      `<button class="genre" data-genre="${escapeHtml(g)}">${escapeHtml(g)}</button>`).join("");
+    document.getElementById("genre-filter").innerHTML =
+      '<option value="">All genres</option>' + genres.map(g=>`<option>${escapeHtml(g)}</option>`).join("");
+  } catch (error) {
+    console.error("Books query failed:",error);
+    containers.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<p class="notice error">Stories could not be loaded. Check public read access to the books table.</p>';
+    });
+  }
+}
+document.addEventListener("click", event => {
+  const bookBtn = event.target.closest("[data-open-book]");
+  if (bookBtn) openBook(bookBtn.dataset.openBook);
+  const genreBtn = event.target.closest("[data-genre]");
+  if (genreBtn) {
+    document.getElementById("genre-filter").value = genreBtn.dataset.genre;
+    filterBooks();
+    go("browse");
+  }
+});
+function filterBooks() {
+  const q = document.getElementById("book-search").value.trim().toLowerCase();
+  const genre = document.getElementById("genre-filter").value;
+  const results = books.filter(b => {
+    const text = [b.title,b.author_name,b.genre,b.synopsis].join(" ").toLowerCase();
+    return (!q || text.includes(q)) && (!genre || b.genre === genre);
+  });
+  document.getElementById("all-books").innerHTML = results.length
+    ? results.map(renderBookCard).join("") : '<p class="muted">No stories match your search.</p>';
+}
+document.getElementById("search-books").addEventListener("click",filterBooks);
+document.getElementById("book-search").addEventListener("keydown",event=>{
+  if(event.key==="Enter"){event.preventDefault();filterBooks();}
+});
+document.getElementById("genre-filter").addEventListener("change",filterBooks);
+
+async function openBook(bookId) {
+  activeBook = books.find(b => String(b.id) === String(bookId));
+  if (!activeBook) return;
+  const detail = document.getElementById("book-detail");
+  detail.innerHTML = `<div class="panel"><h2>${escapeHtml(activeBook.title)}</h2><p>By ${escapeHtml(activeBook.author_name || "Unknown author")}</p><p>${escapeHtml(activeBook.synopsis || "No synopsis provided.")}</p><div id="chapter-list">Loading chapters…</div></div>`;
+  go("book");
+  try {
+    const {data,error} = await getSupabase().from("chapters").select("id,book_id,chapter_number,title,locked,pub_status")
+      .eq("book_id",activeBook.id).order("chapter_number",{ascending:true});
+    if (error) throw error;
+    const chapters = (data || []).filter(c => String(c.pub_status || "").toLowerCase() === "published");
+    document.getElementById("chapter-list").innerHTML = chapters.length ? chapters.map(ch => `
+      <div class="list-item row">
+        <div><strong>Chapter ${escapeHtml(ch.chapter_number)}: ${escapeHtml(ch.title || "")}</strong><br><span class="muted">${ch.locked ? "Locked · 10 coins" : "Free"}</span></div>
+        <button class="btn" data-read-chapter="${escapeHtml(ch.id)}" data-locked="${ch.locked ? "true":"false"}">Read</button>
+      </div>`).join("") : '<p class="muted">No published chapters yet.</p>';
+    document.querySelectorAll("[data-read-chapter]").forEach(btn => btn.addEventListener("click",()=>openChapter(btn.dataset.readChapter,btn.dataset.locked==="true")));
+  } catch (error) {
+    document.getElementById("chapter-list").innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load chapters.")}</p>`;
+  }
+}
+async function openChapter(chapterId,locked) {
+  if (!currentUser) {
+    toast("Log in to read this chapter.");
+    go("account");
+    return;
+  }
+  if (locked) {
+    toast("Locked chapters require a verified unlock. Open your wallet to check your coins.");
+    go("wallet");
+    return;
+  }
+  try {
+    const {data,error} = await getSupabase().from("chapters").select("*").eq("id",chapterId).maybeSingle();
+    if (error) throw error;
+    if (!data || String(data.pub_status||"").toLowerCase()!=="published") throw new Error("This chapter is not published.");
+    activeChapter = data;
+    document.getElementById("reader-content").innerHTML = `
+      <article class="panel">
+        <button class="btn secondary" id="back-to-book">← Back to book</button>
+        <h2>${escapeHtml(activeBook?.title || "Story")}</h2>
+        <h3>Chapter ${escapeHtml(data.chapter_number)}: ${escapeHtml(data.title || "")}</h3>
+        <div style="white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9">${escapeHtml(data.content || data.body || "Chapter content is unavailable.")}</div>
+      </article>`;
+    document.getElementById("back-to-book").onclick=()=>go("book");
+    go("reader");
+  } catch (error) { toast(error.message || "Unable to open chapter."); }
+}
+</script><script>
+async function requireReader() {
+  if (!currentUser) {
+    toast("Please log in first.");
+    go("account");
+    return false;
+  }
+  return true;
+}
+function renderCoinPackages() {
+  document.getElementById("coin-packages").innerHTML = COIN_PACKAGES.map(p => `
+    <div class="panel">
+      <span class="badge">${p.coins.toLocaleString()} coins</span>
+      <div class="package-price">$${p.price.toFixed(2)}</div>
+      <p class="muted">Coin package</p>
+      <button class="btn" data-buy-coins="${p.coins}">Continue to payment</button>
+    </div>`).join("");
+}
+function renderPlans() {
+  document.getElementById("membership-plans").innerHTML = PLANS.map(p => `
+    <div class="panel">
+      <span class="badge">${escapeHtml(p.name)}</span>
+      <h3>${escapeHtml(p.name)}</h3>
+      <div class="package-price">$${p.monthly.toFixed(2)}<small style="font-size:13px"> / month</small></div>
+      <p>${p.coins} free coins monthly</p>
+      <p>${p.discount}% off eligible coin purchases</p>
+      <p>${p.unlocks} free chapter unlocks</p>
+      <p>No homepage banner ads</p>
+      <p class="muted">Yearly: $${p.yearly.toFixed(2)}</p>
+      <div class="form-actions">
+        <button class="btn" data-buy-plan="${p.id}" data-cycle="monthly">Monthly</button>
+        <button class="btn secondary" data-buy-plan="${p.id}" data-cycle="yearly">Yearly</button>
+      </div>
+    </div>`).join("");
+}
+document.addEventListener("click", async event => {
+  const coinButton = event.target.closest("[data-buy-coins]");
+  const planButton = event.target.closest("[data-buy-plan]");
+  if (!coinButton && !planButton) return;
+  if (!(await requireReader())) return;
+  if (busyPayment) return;
+  const isPlan = Boolean(planButton);
+  const product = isPlan ? planButton.dataset.buyPlan : "coins";
+  const coins = isPlan ? null : Number(coinButton.dataset.buyCoins);
+  const cycle = isPlan ? planButton.dataset.cycle : null;
+  await startPayment({product,coins,cycle,button:isPlan?planButton:coinButton});
+});
+async function startPayment({product,coins,cycle,button}) {
+  busyPayment = true;
+  button.disabled = true;
+  const id = product === "coins" ? coins + " coins" : product.replaceAll("-"," ") + " (" + cycle + ")";
+  notice("wallet-message","Preparing secure checkout for " + id + "…");
+  notice("membership-message","Preparing secure checkout for " + id + "…");
+  try {
+    const db = getSupabase();
+    // The server must validate product, price, FX conversion and membership discount.
+    const {data,error} = await db.functions.invoke("initialize-payment",{
+      body:{
+        product_type:product === "coins" ? "coins" : "subscription",
+        product_id:product,
+        coins,
+        billing_cycle:cycle
+      }
+    });
+    if (error) throw error;
+    const url = data?.authorization_url || data?.payment_url || data?.url;
+    if (!url || typeof url !== "string" || !/^https:\/\/(checkout\.)?paystack\.com\//i.test(url)) {
+      throw new Error(data?.error || "The payment service did not return a valid Paystack checkout link.");
+    }
+    window.location.href = url;
+  } catch (error) {
+    console.error("Payment initialization failed:",error);
+    notice("wallet-message",error.message || "Payment could not be started. Try again later.","error");
+    notice("membership-message",error.message || "Payment could not be started. Try again later.","error");
+  } finally {
+    busyPayment = false;
+    button.disabled = false;
+  }
+}
+async function loadWallet() {
+  renderCoinPackages();
+  if (!currentUser) {
+    document.getElementById("wallet-coins").textContent = "—";
+    document.getElementById("wallet-reader-id").textContent = "—";
+    document.getElementById("wallet-membership").textContent = "Free";
+    document.getElementById("transaction-list").innerHTML = '<p>Log in to view your transactions.</p>';
+    document.getElementById("unlock-list").innerHTML = '<p>Log in to view unlocked chapters.</p>';
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    document.getElementById("wallet-coins").textContent = readerProfile.coins ?? readerProfile.coin_balance ?? "—";
+    document.getElementById("wallet-reader-id").textContent = readerId(readerProfile);
+    document.getElementById("wallet-membership").textContent = readerProfile.membership_name || "Free";
+    document.getElementById("coin-count").textContent = "🪙 " + (readerProfile.coins ?? readerProfile.coin_balance ?? "—");
+    const db = getSupabase();
+    const {data:transactions,error:txError} = await db.from("transactions").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(30);
+    document.getElementById("transaction-list").innerHTML = txError
+      ? '<p class="muted">Transaction history is unavailable under current database permissions or field names.</p>'
+      : (transactions||[]).length ? transactions.map(t=>`<div class="list-item"><strong>${escapeHtml(t.description || t.type || "Transaction")}</strong><div class="muted">${escapeHtml(t.status || "Recorded")} · ${escapeHtml(t.created_at || "")}</div></div>`).join("")
+      : '<p class="muted">No transactions yet.</p>';
+    const {data:unlocks,error:unlockError} = await db.from("unlocks").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(30);
+    document.getElementById("unlock-list").innerHTML = unlockError
+      ? '<p class="muted">Unlocked chapters are unavailable under current database permissions or field names.</p>'
+      : (unlocks||[]).length ? unlocks.map(u=>`<div class="list-item">Chapter ${escapeHtml(u.chapter_id || "")} <span class="badge">${escapeHtml(u.status || "Unlocked")}</span></div>`).join("")
+      : '<p class="muted">No unlocked chapters yet.</p>';
+  } catch (error) {
+    notice("wallet-message",error.message || "Wallet could not load.","error");
+  }
+}
+async function loadMemberships() {
+  renderPlans();
+  if (!currentUser) {
+    notice("membership-message","Log in to purchase a membership.");
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    const {data,error} = await getSupabase().from("subscription").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(1);
+    if (error) throw error;
+    const active = (data||[]).find(s => String(s.status||"").toLowerCase()==="active");
+    if (active) notice("membership-message","Your membership status: " + (active.plan_name || active.plan_id || "Active") + ".","success");
+  } catch (error) {
+    console.warn("Membership lookup:",error);
+  }
+}
+async function loadLibrary() {
+  const el = document.getElementById("library-content");
+  if (!currentUser) {
+    el.innerHTML = '<p>Log in to access your library.</p><button class="btn" data-page="account">Log in</button>';
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    const {data,error} = await getSupabase().from("library").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(100);
+    if (error) throw error;
+    const rows = (data||[]).filter(row => {
+      const status = String(row.status || row.reading_status || "viewed").toLowerCase();
+      if (selectedLibraryTab==="viewed") return true;
+      return status.includes(selectedLibraryTab);
+    });
+    el.innerHTML = rows.length ? rows.map(row=>{
+      const book = books.find(b=>String(b.id)===String(row.book_id));
+      return `<div class="list-item"><strong>${escapeHtml(book?.title || row.book_title || ("Book #"+row.book_id))}</strong><div class="muted">${escapeHtml(row.status || row.reading_status || "Viewed")}</div></div>`;
+    }).join("") : '<p class="muted">Your library is empty. Open a story to start reading.</p>';
+  } catch (error) {
+    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load your library.")}</p>`;
+  }
+}
+document.querySelectorAll("[data-library-tab]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    selectedLibraryTab=button.dataset.libraryTab;
+    document.querySelectorAll("[data-library-tab]").forEach(b=>b.classList.toggle("active",b===button));
+    loadLibrary();
+  });
+});
+async function loadNotifications() {
+  const el = document.getElementById("notifications-content");
+  if (!currentUser) {
+    el.innerHTML = '<p>Log in to view notifications.</p><button class="btn" data-page="account">Log in</button>';
+    return;
+  }
+  try {
+    readerProfile = await ensureReaderProfile(currentUser);
+    const {data,error} = await getSupabase().from("notification").select("*")
+      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(50);
+    if (error) throw error;
+    el.innerHTML = (data||[]).length ? data.map(n=>`<div class="list-item"><strong>${escapeHtml(n.title || "Notification")}</strong><p>${escapeHtml(n.message || "")}</p><span class="badge">${n.is_read ? "Read" : "Unread"}</span></div>`).join("") : '<p class="muted">No notifications yet.</p>';
+  } catch (error) {
+    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load notifications.")}</p>`;
+  }
+}
+</script><script>
+document.getElementById("theme-toggle").addEventListener("click",()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("fwl-theme",document.body.classList.contains("dark")?"dark":"light");
+});
+if (localStorage.getItem("fwl-theme")==="dark") document.body.classList.add("dark");
+document.getElementById("current-year").textContent = new Date().getFullYear();
+
+async function initializeReaderSite() {
+  try {
+    const db = getSupabase();
+    const {data,error} = await db.auth.getSession();
+    if (error) throw error;
+    if (data.session?.user) await setSignedIn(data.session.user);
+  } catch (error) {
+    console.error("Reader session initialization:",error);
+  }
+  await loadBooks();
+  renderCoinPackages();
+  renderPlans();
+}
+getSupabase().auth.onAuthStateChange(async (event,session)=>{
+  if (event==="SIGNED_IN" && session?.user) {
+    await setSignedIn(session.user);
+  } else if (event==="SIGNED_OUT") {
+    currentUser = null;
+    readerProfile = null;
+    document.getElementById("login-nav").textContent = "Log in";
+    document.getElementById("login-nav").dataset.page = "account";
+    document.getElementById("coin-count").textContent = "🪙 —";
+  }
+});
+initializeReaderSite();
+})();
+</script>
+</body>
+</html><script>
 "use strict";
 (() => {
 const $ = id => document.getElementById(id);
@@ -762,370 +1127,4 @@ $("logout-button").addEventListener("click", async () => {
     go("home");
   } catch (error) { toast(error.message || "Logout failed."); }
 });
-<script>
-async function loadProfile() {
-  const el = document.getElementById("profile-content");
-  if (!currentUser) {
-    el.innerHTML = '<p>Log in to view your reader profile.</p><button class="btn" data-page="account">Log in / Sign up</button>';
-    return;
-  }
-  try {
-    if (!readerProfile) readerProfile = await ensureReaderProfile(currentUser);
-    const p = readerProfile;
-    el.innerHTML = `
-      <div class="row">
-        <div>
-          <h3>${escapeHtml(p.name || currentUser.user_metadata?.name || "Reader")}</h3>
-          <p class="muted">${escapeHtml(currentUser.email || p.email || "")}</p>
-        </div>
-        <span class="badge">Reader account</span>
-      </div>
-      <p class="muted">Your Reader ID</p>
-      <div class="reader-id" id="reader-id-value">${escapeHtml(readerId(p))}</div>
-      <div class="form-actions" style="margin-top:12px">
-        <button class="btn secondary" id="copy-reader-id">Copy Reader ID</button>
-        <button class="btn" data-page="wallet">Open wallet</button>
-      </div>
-      <div class="grid two" style="margin-top:18px">
-        <div class="stat"><span>Coins</span><strong>${escapeHtml(p.coins ?? p.coin_balance ?? "—")}</strong></div>
-        <div class="stat"><span>Membership</span><strong>${escapeHtml(p.membership_name || "Free")}</strong></div>
-      </div>
-      <p class="muted" style="margin-top:15px">Your account is linked to your secure sign-in. Never share your password.</p>`;
-    document.getElementById("copy-reader-id").onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(String(readerId(p)));
-        toast("Reader ID copied.");
-      } catch { toast("Your Reader ID is " + readerId(p)); }
-    };
-  } catch (error) {
-    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load your profile.")}</p>`;
-  }
-}
-function renderBookCard(book) {
-  const cover = book.cover_url || book.cover_image || "";
-  return `<article class="book-card">
-    ${cover ? `<img class="book-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(book.title)} cover" loading="lazy">` : '<div class="book-cover" aria-label="No cover image"></div>'}
-    <h3>${escapeHtml(book.title || "Untitled")}</h3>
-    <p>By ${escapeHtml(book.author_name || "Unknown author")}</p>
-    <p>${escapeHtml(book.genre || "Fiction")} · ${escapeHtml(book.status || "Published")}</p>
-    <button class="btn" data-open-book="${escapeHtml(book.id)}">Read story</button>
-  </article>`;
-}
-async function loadBooks() {
-  const containers = ["featured-books","ongoing-books","completed-books","all-books"];
-  try {
-    const {data,error} = await getSupabase().from("books").select("*")
-      .in("status",["Ongoing","Completed","Published","published"])
-      .order("created_at",{ascending:false}).limit(300);
-    if (error) throw error;
-    books = data || [];
-    const featured = books.filter(b => b.featured === true);
-    const ongoing = books.filter(b => String(b.status).toLowerCase() === "ongoing");
-    const completed = books.filter(b => String(b.status).toLowerCase() === "completed");
-    document.getElementById("featured-books").innerHTML = featured.length
-      ? featured.map(renderBookCard).join("") : '<p class="muted">No featured stories yet.</p>';
-    document.getElementById("ongoing-books").innerHTML = ongoing.length
-      ? ongoing.map(renderBookCard).join("") : '<p class="muted">No ongoing stories yet.</p>';
-    document.getElementById("completed-books").innerHTML = completed.length
-      ? completed.map(renderBookCard).join("") : '<p class="muted">No completed stories yet.</p>';
-    document.getElementById("all-books").innerHTML = books.length
-      ? books.map(renderBookCard).join("") : '<p class="muted">No published stories are available yet.</p>';
-    document.getElementById("genres").innerHTML = genres.map(g =>
-      `<button class="genre" data-genre="${escapeHtml(g)}">${escapeHtml(g)}</button>`).join("");
-    document.getElementById("genre-filter").innerHTML =
-      '<option value="">All genres</option>' + genres.map(g=>`<option>${escapeHtml(g)}</option>`).join("");
-  } catch (error) {
-    console.error("Books query failed:",error);
-    containers.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = '<p class="notice error">Stories could not be loaded. Check public read access to the books table.</p>';
-    });
-  }
-}
-document.addEventListener("click", event => {
-  const bookBtn = event.target.closest("[data-open-book]");
-  if (bookBtn) openBook(bookBtn.dataset.openBook);
-  const genreBtn = event.target.closest("[data-genre]");
-  if (genreBtn) {
-    document.getElementById("genre-filter").value = genreBtn.dataset.genre;
-    filterBooks();
-    go("browse");
-  }
-});
-function filterBooks() {
-  const q = document.getElementById("book-search").value.trim().toLowerCase();
-  const genre = document.getElementById("genre-filter").value;
-  const results = books.filter(b => {
-    const text = [b.title,b.author_name,b.genre,b.synopsis].join(" ").toLowerCase();
-    return (!q || text.includes(q)) && (!genre || b.genre === genre);
-  });
-  document.getElementById("all-books").innerHTML = results.length
-    ? results.map(renderBookCard).join("") : '<p class="muted">No stories match your search.</p>';
-}
-document.getElementById("search-books").addEventListener("click",filterBooks);
-document.getElementById("book-search").addEventListener("keydown",event=>{
-  if(event.key==="Enter"){event.preventDefault();filterBooks();}
-});
-document.getElementById("genre-filter").addEventListener("change",filterBooks);
-
-async function openBook(bookId) {
-  activeBook = books.find(b => String(b.id) === String(bookId));
-  if (!activeBook) return;
-  const detail = document.getElementById("book-detail");
-  detail.innerHTML = `<div class="panel"><h2>${escapeHtml(activeBook.title)}</h2><p>By ${escapeHtml(activeBook.author_name || "Unknown author")}</p><p>${escapeHtml(activeBook.synopsis || "No synopsis provided.")}</p><div id="chapter-list">Loading chapters…</div></div>`;
-  go("book");
-  try {
-    const {data,error} = await getSupabase().from("chapters").select("id,book_id,chapter_number,title,locked,pub_status")
-      .eq("book_id",activeBook.id).order("chapter_number",{ascending:true});
-    if (error) throw error;
-    const chapters = (data || []).filter(c => String(c.pub_status || "").toLowerCase() === "published");
-    document.getElementById("chapter-list").innerHTML = chapters.length ? chapters.map(ch => `
-      <div class="list-item row">
-        <div><strong>Chapter ${escapeHtml(ch.chapter_number)}: ${escapeHtml(ch.title || "")}</strong><br><span class="muted">${ch.locked ? "Locked · 10 coins" : "Free"}</span></div>
-        <button class="btn" data-read-chapter="${escapeHtml(ch.id)}" data-locked="${ch.locked ? "true":"false"}">Read</button>
-      </div>`).join("") : '<p class="muted">No published chapters yet.</p>';
-    document.querySelectorAll("[data-read-chapter]").forEach(btn => btn.addEventListener("click",()=>openChapter(btn.dataset.readChapter,btn.dataset.locked==="true")));
-  } catch (error) {
-    document.getElementById("chapter-list").innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load chapters.")}</p>`;
-  }
-}
-async function openChapter(chapterId,locked) {
-  if (!currentUser) {
-    toast("Log in to read this chapter.");
-    go("account");
-    return;
-  }
-  if (locked) {
-    toast("Locked chapters require a verified unlock. Open your wallet to check your coins.");
-    go("wallet");
-    return;
-  }
-  try {
-    const {data,error} = await getSupabase().from("chapters").select("*").eq("id",chapterId).maybeSingle();
-    if (error) throw error;
-    if (!data || String(data.pub_status||"").toLowerCase()!=="published") throw new Error("This chapter is not published.");
-    activeChapter = data;
-    document.getElementById("reader-content").innerHTML = `
-      <article class="panel">
-        <button class="btn secondary" id="back-to-book">← Back to book</button>
-        <h2>${escapeHtml(activeBook?.title || "Story")}</h2>
-        <h3>Chapter ${escapeHtml(data.chapter_number)}: ${escapeHtml(data.title || "")}</h3>
-        <div style="white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9">${escapeHtml(data.content || data.body || "Chapter content is unavailable.")}</div>
-      </article>`;
-    document.getElementById("back-to-book").onclick=()=>go("book");
-    go("reader");
-  } catch (error) { toast(error.message || "Unable to open chapter."); }
-}
-<script>
-async function requireReader() {
-  if (!currentUser) {
-    toast("Please log in first.");
-    go("account");
-    return false;
-  }
-  return true;
-}
-function renderCoinPackages() {
-  document.getElementById("coin-packages").innerHTML = COIN_PACKAGES.map(p => `
-    <div class="panel">
-      <span class="badge">${p.coins.toLocaleString()} coins</span>
-      <div class="package-price">$${p.price.toFixed(2)}</div>
-      <p class="muted">Coin package</p>
-      <button class="btn" data-buy-coins="${p.coins}">Continue to payment</button>
-    </div>`).join("");
-}
-function renderPlans() {
-  document.getElementById("membership-plans").innerHTML = PLANS.map(p => `
-    <div class="panel">
-      <span class="badge">${escapeHtml(p.name)}</span>
-      <h3>${escapeHtml(p.name)}</h3>
-      <div class="package-price">$${p.monthly.toFixed(2)}<small style="font-size:13px"> / month</small></div>
-      <p>${p.coins} free coins monthly</p>
-      <p>${p.discount}% off eligible coin purchases</p>
-      <p>${p.unlocks} free chapter unlocks</p>
-      <p>No homepage banner ads</p>
-      <p class="muted">Yearly: $${p.yearly.toFixed(2)}</p>
-      <div class="form-actions">
-        <button class="btn" data-buy-plan="${p.id}" data-cycle="monthly">Monthly</button>
-        <button class="btn secondary" data-buy-plan="${p.id}" data-cycle="yearly">Yearly</button>
-      </div>
-    </div>`).join("");
-}
-document.addEventListener("click", async event => {
-  const coinButton = event.target.closest("[data-buy-coins]");
-  const planButton = event.target.closest("[data-buy-plan]");
-  if (!coinButton && !planButton) return;
-  if (!(await requireReader())) return;
-  if (busyPayment) return;
-  const isPlan = Boolean(planButton);
-  const product = isPlan ? planButton.dataset.buyPlan : "coins";
-  const coins = isPlan ? null : Number(coinButton.dataset.buyCoins);
-  const cycle = isPlan ? planButton.dataset.cycle : null;
-  await startPayment({product,coins,cycle,button:isPlan?planButton:coinButton});
-});
-async function startPayment({product,coins,cycle,button}) {
-  busyPayment = true;
-  button.disabled = true;
-  const id = product === "coins" ? coins + " coins" : product.replaceAll("-"," ") + " (" + cycle + ")";
-  notice("wallet-message","Preparing secure checkout for " + id + "…");
-  notice("membership-message","Preparing secure checkout for " + id + "…");
-  try {
-    const db = getSupabase();
-    // The server must validate product, price, FX conversion and membership discount.
-    const {data,error} = await db.functions.invoke("initialize-payment",{
-      body:{
-        product_type:product === "coins" ? "coins" : "subscription",
-        product_id:product,
-        coins,
-        billing_cycle:cycle
-      }
-    });
-    if (error) throw error;
-    const url = data?.authorization_url || data?.payment_url || data?.url;
-    if (!url || typeof url !== "string" || !/^https:\/\/(checkout\.)?paystack\.com\//i.test(url)) {
-      throw new Error(data?.error || "The payment service did not return a valid Paystack checkout link.");
-    }
-    window.location.href = url;
-  } catch (error) {
-    console.error("Payment initialization failed:",error);
-    notice("wallet-message",error.message || "Payment could not be started. Try again later.","error");
-    notice("membership-message",error.message || "Payment could not be started. Try again later.","error");
-  } finally {
-    busyPayment = false;
-    button.disabled = false;
-  }
-}
-async function loadWallet() {
-  renderCoinPackages();
-  if (!currentUser) {
-    document.getElementById("wallet-coins").textContent = "—";
-    document.getElementById("wallet-reader-id").textContent = "—";
-    document.getElementById("wallet-membership").textContent = "Free";
-    document.getElementById("transaction-list").innerHTML = '<p>Log in to view your transactions.</p>';
-    document.getElementById("unlock-list").innerHTML = '<p>Log in to view unlocked chapters.</p>';
-    return;
-  }
-  try {
-    readerProfile = await ensureReaderProfile(currentUser);
-    document.getElementById("wallet-coins").textContent = readerProfile.coins ?? readerProfile.coin_balance ?? "—";
-    document.getElementById("wallet-reader-id").textContent = readerId(readerProfile);
-    document.getElementById("wallet-membership").textContent = readerProfile.membership_name || "Free";
-    document.getElementById("coin-count").textContent = "🪙 " + (readerProfile.coins ?? readerProfile.coin_balance ?? "—");
-    const db = getSupabase();
-    const {data:transactions,error:txError} = await db.from("transactions").select("*")
-      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(30);
-    document.getElementById("transaction-list").innerHTML = txError
-      ? '<p class="muted">Transaction history is unavailable under current database permissions or field names.</p>'
-      : (transactions||[]).length ? transactions.map(t=>`<div class="list-item"><strong>${escapeHtml(t.description || t.type || "Transaction")}</strong><div class="muted">${escapeHtml(t.status || "Recorded")} · ${escapeHtml(t.created_at || "")}</div></div>`).join("")
-      : '<p class="muted">No transactions yet.</p>';
-    const {data:unlocks,error:unlockError} = await db.from("unlocks").select("*")
-      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(30);
-    document.getElementById("unlock-list").innerHTML = unlockError
-      ? '<p class="muted">Unlocked chapters are unavailable under current database permissions or field names.</p>'
-      : (unlocks||[]).length ? unlocks.map(u=>`<div class="list-item">Chapter ${escapeHtml(u.chapter_id || "")} <span class="badge">${escapeHtml(u.status || "Unlocked")}</span></div>`).join("")
-      : '<p class="muted">No unlocked chapters yet.</p>';
-  } catch (error) {
-    notice("wallet-message",error.message || "Wallet could not load.","error");
-  }
-}
-async function loadMemberships() {
-  renderPlans();
-  if (!currentUser) {
-    notice("membership-message","Log in to purchase a membership.");
-    return;
-  }
-  try {
-    readerProfile = await ensureReaderProfile(currentUser);
-    const {data,error} = await getSupabase().from("subscription").select("*")
-      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(1);
-    if (error) throw error;
-    const active = (data||[]).find(s => String(s.status||"").toLowerCase()==="active");
-    if (active) notice("membership-message","Your membership status: " + (active.plan_name || active.plan_id || "Active") + ".","success");
-  } catch (error) {
-    console.warn("Membership lookup:",error);
-  }
-}
-async function loadLibrary() {
-  const el = document.getElementById("library-content");
-  if (!currentUser) {
-    el.innerHTML = '<p>Log in to access your library.</p><button class="btn" data-page="account">Log in</button>';
-    return;
-  }
-  try {
-    readerProfile = await ensureReaderProfile(currentUser);
-    const {data,error} = await getSupabase().from("library").select("*")
-      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(100);
-    if (error) throw error;
-    const rows = (data||[]).filter(row => {
-      const status = String(row.status || row.reading_status || "viewed").toLowerCase();
-      if (selectedLibraryTab==="viewed") return true;
-      return status.includes(selectedLibraryTab);
-    });
-    el.innerHTML = rows.length ? rows.map(row=>{
-      const book = books.find(b=>String(b.id)===String(row.book_id));
-      return `<div class="list-item"><strong>${escapeHtml(book?.title || row.book_title || ("Book #"+row.book_id))}</strong><div class="muted">${escapeHtml(row.status || row.reading_status || "Viewed")}</div></div>`;
-    }).join("") : '<p class="muted">Your library is empty. Open a story to start reading.</p>';
-  } catch (error) {
-    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load your library.")}</p>`;
-  }
-}
-document.querySelectorAll("[data-library-tab]").forEach(button=>{
-  button.addEventListener("click",()=>{
-    selectedLibraryTab=button.dataset.libraryTab;
-    document.querySelectorAll("[data-library-tab]").forEach(b=>b.classList.toggle("active",b===button));
-    loadLibrary();
-  });
-});
-async function loadNotifications() {
-  const el = document.getElementById("notifications-content");
-  if (!currentUser) {
-    el.innerHTML = '<p>Log in to view notifications.</p><button class="btn" data-page="account">Log in</button>';
-    return;
-  }
-  try {
-    readerProfile = await ensureReaderProfile(currentUser);
-    const {data,error} = await getSupabase().from("notification").select("*")
-      .eq("user_id",readerProfile.id).order("created_at",{ascending:false}).limit(50);
-    if (error) throw error;
-    el.innerHTML = (data||[]).length ? data.map(n=>`<div class="list-item"><strong>${escapeHtml(n.title || "Notification")}</strong><p>${escapeHtml(n.message || "")}</p><span class="badge">${n.is_read ? "Read" : "Unread"}</span></div>`).join("") : '<p class="muted">No notifications yet.</p>';
-  } catch (error) {
-    el.innerHTML = `<p class="notice error">${escapeHtml(error.message || "Could not load notifications.")}</p>`;
-  }
-}
-<script>
-document.getElementById("theme-toggle").addEventListener("click",()=>{
-  document.body.classList.toggle("dark");
-  localStorage.setItem("fwl-theme",document.body.classList.contains("dark")?"dark":"light");
-});
-if (localStorage.getItem("fwl-theme")==="dark") document.body.classList.add("dark");
-document.getElementById("current-year").textContent = new Date().getFullYear();
-
-async function initializeReaderSite() {
-  try {
-    const db = getSupabase();
-    const {data,error} = await db.auth.getSession();
-    if (error) throw error;
-    if (data.session?.user) await setSignedIn(data.session.user);
-  } catch (error) {
-    console.error("Reader session initialization:",error);
-  }
-  await loadBooks();
-  renderCoinPackages();
-  renderPlans();
-}
-getSupabase().auth.onAuthStateChange(async (event,session)=>{
-  if (event==="SIGNED_IN" && session?.user) {
-    await setSignedIn(session.user);
-  } else if (event==="SIGNED_OUT") {
-    currentUser = null;
-    readerProfile = null;
-    document.getElementById("login-nav").textContent = "Log in";
-    document.getElementById("login-nav").dataset.page = "account";
-    document.getElementById("coin-count").textContent = "🪙 —";
-  }
-});
-initializeReaderSite();
-})();
 </script>
-</body>
-</html>
