@@ -1,10 +1,13 @@
 async function getPublishedBooks() {
   const { data, error } = await supabaseClient
     .from("books")
-    .select("*");
+    .select("*")
+    .eq("status", "published")
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return data;
+
+  return data || [];
 }
 
 async function getBookChapters(bookId) {
@@ -15,7 +18,8 @@ async function getBookChapters(bookId) {
     .order("chapter_number", { ascending: true });
 
   if (error) throw error;
-  return data;
+
+  return data || [];
 }
 
 async function getChapterContent(chapterId) {
@@ -25,6 +29,7 @@ async function getChapterContent(chapterId) {
   );
 
   if (error) throw error;
+
   return data;
 }
 
@@ -35,5 +40,6 @@ async function unlockChapter(chapterId) {
   );
 
   if (error) throw error;
+
   return data;
 }
