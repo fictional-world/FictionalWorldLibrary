@@ -174,7 +174,6 @@
       gap:12px;
       margin-top:24px;
     }
-
     .section { margin-top:34px; }
     .section-head {
       display:flex;
@@ -184,7 +183,6 @@
       margin-bottom:18px;
       flex-wrap:wrap;
     }
-
     .genre-list { display:flex; flex-wrap:wrap; gap:10px; padding:6px 0; }
     .genre {
       background:var(--surface);
@@ -199,7 +197,6 @@
       border-color:var(--accent);
       color:#201526;
     }
-
     .book-grid {
       display:grid;
       grid-template-columns:repeat(5,minmax(0,1fr));
@@ -244,7 +241,6 @@
       text-transform:uppercase;
       font-weight:700;
     }
-
     .panel {
       background:var(--surface);
       border:1px solid var(--line);
@@ -269,50 +265,6 @@
     }
     .grid-two { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
     .grid-three { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
-    .plan {
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:18px;
-    }
-    .plan.featured { border-color:var(--accent); }
-    .price { font-size:32px; font-weight:700; margin:12px 0; }
-    .plan ul { padding-left:20px; line-height:1.8; color:var(--muted); }
-
-    .profile-head { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-    .avatar {
-      width:72px;
-      height:72px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      background:var(--card);
-      border:1px solid var(--line);
-      overflow:hidden;
-      font-size:28px;
-    }
-    .avatar img { width:100%; height:100%; object-fit:cover; }
-    .stat {
-      background:var(--surface);
-      border:1px solid var(--line);
-      padding:18px;
-      border-radius:14px;
-    }
-    .stat strong { display:block; font-size:30px; margin-top:8px; }
-    .chapter-row {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:14px 0;
-      border-bottom:1px solid var(--line);
-      flex-wrap:wrap;
-    }
-    .chapter-row:last-child { border-bottom:none; }
-    .chapter-label { flex:1; min-width:150px; }
-    .chapter-price.free { color:var(--success); font-weight:700; }
-    .chapter-price.locked { color:var(--gold); font-weight:700; }
-
     .field { margin-bottom:15px; }
     .field label { display:block; margin-bottom:6px; color:var(--muted); font-weight:600; }
     .field input,.field textarea,.field select {
@@ -326,7 +278,6 @@
     }
     .field textarea { min-height:120px; resize:vertical; }
     .form-shell { max-width:520px; margin:18px auto; }
-
     .reader-text {
       font-family:Georgia,"Times New Roman",serif;
       font-size:18px;
@@ -353,7 +304,6 @@
       max-width:90%;
       text-align:center;
     }
-
     .bottom-nav {
       position:fixed;
       left:0;
@@ -378,7 +328,6 @@
       padding:4px 2px;
     }
     .bottom-nav button.active { color:var(--accent); }
-
     .footer {
       max-width:1200px;
       margin:0 auto;
@@ -387,7 +336,6 @@
       color:var(--muted);
     }
     .footer nav { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:10px; }
-
     @media (max-width:980px) { .book-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
     @media (max-width:760px) {
       .navlinks { display:none; }
@@ -433,8 +381,7 @@
       </div>
     </div>
   </header>
-
-  <main>
+    <main>
     <section class="page active" id="page-home">
       <div class="hero">
         <div class="hero-copy">
@@ -615,7 +562,6 @@
 
     <section class="page" id="page-book">
       <button class="btn" data-page="browse">← Back to stories</button>
-
       <div class="panel" style="margin-top:18px;">
         <div class="grid-two">
           <div class="cover" id="detail-cover" style="height:360px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(135deg,#3a2a4b,#211b32);"></div>
@@ -625,7 +571,6 @@
             <p class="muted" id="detail-author"></p>
             <p id="detail-description" style="margin-top:12px;"></p>
             <p class="muted" id="detail-status" style="margin-top:12px;"></p>
-
             <div class="hero-actions">
               <button class="btn primary" id="start-reading">Start reading</button>
               <button class="btn" id="save-book">＋ Add to library</button>
@@ -646,7 +591,6 @@
         <div class="muted" id="reader-book-title"></div>
         <h1 id="reader-chapter-title">Chapter</h1>
         <div class="reader-text" id="reader-content" style="margin-top:14px;">Select a chapter to begin reading.</div>
-
         <div class="hero-actions" style="margin-top:18px;">
           <button class="btn" id="previous-chapter">← Previous</button>
           <button class="btn primary" id="next-chapter">Next chapter →</button>
@@ -659,7 +603,7 @@
       <h1>Wallet</h1>
       <div class="panel" style="margin-top:18px;">
         <p class="muted">Available coins</p>
-        <div class="price"><span id="wallet-coins">0</span> 🪙</div>
+        <div class="price" style="font-size:32px;font-weight:700;margin:12px 0;"><span id="wallet-coins">0</span> 🪙</div>
         <p class="muted">Coins are used to unlock paid chapters and access premium reading features.</p>
       </div>
 
@@ -791,8 +735,7 @@
       <a href="#" data-page="writer">Be Our Author</a>
     </nav>
   </div>
-
-  <script type="module">
+    <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const SUPABASE_URL = "https://mhvphjcreqhfnulflgiy.supabase.co";
@@ -839,7 +782,6 @@
     let chapters = [];
     let currentChapterIndex = 0;
     let reader = null;
-    let isRegister = false;
     let libraryIds = new Set();
     const unlockedChapterIds = new Set();
     const $ = id => document.getElementById(id);
@@ -855,37 +797,35 @@
 
     function escapeHTML(value = "") {
       return String(value).replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;", ">":"&gt;", '"':"&quot;","'":"&#39;"
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       })[c]);
     }
 
-    function buildReaderCode(id = "") {
-      if (!id) return "FWL-0000";
-      return `FWL-${String(id).slice(0, 8).toUpperCase()}`;
-    }
-
     function showPage(name) {
-      if (name === "profile" || name === "account") name = reader ? "profile" : "account";
       const page = $("page-" + name);
       if (!page) return;
 
       document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
       page.classList.add("active");
-      document.querySelectorAll("[data-page]").forEach(b => b.classList.toggle("active", b.dataset.page === name));
+
+      document.querySelectorAll("[data-page]").forEach(b => {
+        b.classList.toggle("active", b.dataset.page === name);
+      });
+
       window.scrollTo({ top: 0, behavior: "smooth" });
 
       if (name === "profile" && reader) loadProfile();
-      if (name === "notifications") loadNotifications();
       if (name === "wallet" && reader) loadTransactions();
+      if (name === "notifications") loadNotifications();
     }
 
     function renderGenres() {
       ["home-genres","browse-genres"].forEach(id => {
         const el = $(id);
         if (!el) return;
-        el.innerHTML = genres.map(g =>
-          `<button class="genre ${g === selectedGenre ? "active" : ""}" data-genre="${escapeHTML(g)}">${escapeHTML(g)}</button>`
-        ).join("");
+        el.innerHTML = genres.map(g => `
+          <button class="genre ${g === selectedGenre ? "active" : ""}" data-genre="${escapeHTML(g)}">${escapeHTML(g)}</button>
+        `).join("");
       });
     }
 
@@ -895,21 +835,26 @@
       const author = escapeHTML(book.author_name || book.author || "Fictional World");
       const genre = escapeHTML(book.genre || "Fiction");
       const cover = book.cover_url || "";
-
-      return `<article class="book-card" data-open-book="${id}" tabindex="0" role="button">
-        <div class="cover">${cover ? `<img loading="lazy" src="${escapeHTML(cover)}" alt="${title}" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'cover-fallback\'>${title}</div>'">` : `<div class="cover-fallback">${title}</div>`}</div>
-        <div class="book-card-content">
-          <h3>${title}</h3>
-          <p>${author}</p>
-          <span class="tag">${genre}</span>
-        </div>
-      </article>`;
+      return `
+        <article class="book-card" data-open-book="${id}" tabindex="0" role="button">
+          <div class="cover">
+            ${cover ? `<img loading="lazy" src="${escapeHTML(cover)}" alt="${title}" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'cover-fallback\'>${escapeHTML(title)}</div>'">` : `<div class="cover-fallback">${escapeHTML(title)}</div>`}
+          </div>
+          <div class="book-card-content">
+            <h3>${title}</h3>
+            <p>${author}</p>
+            <span class="tag">${genre}</span>
+          </div>
+        </article>
+      `;
     }
 
     function renderBookList(target, list) {
       const el = $(target);
       if (!el) return;
-      el.innerHTML = list.length ? list.map(bookCard).join("") : `<div class="empty">No stories to display yet.</div>`;
+      el.innerHTML = list.length
+        ? list.map(bookCard).join("")
+        : `<div class="empty">No stories to display yet.</div>`;
     }
 
     function filteredBooks() {
@@ -924,16 +869,20 @@
     function renderBooks() {
       const featured = books.filter(b => b.featured === true);
       const featuredList = featured.length ? featured.slice(0, 5) : books.slice(0, 5);
+
       renderBookList("featured-books", featuredList);
       renderBookList("ongoing-books", books.filter(b => /ongoing/i.test(b.status || "")).slice(0, 5));
       renderBookList("completed-books", books.filter(b => /completed/i.test(b.status || "")).slice(0, 5));
 
       const list = filteredBooks();
       renderBookList("all-books", list);
+
       const total = $("book-total");
       if (total) total.textContent = `${list.length} stories`;
+
       const heading = $("browse-heading");
       if (heading) heading.textContent = selectedGenre === "All" ? "All stories" : selectedGenre;
+
       renderGenres();
     }
 
@@ -943,11 +892,12 @@
 
       try {
         const { data, error } = await supabase.from("books").select("*").limit(100);
+
         if (error) {
           console.warn("Books query failed:", error.message);
           books = demoBooks;
           renderBooks();
-          notify("The live book list was unavailable, so the sample books are showing instead.");
+          notify("Live books unavailable. Showing sample stories.");
           return;
         }
 
@@ -960,606 +910,448 @@
       }
     }
 
-    function renderPackages() {
-      const packages = [
-        { id: "coins_50", coins: 50, price: "$2.99" },
-        { id: "coins_100", coins: 100, price: "$4.00" },
-        { id: "coins_250", coins: 250, price: "$10.00" },
-        { id: "coins_500", coins: 500, price: "$18.99" },
-        { id: "coins_1000", coins: 1000, price: "$35.00" }
-      ];
+    function buildReaderCode(readerId) {
+      return readerId ? `FWM${String(readerId).padStart(7, "0")}` : "FWM0000000";
+    }
 
-      const el = $("coin-packages");
-      if (el) {
-        el.innerHTML = packages.map(p => `
-          <div class="plan">
-            <div class="eyebrow">Coin package</div>
-            <h2>${p.coins.toLocaleString()} coins</h2>
-            <div class="price">${p.price}</div>
-            <button class="btn primary buy-product" data-type="coins" data-id="${p.id}" style="width:100%;">Get coins</button>
-          </div>
-        `).join("");
+    async function getReaderProfile() {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+        if (userError || !user) return null;
+
+        const { data: profile, error } = await supabase
+          .from("readers")
+          .select("*")
+          .eq("auth_user_id", user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.warn("Reader lookup error:", error);
+          return null;
+        }
+
+        return profile;
+      } catch (error) {
+        console.warn("Reader profile error:", error);
+        return null;
+      }
+    }
+
+    async function loadProfile() {
+      const profile = await getReaderProfile();
+      if (!profile) {
+        reader = null;
+        return;
       }
 
+      reader = profile;
+
+      const profileName = $("profile-name");
+      const emailField = $("profile-email");
+      const readerIdField = $("profile-reader-id");
+      const profileCoins = $("profile-coins");
+      const walletCoins = $("wallet-coins");
+      const profileSaved = $("profile-saved");
+      const avatar = $("profile-avatar");
+      const displayNameInput = $("profile-display-name");
+
+      if (profileName) profileName.textContent = profile.display_name || "Reader";
+      if (emailField) emailField.textContent = profile.email || "";
+      if (readerIdField) readerIdField.textContent = profile.reader_id || "FWM0000000";
+      if (profileCoins) profileCoins.textContent = String(profile.coin_balance || 0);
+      if (walletCoins) walletCoins.textContent = String(profile.coin_balance || 0);
+      if (profileSaved) profileSaved.textContent = String(profile.saved_count || 0);
+      if (avatar) avatar.textContent = "♡";
+      if (displayNameInput) displayNameInput.value = profile.display_name || "";
+    }
+
+    async function loadTransactions() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) return;
+
+      const { data, error: txError } = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (txError) {
+        console.warn("Transactions error:", txError);
+        return;
+      }
+
+      const transactionsEl = $("transactions");
+      if (transactionsEl) {
+        transactionsEl.innerHTML = data && data.length
+          ? data.map(t => `
+              <div class="chapter-row">
+                <span>${t.payment_status || "Transaction"} · ${t.amount_ngn ?? 0} NGN</span>
+                <span>${t.coins_added ?? 0} coins</span>
+              </div>
+            `).join("")
+          : `<p class="muted">No transactions yet.</p>`;
+      }
+    }
+
+    async function loadNotifications() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) return;
+
+      const { data, error: notificationError } = await supabase
+        .from("notification")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (notificationError) {
+        console.warn("Notifications error:", notificationError);
+        return;
+      }
+
+      const list = $("notification-list");
+      if (list) {
+        list.innerHTML = data && data.length
+          ? data.map(n => `
+              <article class="chapter-row">
+                <div class="chapter-label">
+                  <strong>${escapeHTML(n.title || "Notification")}</strong>
+                  <p class="muted">${escapeHTML(n.message || n.body || "")}</p>
+                  <small class="muted">${new Date(n.created_at).toLocaleString()}</small>
+                </div>
+                <span class="tag">${escapeHTML(n.type || "info")}</span>
+              </article>
+            `).join("")
+          : `<p class="muted">You're all caught up. No notifications yet.</p>`;
+      }
+    }
+
+    async function saveProfile() {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        notify("Please log in first.");
+        return;
+      }
+
+      const displayName = $("profile-display-name")?.value?.trim() || "";
+      const { error } = await supabase
+        .from("readers")
+        .update({
+          display_name: displayName,
+          gender: $("profile-gender")?.value || ""
+        })
+        .eq("auth_user_id", user.id);
+
+      if (error) {
+        console.warn("Profile update error:", error);
+        notify("Profile update failed.");
+        return;
+      }
+
+      notify("Profile updated.");
+    }
+
+    async function signIn() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (user) {
+        showPage("profile");
+        return;
+      }
+      showPage("account");
+    }
+
+    function renderMembershipPlans() {
       const plans = [
-        { id: "readers_pass", name: "Readers Pass", monthly: "$5.99", yearly: "$49.99", benefits: ["No banner ad on homepage","75 free coins monthly","5% off on all coin purchases"] },
-        { id: "vip_reader", name: "VIP Reader", monthly: "$9.99", yearly: "$89.99", benefits: ["No banner ad on homepage","175 free coins monthly","10% off on all coin purchases"] },
-        { id: "exclusive_reader", name: "Exclusive Reader", monthly: "$19.99", yearly: "$179.99", benefits: ["No banner ad on homepage","325 free coins monthly","20% off on all coin purchases","2 chapters free unlocked"] }
+        { id:"readers_pass", name:"Readers Pass", monthly:"$5.99", yearly:"$49.99", benefits:["No banner ad on homepage","75 free coins monthly","5% off on all coin purchases"] },
+        { id:"vip_reader", name:"VIP Reader", monthly:"$9.99", yearly:"$89.99", benefits:["No banner ad on homepage","175 free coins monthly","10% off on all coin purchases"] },
+        { id:"exclusive_reader", name:"Exclusive Reader", monthly:"$19.99", yearly:"$179.99", benefits:["No banner ad on homepage","325 free coins monthly","20% off on all coin purchases"] }
       ];
 
       const membershipEl = $("membership-plans");
       if (membershipEl) {
         membershipEl.innerHTML = plans.map((p, i) => `
-          <div class="plan ${i === 1 ? "featured" : ""}">
+          <div class="plan ${i === 1 ? "featured" : ""}" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;">
             <div class="eyebrow">${i === 1 ? "Popular choice" : "Reader membership"}</div>
             <h2>${p.name}</h2>
-            <div class="price">${p.monthly}<small class="muted" style="font-size:14px;"> / month</small></div>
+            <div class="price" style="font-size:32px;font-weight:700;margin:12px 0;">${p.monthly}<small class="muted" style="font-size:14px;"> / month</small></div>
             <p class="muted">${p.yearly} when billed yearly</p>
-            <ul>${p.benefits.map(x => `<li>${x}</li>`).join("")}</ul>
-            <button class="btn primary buy-product" data-type="membership" data-id="${p.id}" style="width:100%;">Choose plan</button>
+            <ul style="padding-left:20px;line-height:1.8;color:var(--muted);">
+              ${p.benefits.map(x => `<li>${x}</li>`).join("")}
+            </ul>
+            <button class="btn primary" style="width:100%;" data-type="membership" data-id="${p.id}">Choose plan</button>
+          </div>
+        `).join("");
+      }
+    }
+          async function initAuthForm() {
+      const form = $("auth-form");
+      const formReset = $("reset-form");
+
+      if (form) {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const email = $("auth-email")?.value.trim();
+          const password = $("auth-password")?.value.trim();
+          const name = $("auth-name")?.value.trim();
+
+          const isRegister = !$("name-field")?.hidden;
+
+          if (isRegister) {
+            const { data, error } = await supabase.auth.signUp({
+              email,
+              password,
+              options: { data: { name } }
+            });
+
+            if (error) {
+              notify(error.message || "Sign up failed.");
+              return;
+            }
+
+            const authUser = data.user;
+            const userIdCode = `FWM${String(Date.now()).slice(-7).padStart(7, "0")}`;
+
+            const { data: readerProfile, error: profileError } = await supabase
+              .from("readers")
+              .upsert([
+                {
+                  auth_user_id: authUser.id,
+                  reader_id: userIdCode,
+                  display_name: name || "Reader",
+                  email,
+                  created_at: new Date().toISOString()
+                }
+              ], { onConflict: "auth_user_id" })
+              .select()
+              .single();
+
+            if (profileError) {
+              console.warn("Profile creation error:", profileError);
+              notify("Account created, but profile could not be created.");
+            } else {
+              notify("Account created successfully.");
+            }
+          } else {
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+
+            if (error) {
+              notify(error.message || "Sign in failed.");
+              return;
+            }
+
+            notify("Signed in successfully.");
+          }
+
+          const profile = await getReaderProfile();
+          if (profile) {
+            reader = profile;
+            showPage("profile");
+          } else {
+            showPage("home");
+          }
+        });
+      }
+
+      if (formReset) {
+        formReset.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const resetEmail = $("reset-email")?.value.trim();
+
+          const { error } = await supabase.auth.resetPasswordForEmail(resetEmail);
+
+          if (error) {
+            notify(error.message || "Reset password failed.");
+            return;
+          }
+
+          notify("Password reset link has been sent.");
+        });
+      }
+    }
+
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-page]");
+      if (target) {
+        event.preventDefault();
+        showPage(target.dataset.page);
+      }
+
+      const genreButton = event.target.closest("[data-genre]");
+      if (genreButton) {
+        selectedGenre = genreButton.dataset.genre;
+        renderBooks();
+      }
+
+      const bookClick = event.target.closest("[data-open-book]");
+      if (bookClick) {
+        const current = books.find(book => String(book.id) === String(bookClick.dataset.openBook));
+        if (current) {
+          currentBook = current;
+          showPage("book");
+        }
+      }
+
+      const themeToggle = event.target.closest("#theme-toggle");
+      if (themeToggle) {
+        document.body.classList.toggle("light");
+        localStorage.setItem("fwl-theme", document.body.classList.contains("light") ? "light" : "dark");
+      }
+
+      const settingsTheme = event.target.closest("#settings-theme");
+      if (settingsTheme) {
+        document.body.classList.toggle("light");
+        localStorage.setItem("fwl-theme", document.body.classList.contains("light") ? "light" : "dark");
+      }
+
+      const logoutButton = event.target.closest("#logout-btn");
+      if (logoutButton) {
+        supabase.auth.signOut();
+        reader = null;
+        notify("Logged out.");
+        showPage("home");
+      }
+
+      const saveProfileButton = event.target.closest("#save-profile");
+      if (saveProfileButton) {
+        saveProfile();
+      }
+
+      const switchAuthButton = event.target.closest("#switch-auth");
+      if (switchAuthButton) {
+        const nameField = $("name-field");
+        const submitButton = $("auth-form")?.querySelector("button[type='submit']");
+        const hiddenState = nameField?.hidden;
+
+        if (hiddenState === false) {
+          nameField.hidden = true;
+        } else {
+          nameField.hidden = false;
+        }
+
+        if (submitButton) {
+          submitButton.textContent = hiddenState === false ? "Log in" : "Create account";
+        }
+      }
+
+      const forgotPassword = event.target.closest("#forgot-password");
+      if (forgotPassword) {
+        showPage("reset");
+      }
+
+      const coverAction = event.target.closest("#start-reading");
+      if (coverAction && currentBook) {
+        if (!chapters.length) {
+          const first = currentBook.chapters || [];
+          if (first.length) {
+            chapters = first;
+          } else {
+            chapters = [{
+              chapter_number: 1,
+              title: "Chapter 1",
+              content: "This is a sample chapter. Readers can open it here."
+            }];
+          }
+        }
+        currentChapterIndex = 0;
+        showPage("reader");
+        renderReader();
+      }
+
+      const backToBook = event.target.closest("#back-to-book");
+      if (backToBook) {
+        showPage("book");
+      }
+
+      const previousChapter = event.target.closest("#previous-chapter");
+      if (previousChapter) {
+        if (currentChapterIndex > 0) {
+          currentChapterIndex--;
+          renderReader();
+        }
+      }
+
+      const nextChapter = event.target.closest("#next-chapter");
+      if (nextChapter) {
+        if (currentChapterIndex < chapters.length - 1) {
+          currentChapterIndex++;
+          renderReader();
+        } else {
+          notify("You are at the last chapter.");
+        }
+      }
+
+      const saveBookBtn = event.target.closest("#save-book");
+      if (saveBookBtn && currentBook) {
+        libraryIds.add(currentBook.id);
+        notify("Book added to library.");
+      }
+
+      const walletButton = event.target.closest("[data-page='wallet']");
+      if (walletButton) {
+        showPage("wallet");
+      }
+
+      const pageLink = event.target.closest("[data-page]");
+      if (pageLink && pageLink.dataset.page === "home") {
+        showPage("home");
+      }
+    });
+
+    function renderReader() {
+      const bookTitle = $("reader-book-title");
+      const chapterTitle = $("reader-chapter-title");
+      const content = $("reader-content");
+      const chapter = chapters[currentChapterIndex];
+
+      if (!chapter) {
+        if (content) content.textContent = "Select a chapter to begin reading.";
+        return;
+      }
+
+      if (bookTitle) bookTitle.textContent = currentBook?.title || "Story";
+      if (chapterTitle) chapterTitle.textContent = chapter.title || `Chapter ${chapter.chapter_number || 1}`;
+      if (content) content.textContent = chapter.content || "No content available.";
+    }
+
+    function renderMembershipSection() {
+      const plans = [
+        { id:"readers_pass", name:"Readers Pass", monthly:"$5.99", yearly:"$49.99", benefits:["No banner ad on homepage","75 free coins monthly","5% off on all coin purchases"] },
+        { id:"vip_reader", name:"VIP Reader", monthly:"$9.99", yearly:"$89.99", benefits:["No banner ad on homepage","175 free coins monthly","10% off on all coin purchases"] },
+        { id:"exclusive_reader", name:"Exclusive Reader", monthly:"$19.99", yearly:"$179.99", benefits:["No banner ad on homepage","325 free coins monthly","20% off on all coin purchases"] }
+      ];
+
+      const membershipEl = $("membership-plans");
+      if (membershipEl) {
+        membershipEl.innerHTML = plans.map((p, i) => `
+          <div class="plan" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;">
+            <div class="eyebrow">${i === 1 ? "Popular choice" : "Reader membership"}</div>
+            <h2>${p.name}</h2>
+            <div class="price" style="font-size:32px;font-weight:700;margin:12px 0;">${p.monthly}<small class="muted" style="font-size:14px;"> / month</small></div>
+            <p class="muted">${p.yearly} when billed yearly</p>
+            <ul style="padding-left:20px;line-height:1.8;color:var(--muted);">
+              ${p.benefits.map(x => `<li>${x}</li>`).join("")}
+            </ul>
+            <button class="btn primary" style="width:100%;" data-type="membership" data-id="${p.id}">Choose plan</button>
           </div>
         `).join("");
       }
     }
 
-    function setProfileFields(profile = {}) {
-      const displayName = $("profile-display-name");
-      const gender = $("profile-gender");
-      const name = $("profile-name");
-      const email = $("profile-email");
-      const idBox = $("profile-reader-id");
-      const tierStat = $("profile-tier-stat");
-      const avatar = $("profile-avatar");
-
-      if (displayName) displayName.value = profile.name || (reader ? (reader.user_metadata?.display_name || reader.email?.split("@")[0] || "Reader") : "");
-      if (gender) gender.value = profile.gender || "";
-      if (name) name.textContent = profile.name || (reader ? (reader.user_metadata?.display_name || reader.email?.split("@")[0] || "Reader") : "Reader");
-      if (email) email.textContent = reader?.email || profile.email || "Sign in to view your profile";
-      if (idBox) idBox.textContent = buildReaderCode(reader?.id || profile.auth_user_id || "");
-      if (tierStat) tierStat.textContent = profile.subscription_tier || "Free";
-      if (avatar) {
-        const avatarUrl = profile.avatar_url || reader?.user_metadata?.avatar_url || reader?.user_metadata?.picture || "";
-        avatar.innerHTML = avatarUrl ? `<img src="${escapeHTML(avatarUrl)}" alt="Profile picture" onerror="this.parentElement.textContent='♡'">` : "♡";
-      }
-    }
-
-    async function loadProfile() {
-      if (!reader) return;
-
-      try {
-        const { data, error } = await supabase.from("users").select("*").eq("auth_user_id", reader.id).maybeSingle();
-        const profile = data || {};
-        if (error) console.warn("Profile load error:", error.message);
-
-        const name = profile.name || reader.user_metadata?.display_name || reader.email?.split("@")[0] || "Reader";
-        const gender = profile.gender || "";
-        const coins = Number(profile.coin_balance ?? 0);
-
-        $("coin-count").textContent = String(coins);
-        $("wallet-coins").textContent = String(coins);
-        $("profile-coins").textContent = String(coins);
-        $("profile-saved").textContent = String(libraryIds.size || 0);
-
-        setProfileFields({
-          name,
-          gender,
-          email: reader.email,
-          auth_user_id: reader.id,
-          subscription_tier: profile.subscription_tier || "Free",
-          avatar_url: profile.avatar_url || reader.user_metadata?.avatar_url || reader.user_metadata?.picture || ""
-        });
-      } catch (err) {
-        console.warn("profile load failed", err);
-        setProfileFields({
-          name: reader.user_metadata?.display_name || reader.email?.split("@")[0] || "Reader",
-          auth_user_id: reader.id,
-          email: reader.email
-        });
-      }
-    }
-
-    async function loadLibrary() {
-      if (!reader) {
-        const note = $("library-note");
-        if (note) note.hidden = false;
-        renderBookList("library-books", []);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase.from("library").select("*").eq("user_id", reader.id);
-        if (error) {
-          console.warn("Library load error:", error.message);
-          return;
-        }
-
-        libraryIds = new Set((data || []).map(x => String(x.book_id)));
-        $("profile-saved").textContent = String(libraryIds.size);
-
-        const note = $("library-note");
-        if (note) note.hidden = libraryIds.size > 0;
-
-        renderBookList("library-books", books.filter(b => libraryIds.has(String(b.id))));
-      } catch (err) {
-        console.warn("library load failed", err);
-      }
-    }
-
-    async function loadTransactions() {
-      if (!reader) return;
-      const { data, error } = await supabase.from("transactions").select("*").eq("user_id", reader.id).order("created_at", { ascending: false }).limit(20);
-
-      if (error) {
-        console.warn("Transactions load error:", error.message);
-        const trans = $("transactions");
-        if (trans) trans.innerHTML = `<p class="muted">Transaction history is unavailable right now.</p>`;
-        return;
-      }
-
-      const trans = $("transactions");
-      if (!trans) return;
-      if (!data || data.length === 0) {
-        trans.innerHTML = `<p class="muted">No transactions yet.</p>`;
-        return;
-      }
-
-      trans.innerHTML = data.map(t => `
-        <div class="chapter-row">
-          <span>${t.payment_status || "Transaction"} · ${t.amount_ngn ?? 0} NGN</span>
-          <span>${t.coins_added ?? 0} coins</span>
-        </div>
-      `).join("");
-    }
-
-    async function loadNotifications() {
-      const list = $("notification-list");
-      if (!list) return;
-      if (!reader) {
-        list.innerHTML = `<p class="muted">Log in to view your notifications.</p>`;
-        return;
-      }
-
-      const { data, error } = await supabase.from("notification").select("*").eq("user_id", reader.id).order("created_at", { ascending: false }).limit(30);
-      if (error) {
-        console.warn("Notifications load error:", error.message);
-        list.innerHTML = `<p class="muted">Notifications are unavailable right now.</p>`;
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        list.innerHTML = `<p class="muted">You're all caught up. No notifications are available.</p>`;
-        return;
-      }
-
-      list.innerHTML = data.map(n => `
-        <article class="chapter-row">
-          <div class="chapter-label">
-            <strong>${escapeHTML(n.title || "Notification")}</strong>
-            <p class="muted">${escapeHTML(n.message || n.body || "")}</p>
-            <small class="muted">${new Date(n.created_at).toLocaleString()}</small>
-          </div>
-          <span class="tag">${escapeHTML(n.type || "info")}</span>
-        </article>
-      `).join("");
-    }
-
-    async function openBook(id) {
-      currentBook = books.find(b => String(b.id) === String(id));
-      if (!currentBook) return;
-
-      const detailTitle = $("detail-title");
-      const detailAuthor = $("detail-author");
-      const detailGenre = $("detail-genre");
-      const detailDescription = $("detail-description");
-      const detailStatus = $("detail-status");
-      const detailCover = $("detail-cover");
-      const saveBook = $("save-book");
-      const chapterList = $("chapter-list");
-
-      if (detailTitle) detailTitle.textContent = currentBook.title || "Untitled story";
-      if (detailAuthor) detailAuthor.textContent = currentBook.author_name || currentBook.author || "";
-      if (detailGenre) detailGenre.textContent = currentBook.genre || "Fiction";
-      if (detailDescription) detailDescription.textContent = currentBook.synopsis || currentBook.description || "Discover this story on Fictional World Library.";
-      if (detailStatus) detailStatus.textContent = currentBook.status || "";
-
-      if (detailCover) {
-        const cover = currentBook.cover_url || currentBook.cover_image;
-        detailCover.innerHTML = cover
-          ? `<img src="${escapeHTML(cover)}" alt="" style="width:100%;height:100%;object-fit:cover;">`
-          : `<div class="cover-fallback">${escapeHTML(currentBook.title || "Story")}</div>`;
-      }
-
-      if (saveBook) saveBook.textContent = libraryIds.has(String(id)) ? "✓ In my library" : "＋ Add to library";
-      if (chapterList) chapterList.innerHTML = `<p class="muted">Loading chapters...</p>`;
-
-      showPage("book");
-
-      try {
-        const { data, error } = await supabase.from("chapters").select("*").eq("book_id", String(id)).order("chapter_number", { ascending: true });
-        if (error) {
-          console.error("Chapters:", error);
-          if (chapterList) chapterList.innerHTML = `<p class="muted">Chapters could not be loaded. Please try again.</p>`;
-          return;
-        }
-
-        chapters = (data || []).filter(c => String(c.pub_status || "").trim().toLowerCase() === "published");
-        renderChapterList();
-      } catch (err) {
-        if (chapterList) chapterList.innerHTML = `<p class="muted">Chapters are unavailable right now.</p>`;
-      }
-    }
-
-    function renderChapterList() {
-      const chapterList = $("chapter-list");
-      if (!chapterList) return;
-
-      chapterList.innerHTML = chapters.length
-        ? chapters.map((c, i) => {
-            const locked = c.locked === true && !unlockedChapterIds.has(String(c.id));
-            return `
-              <div class="chapter-row">
-                <span class="chapter-label">${locked ? "🔒" : "📖"} ${escapeHTML(c.title || `Chapter ${i + 1}`)}</span>
-                <span class="chapter-price ${locked ? "locked" : "free"}">${locked ? "25 coins" : "FREE"}</span>
-                <button class="btn ${locked ? "" : "primary"} open-chapter" data-index="${i}">${locked ? "Unlock" : "Read"}</button>
-              </div>
-            `;
-          }).join("")
-        : `<div class="empty">No published chapters are available yet.</div>`;
-    }
-
-    async function openChapter(index) {
-      if (!reader) {
-        notify("Please log in to read chapters.");
-        showPage("account");
-        return;
-      }
-
-      const chapter = chapters[index];
-      if (!chapter) return;
-      const chapterId = String(chapter.id);
-      const isLocked = chapter.locked === true && !unlockedChapterIds.has(chapterId);
-
-      if (isLocked) {
-        if (!confirm("Unlock this chapter for 25 coins?")) return;
-        try {
-          const { data: unlockData, error: unlockError } = await supabase.rpc("unlock_chapter", { p_chapter_id: chapterId });
-          if (unlockError) {
-            console.error("Unlock error:", unlockError);
-            notify(unlockError.message || "Unable to unlock chapter.");
-            return;
-          }
-          if (unlockData?.success !== true) {
-            notify("The chapter could not be unlocked.");
-            return;
-          }
-
-          unlockedChapterIds.add(chapterId);
-          await loadProfile();
-          renderChapterList();
-        } catch (err) {
-          console.error(err);
-          notify("Unable to unlock chapter right now.");
-          return;
-        }
-      }
-
-      try {
-        const { data, error } = await supabase.rpc("get_chapter_content", { p_chapter_id: chapterId });
-        if (error) {
-          console.error("Chapter content error:", error);
-          notify(error.message || "The chapter could not be opened.");
-          return;
-        }
-
-        const content = typeof data === "string" ? data : data?.content || "";
-        if (!content) {
-          notify("Chapter content is unavailable.");
-          return;
-        }
-
-        displayChapter(index, chapter, content);
-      } catch (err) {
-        console.error(err);
-        notify("The chapter could not be opened.");
-      }
-    }
-
-    function displayChapter(index, chapter, content) {
-      currentChapterIndex = index;
-      const readerBookTitle = $("reader-book-title");
-      const readerChapterTitle = $("reader-chapter-title");
-      const readerContent = $("reader-content");
-      const previousBtn = $("previous-chapter");
-      const nextBtn = $("next-chapter");
-
-      if (readerBookTitle) readerBookTitle.textContent = currentBook?.title || "";
-      if (readerChapterTitle) readerChapterTitle.textContent = chapter.title || `Chapter ${index + 1}`;
-      if (readerContent) readerContent.textContent = content;
-      if (previousBtn) previousBtn.disabled = index <= 0;
-      if (nextBtn) nextBtn.disabled = index >= chapters.length - 1;
-      showPage("reader");
-    }
-
-    async function buyProduct(type, id) {
-      if (!reader) {
-        notify("Please log in before making a purchase.");
-        showPage("account");
-        return;
-      }
-
-      notify("Connecting to secure checkout...");
-      try {
-        const { data, error } = await supabase.functions.invoke("initialize-payment", {
-          body: { product_type: type, product_id: id, billing_cycle: "monthly" }
-        });
-
-        if (error || !data?.authorization_url) {
-          notify("Checkout could not be started. Please try again later.");
-          console.error(error || data);
-          return;
-        }
-
-        window.location.href = data.authorization_url;
-      } catch (err) {
-        console.error(err);
-        notify("Checkout could not be started. Please try again later.");
-      }
-    }
-
-    $("search-btn")?.addEventListener("click", renderBooks);
-    $("search-input")?.addEventListener("input", renderBooks);
-
-    $("theme-toggle")?.addEventListener("click", () => {
-      document.body.classList.toggle("light");
-      localStorage.setItem("fw-theme", document.body.classList.contains("light") ? "light" : "dark");
+    document.addEventListener("DOMContentLoaded", () => {
+      renderMembershipSection();
+      renderGenres();
+      loadBooks();
+      loadProfile();
+      initAuthForm();
+      signIn();
     });
-
-    $("settings-theme")?.addEventListener("click", () => $("theme-toggle")?.click());
-    if (localStorage.getItem("fw-theme") === "light") document.body.classList.add("light");
-
-    $("switch-auth")?.addEventListener("click", () => {
-      isRegister = !isRegister;
-      const heading = $("account-heading");
-      const desc = $("account-description");
-      const nameField = $("name-field");
-      const authName = $("auth-name");
-      const submit = $("auth-form").querySelector("button[type='submit']");
-      const switchBtn = $("switch-auth");
-
-      if (heading) heading.textContent = isRegister ? "Create your account" : "Welcome back";
-      if (desc) desc.textContent = isRegister ? "Join Fictional World Library." : "Log in to continue your reading journey.";
-      if (nameField) nameField.hidden = !isRegister;
-      if (authName) authName.required = isRegister;
-      if (submit) submit.textContent = isRegister ? "Create account" : "Log in";
-      if (switchBtn) switchBtn.textContent = isRegister ? "Already have an account? Log in" : "Create an account";
-    });
-
-    $("auth-form")?.addEventListener("submit", async e => {
-      e.preventDefault();
-      const email = $("auth-email").value.trim();
-      const password = $("auth-password").value;
-      const msg = $("auth-message");
-      if (msg) msg.textContent = "Please wait...";
-
-      let result;
-      if (isRegister) {
-        result = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { display_name: $("auth-name").value.trim() } }
-        });
-      } else {
-        result = await supabase.auth.signInWithPassword({ email, password });
-      }
-
-      if (result.error) {
-        if (msg) msg.textContent = result.error.message;
-        return;
-      }
-
-      if (isRegister && !result.data.session) {
-        if (msg) msg.textContent = "Check your email to confirm your account.";
-        return;
-      }
-
-      reader = result.data.user || result.data.session?.user || null;
-      if (msg) msg.textContent = "You're signed in.";
-      updateAccountUI();
-      await loadProfile();
-      await loadLibrary();
-      await loadTransactions();
-      await loadNotifications();
-      showPage("profile");
-    });
-
-    $("forgot-password")?.addEventListener("click", () => showPage("reset"));
-
-    $("reset-form")?.addEventListener("submit", async e => {
-      e.preventDefault();
-      const email = $("reset-email").value.trim();
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
-      notify(error ? error.message : "If the email is registered, a reset link will be sent.");
-    });
-
-    $("logout-btn")?.addEventListener("click", async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        notify(error.message || "Could not sign out.");
-        return;
-      }
-
-      reader = null;
-      libraryIds.clear();
-      unlockedChapterIds.clear();
-      updateAccountUI();
-      const coin = $("coin-count");
-      const wallet = $("wallet-coins");
-      const prof = $("profile-coins");
-      const saved = $("profile-saved");
-      const trans = $("transactions");
-
-      if (coin) coin.textContent = "0";
-      if (wallet) wallet.textContent = "0";
-      if (prof) prof.textContent = "0";
-      if (saved) saved.textContent = "0";
-      if (trans) trans.innerHTML = `<p class="muted">Log in to view transactions.</p>`;
-      notify("You have logged out.");
-      showPage("home");
-    });
-
-    $("save-profile")?.addEventListener("click", async () => {
-      if (!reader) {
-        notify("Please log in first.");
-        showPage("account");
-        return;
-      }
-
-      const name = $("profile-display-name").value.trim();
-      const gender = $("profile-gender").value;
-
-      try {
-        const { error: authError } = await supabase.auth.updateUser({
-          data: { display_name: name, gender }
-        });
-        if (authError) console.warn("auth update failed", authError.message);
-
-        const { data, error } = await supabase.from("users").upsert({
-          auth_user_id: reader.id,
-          name,
-          gender,
-          email: reader.email,
-          updated_at: new Date().toISOString()
-        }, { onConflict: "auth_user_id" }).select().single();
-
-        if (error) {
-          console.warn("profile save failed", error.message);
-          notify(error.message || "Could not save your profile.");
-          return;
-        }
-
-        setProfileFields({
-          name: data?.name || name,
-          gender: data?.gender || gender,
-          auth_user_id: reader.id,
-          email: reader.email,
-          subscription_tier: data?.subscription_tier || "Free"
-        });
-        notify("Profile saved.");
-      } catch (err) {
-        console.error(err);
-        notify("Profile could not be saved.");
-      }
-    });
-
-    $("save-book")?.addEventListener("click", async () => {
-      if (!reader || !currentBook) {
-        notify("Please log in to save stories.");
-        showPage("account");
-        return;
-      }
-
-      const id = String(currentBook.id);
-      if (libraryIds.has(id)) {
-        notify("This story is already in your library.");
-        return;
-      }
-
-      const { error } = await supabase.from("library").insert({ user_id: reader.id, book_id: id });
-      if (error) {
-        notify(error.message);
-      } else {
-        libraryIds.add(id);
-        const saveBook = $("save-book");
-        if (saveBook) saveBook.textContent = "✓ In my library";
-        await loadLibrary();
-        notify("Added to your library.");
-      }
-    });
-
-    $("start-reading")?.addEventListener("click", () => {
-      if (chapters.length) openChapter(0);
-      else notify("No chapters are available yet.");
-    });
-
-    $("back-to-book")?.addEventListener("click", () => showPage("book"));
-    $("previous-chapter")?.addEventListener("click", () => {
-      if (currentChapterIndex > 0) openChapter(currentChapterIndex - 1);
-    });
-    $("next-chapter")?.addEventListener("click", () => {
-      if (currentChapterIndex < chapters.length - 1) openChapter(currentChapterIndex + 1);
-    });
-
-    function updateAccountUI() {
-      const nav = $("login-nav");
-      if (nav) nav.textContent = reader ? "Profile" : "My Account";
-    }
-
-    document.addEventListener("click", e => {
-      const pageButton = e.target.closest("[data-page]");
-      if (pageButton) {
-        e.preventDefault();
-        showPage(pageButton.dataset.page);
-      }
-
-      const genreButton = e.target.closest("[data-genre]");
-      if (genreButton) {
-        selectedGenre = genreButton.dataset.genre;
-        renderBooks();
-        showPage("browse");
-      }
-
-      const card = e.target.closest("[data-open-book]");
-      if (card) openBook(card.dataset.openBook);
-
-      const chapterButton = e.target.closest(".open-chapter");
-      if (chapterButton) openChapter(Number(chapterButton.dataset.index));
-
-      const purchase = e.target.closest(".buy-product");
-      if (purchase) buyProduct(purchase.dataset.type, purchase.dataset.id);
-
-      const libraryFilter = e.target.closest("[data-library-filter]");
-      if (libraryFilter) {
-        const status = libraryFilter.dataset.libraryFilter;
-        renderBookList("library-books", books.filter(b =>
-          libraryIds.has(String(b.id)) &&
-          (status === "all" || String(b.status || "").toLowerCase() === status)
-        ));
-      }
-    });
-
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      reader = session?.user || null;
-      updateAccountUI();
-      if (reader) {
-        await loadProfile();
-        await loadLibrary();
-        await loadTransactions();
-        await loadNotifications();
-        if ($("page-account") && $("page-account").classList.contains("active")) showPage("profile");
-      } else {
-        libraryIds.clear();
-        setProfileFields({ name: "Reader", auth_user_id: "", email: "" });
-      }
-    });
-
-    async function getSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) console.warn(error.message);
-      reader = session?.user || null;
-      updateAccountUI();
-      if (reader) {
-        await loadProfile();
-        await loadLibrary();
-        await loadTransactions();
-        await loadNotifications();
-      }
-    }
-
-    renderGenres();
-    renderPackages();
-    renderBooks();
-    loadBooks();
-    getSession();
   </script>
 </body>
 </html>
